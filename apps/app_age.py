@@ -12,10 +12,10 @@ colors = {
     'text': '#7FDBFF'
 }
 
-age_data = age.Age_Structure("./data/users.csv")
-#tuple类型 用于存放年龄段列表和占比列表
+file_path = "D:/python/code/data/users.csv"
+
+age_data = age.Age_Structure(file_path)
 age_struct = age_data.get_structure()
-#dict类型 用于存放各年龄所对应的用户数
 age_dict = age_data.process_data()
 
 df = pd.DataFrame({
