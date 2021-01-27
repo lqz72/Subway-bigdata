@@ -12,7 +12,7 @@ class DataSource(object):
         用于提供数据分析所需的各种数据 
     '''
     def __init__(self):
-        abs_path = os.getcwd() + '/Subway-bigdata/PredictModel/csv_data/'
+        abs_path = os.path.abspath(os.path.dirname(__file__)) + '/csv_data/'
         self.file_path = {
             'station': abs_path + 'station.csv',
             'trips': abs_path + 'trips.csv',
@@ -158,3 +158,4 @@ class DataSource(object):
         '''
         date_flow = flow_data.groupby(by=['day'])['客流量'].sum()
         return date_flow
+

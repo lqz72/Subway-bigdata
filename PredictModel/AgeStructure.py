@@ -8,6 +8,7 @@ def get_age_structure():
     label = ["0-17岁", "18-40岁", "41—65岁", "大于66岁"]
 
     age_dict = DataSource().get_age_data()
+
     # 创建一个字典用于存放 年龄段分布
     temp_dict = dict.fromkeys(label, 0)
     for age in age_dict:
@@ -24,5 +25,7 @@ def get_age_structure():
     for val in temp_dict.values():
         percent.append((val * 100) / all_num)
 
-    return label, percent   
-    
+    return label, percent
+
+
+print(get_age_structure())
