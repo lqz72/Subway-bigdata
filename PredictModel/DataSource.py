@@ -6,13 +6,15 @@ from datetime import datetime
 import os
 from sys import path
 
+
+
 class DataSource(object):
     '''
     通用数据解析类:
         用于提供数据分析所需的各种数据 
     '''
     def __init__(self):
-        abs_path = os.getcwd() + '/Subway-bigdata/PredictModel/csv_data/'
+        abs_path = os.path.abspath(os.path.dirname(__file__)) + '/csv_data/'
         self.file_path = {
             'station': abs_path + 'station.csv',
             'trips': abs_path + 'trips.csv',
@@ -28,6 +30,7 @@ class DataSource(object):
         获取年龄分布 返回一个字典 {'age': amount}
         '''
         age_list = self.age_df.groupby(by="出生年份").count()["用户ID"]
+         
         age_index = [2021 - i for i in age_list.index]
         age_values = age_list.values
 

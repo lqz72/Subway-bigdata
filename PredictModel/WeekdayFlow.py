@@ -18,3 +18,5 @@ def get_weekday_flow():
         week_flow_dict[i] = temp_dict
 
     return week_flow_dict
+
+print(get_weekday_flow())

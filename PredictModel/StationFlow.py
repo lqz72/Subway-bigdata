@@ -34,3 +34,4 @@ def get_sta_flow():
 
     return in_data_dict, out_data_dict
 
+print(get_sta_flow())

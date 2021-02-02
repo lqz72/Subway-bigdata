@@ -1,5 +1,6 @@
 from DataSource import *
 
+
 def get_age_structure():
     '''
     获取年龄结构 返回一个元组 分别为年龄段 和 对应的百分比
@@ -25,4 +26,5 @@ def get_age_structure():
         percent.append((val * 100) / all_num)
 
     return label, percent   
-    
+
+print(get_age_structure())
