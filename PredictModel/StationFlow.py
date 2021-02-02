@@ -3,7 +3,7 @@ from DataSource import *
 def get_sta_flow():
     '''
     单站的点出/入站客流分析
-    返回两个字典 分别存储进站和出站数据 格式{'station_name':num}
+    返回两个字典 分别存储进站和出站数据 格式{'station_name':{'month':num}}
     '''
     in_df, out_df = DataSource().clean_data()
     
