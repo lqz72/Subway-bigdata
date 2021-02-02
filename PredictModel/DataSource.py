@@ -7,13 +7,11 @@ from datetime import datetime
 import os
 from sys import path
 
-
 class DataSource(object):
     '''
     通用数据解析类:
         用于提供数据分析所需的各种数据 
     '''
-
     def __init__(self):
         abs_path = os.path.abspath(os.path.dirname(__file__)) + '/csv_data/'
         self.file_path = {
@@ -22,18 +20,15 @@ class DataSource(object):
             'users': abs_path + 'users.csv',
             'flow': abs_path + 'flow.csv',
         }
-        self.sta_df = pd.read_csv(
-            self.file_path['station'], encoding='gb18030')
-        self.trips_df = pd.read_csv(
-            self.file_path['trips'], encoding='gb18030')
+        self.sta_df = pd.read_csv(self.file_path['station'], encoding='gb18030')
+        self.trips_df = pd.read_csv(self.file_path['trips'], encoding='gb18030')
         self.age_df = pd.read_csv(self.file_path['users'], encoding='gb18030')
-
+        
     def get_age_data(self):
         '''
         获取年龄分布 返回一个字典 {'age': amount}
         '''
         age_list = self.age_df.groupby(by="出生年份").count()["用户ID"]
-
         age_index = [2021 - i for i in age_list.index]
         age_values = age_list.values
 
@@ -45,19 +40,19 @@ class DataSource(object):
         '''
         数据清洗 返回一个元组 存储进站和出站各自的dataframe
         '''
-        # 删去含有空缺值的行
+        #删去含有空缺值的行
         if True in pd.isnull(self.trips_df):
-            self.trips_df.dropna(axis=0, how='any', inplace=True)
+            self.trips_df.dropna(axis = 0, how = 'any', inplace = True)
 
-        # 检验是否含有重复的行
+        #检验是否含有重复的行
         if True in self.trips_df.duplicated():
-            # 删去重复行
+            #删去重复行
             self.trips_df.drop_duplicates(inplace=True)
+            
+        in_df = self.trips_df.loc[:,['进站名称','进站时间']]
+        out_df = self.trips_df.loc[:,['出站名称','出站时间']]
 
-        in_df = self.trips_df.loc[:, ['进站名称', '进站时间']]
-        out_df = self.trips_df.loc[:, ['出站名称', '出站时间']]
-
-        # 获取站点列表
+        #获取站点列表
         self.sta_list = self.sta_df["站点名称"].tolist()
 
         # 获取所有进站行程中出现的站点
@@ -68,13 +63,11 @@ class DataSource(object):
         # 非法的站点名称 ['Sta104', 'Sta14', 'Sta5', 'Sta155', 'Sta98']
         ill_sta_list = list((set(self.sta_list) ^ trips_sta_set))
 
-        # 经验证 trips.csv中存在不存在的站点以及错误的站点名  需要删去 32583条
-        index_list_in = self.trips_df[self.trips_df["进站名称"].isin(
-            ill_sta_list)].index.tolist()
-        in_df.drop(index_list_in, axis=0, inplace=True)
+        #经验证 trips.csv中存在不存在的站点以及错误的站点名  需要删去 32583条
+        index_list_in = self.trips_df[self.trips_df["进站名称"].isin(ill_sta_list)].index.tolist()
+        in_df.drop(index_list_in, axis = 0, inplace = True)
 
-        index_list_out = self.trips_df[self.trips_df["出站名称"].isin(
-            ill_sta_list)].index.tolist()
+        index_list_out = self.trips_df[self.trips_df["出站名称"].isin(ill_sta_list)].index.tolist()
         out_df.drop(index_list_out, axis=0, inplace=True)
 
         return in_df, out_df
@@ -93,24 +86,23 @@ class DataSource(object):
         [1517815 rows x 5 columns]
         '''
         in_df, out_df = self.clean_data()
-        # 创建一个新的数据表 合并进站和出站
+        #创建一个新的数据表 合并进站和出站 
         in_df.columns = ['sta', 'time']
         out_df.columns = ['sta', 'time']
-        flow_df = pd.concat([in_df, out_df], axis=0)
+        flow_df = pd.concat([in_df, out_df], axis = 0)
 
-        # 增加一列 显示日期 格式：20xx-xx-xx
+        #增加一列 显示日期 格式：20xx-xx-xx
         flow_df['day'] = pd.to_datetime(flow_df['time']).dt.normalize()
 
-        # 增加一列 显示星期 格式：1~7
+        #增加一列 显示星期 格式：1~7 
         day_name = [1, 2, 3, 4, 5, 6, 7]
-        flow_df['dayofweek'] = flow_df['day'].apply(
-            lambda x: day_name[x.weekday()])
+        flow_df['dayofweek'] = flow_df['day'].apply(lambda x: day_name[x.weekday()])
 
-        # 增加一列 显示月份 格式：1~12
+        #增加一列 显示月份 格式：1~12
         flow_df['month'] = flow_df['day'].dt.month
 
-        # 根据时间重排列
-        flow_df.sort_values(by='time', ascending=True, inplace=True)
+        #根据时间重排列
+        flow_df.sort_values(by = 'time', ascending = True, inplace = True)
         flow_df.index = range(flow_df.shape[0])
 
         flow_df.to_csv(self.file_path['flow'], encoding='gb18030', index=0)
@@ -130,10 +122,9 @@ class DataSource(object):
 
         [30505 rows x 3 columns]
         '''
-        flow_data = self.get_flow_df()
+        flow_data = self.get_flow_df() 
         flow_data['flow'] = 1
-        flow_data = flow_data.groupby(by=['day', 'sta'], as_index=False)[
-            'flow'].count()
+        flow_data = flow_data.groupby(by=['day', 'sta'], as_index=False)['flow'].count()
         return flow_data
 
     @staticmethod
@@ -148,8 +139,7 @@ class DataSource(object):
         2020-06-30     88
         '''
         tag_data = flow_data[flow_data['sta'] == station_name]
-        sta_series = pd.Series(
-            tag_data['flow'].values, index=tag_data['day'].values)
+        sta_series = pd.Series(tag_data['flow'].values, index = tag_data['day'].values)
         return sta_series
 
     @staticmethod
@@ -164,3 +154,18 @@ class DataSource(object):
         2020-07-15    14390
         2020-07-16    14379
         '''
+        date_series = flow_data.groupby(by=['day'])['flow'].sum()
+        return date_series
+
+    @staticmethod
+    def get_month_list(time_list):
+        '''
+        获取所有行程中出现的年月
+        接收一个时间序列 返回一个有序的字符串列表
+        '''
+        month_list = [i.strftime("%Y-%m") for i in time_list]
+        month_list = list(set(month_list))
+        month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
+        return month_list
+
+

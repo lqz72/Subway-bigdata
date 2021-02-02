@@ -4,13 +4,12 @@ from pyecharts.charts import Radar
 from pyecharts.charts import Pie
 from pyecharts.faker import Faker
 
-
 def get_age_structure():
     '''
     获取年龄结构 返回一个元组 分别为年龄段 和 对应的百分比
     '''
     label = ["0-20岁", "21-30岁", "31-40岁", "41—50岁", "大于50岁"]
-    percent = []
+    percent  = []
     age_dict = DataSource().get_age_data()
 
     # 创建一个字典用于存放 年龄段分布
@@ -33,7 +32,6 @@ def get_age_structure():
 
     return label, percent
 
-
 def age_radar(age, percent) -> Radar:
     c = (
         Radar()
@@ -49,7 +47,6 @@ def age_radar(age, percent) -> Radar:
     )
     return c
 
-
 def age_pie(age, percent) -> Pie:
     c = (
         Pie()
@@ -60,10 +57,13 @@ def age_pie(age, percent) -> Pie:
         )
         .set_global_opts(
             title_opts=opts.TitleOpts(title="Pie"),
-            legend_opts=opts.LegendOpts(
-                type_="scroll", pos_left="80%", orient="vertical"),
+            legend_opts=opts.LegendOpts(type_="scroll", pos_left="80%", orient="vertical"),
         )
         .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}%"))
         .render("./age_pie.html")
     )
     return c
+
+# age, percent = get_age_structure()
+# age_pie(age, percent)
+# age_radar(age, percent)
