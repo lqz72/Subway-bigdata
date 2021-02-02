@@ -22,7 +22,7 @@ def data():
     age, value = AgeStructure.get_age_structure()
 
     #return json.dumps({'age':age,'value':value},ensure_ascii=False) #如果有中文的话，就需要ensure_ascii=False
-    return render_template('data.html', age = age, num = num)
+    return render_template('data.html', age = age, value = value)
 
 if __name__ == '__main__':
     app.run()
