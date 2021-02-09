@@ -1,0 +1,71 @@
+/* 首页 */
+.bd{
+    width: 200px;
+    height: 100px;
+    margin: 200px auto;
+    text-align: center;
+}
+.bd div {
+    height: 50px;
+    line-height: 50px;
+}
+
+/* 历史数据分析 */
+.history {
+    margin: 100px auto;
+    width: 300px;
+    padding-top: 1px;
+}
+.history div {
+    height: 40px;
+    margin-bottom: 15px;
+    border: 2px solid rgb(0, 153, 255);
+    border-radius: 10px;
+    text-align: center;
+    line-height: 38px;
+}
+
+/* 单月整体 */
+.wholemonthsheet {
+    width: 1000px;
+    height: 500px;
+    margin: 50px auto;
+    background-color: pink;
+    border: 1px red solid;
+}
+
+/* 工作日和周末 */
+.weeksheet {
+    width: 1000px;
+    height: 500px;
+    margin: 50px auto;
+    background-color: pink;
+    border: 1px red solid;
+}
+
+/* 单站点入点出 */
+.stationsheet {
+    width: 1000px;
+    height: 500px;
+    margin: 50px auto;
+    background-color: pink;
+    border: 1px red solid;
+}
+
+/* 年龄结构 */
+.agesheet {
+    width: 1000px;
+    height: 500px;
+    margin: 50px auto;
+    background-color: pink;
+    border: 1px red solid;
+}
+
+/* 早晚高峰 */
+.dayhighsheet {
+    width: 1000px;
+    height: 500px;
+    margin: 50px auto;
+    background-color: pink;
+    border: 1px red solid;
+}

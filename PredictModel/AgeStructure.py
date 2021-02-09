@@ -2,7 +2,6 @@ from DataSource import *
 from pyecharts import options as opts
 from pyecharts.charts import Radar
 from pyecharts.charts import Pie
-from pyecharts.faker import Faker
 
 def get_age_structure():
     '''
@@ -33,6 +32,10 @@ def get_age_structure():
     return label, percent
 
 def age_radar(age, percent) -> Radar:
+    '''
+    绘制年龄结构分布图
+    返回一个雷达图
+    '''
     c = (
         Radar()
         .add_schema(
@@ -48,6 +51,10 @@ def age_radar(age, percent) -> Radar:
     return c
 
 def age_pie(age, percent) -> Pie:
+    '''
+    绘制年龄结构分布图
+    返回一个饼状图
+    '''
     c = (
         Pie()
         .add(
@@ -56,14 +63,14 @@ def age_pie(age, percent) -> Pie:
             center=["40%", "50%"],
         )
         .set_global_opts(
-            title_opts=opts.TitleOpts(title="Pie"),
+            title_opts=opts.TitleOpts(title="用户年龄结构分布"),
             legend_opts=opts.LegendOpts(type_="scroll", pos_left="80%", orient="vertical"),
         )
         .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}%"))
-        .render("./age_pie.html")
+
     )
     return c
 
-# age, percent = get_age_structure()
+age, percent = get_age_structure()
 # age_pie(age, percent)
 # age_radar(age, percent)

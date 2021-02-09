@@ -1,4 +1,6 @@
 from DataSource import *
+from pyecharts import options as opts
+from pyecharts.charts import Line, Timeline
 
 def get_month_flow():
     '''
@@ -20,4 +22,36 @@ def get_month_flow():
 
     return month_dict
 
-# get_month_flow()
+def month_line(month_dict) -> Line:
+    '''
+    绘制单月整体客流分布
+    返回一个Line图表
+    '''
+    tl = Timeline()
+    for i in month_dict:
+        day = month_dict[i].keys()
+        flow = [str(j) for j in month_dict[i].values()]
+        line = (
+            Line()
+            .add_xaxis(xaxis_data = day)
+            .add_yaxis(
+                series_name= "{}月客流".format(int(i[-2:])),
+                y_axis=flow,
+                label_opts=opts.LabelOpts(is_show=False)
+            )
+            .set_global_opts(
+                title_opts=opts.TitleOpts(title="单月整体客流波动"),
+                tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                yaxis_opts=opts.AxisOpts(
+                    name = "客流量/人次",
+                    type_="value",
+                    splitline_opts=opts.SplitLineOpts(is_show=True),
+                ),
+                xaxis_opts=opts.AxisOpts(name = "日期", type_="category", boundary_gap=False),
+            )
+        )
+        tl.add(line, "{0}年{1}月".format(i[0:4], int(i[-2:])))
+    return tl
+    
+month_dict = get_month_flow()
+# month_line(month_dict)

@@ -52,7 +52,7 @@ def get_train_data():
 def get_sta_df(df, sta_name):
     return df[df['sta'] == sta_name]
 
-def train_test_split(X, y, train_size=0.9)
+def train_test_split(X, y, train_size=0.9):
     '''
     划分训练集和测试集
     '''

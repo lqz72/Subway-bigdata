@@ -3,7 +3,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from datetime import datetime
-
 import os
 from sys import path
 
@@ -36,24 +35,27 @@ class DataSource(object):
         age_dict = dict(zip(age_index, age_values))
         return age_dict
 
+    def get_station_list(self):
+        '''
+        返回有序站点列表
+        '''
+        sta_list = self.sta_df["站点名称"].tolist()
+        sta_list.sort(key = lambda x: int(x[3:]))
+        return sta_list
+
     def clean_data(self):
         '''
         数据清洗 返回一个元组 存储进站和出站各自的dataframe
         '''
-        #删去含有空缺值的行
-        if True in pd.isnull(self.trips_df):
-            self.trips_df.dropna(axis = 0, how = 'any', inplace = True)
-
-        #检验是否含有重复的行
-        if True in self.trips_df.duplicated():
-            #删去重复行
-            self.trips_df.drop_duplicates(inplace=True)
-            
+        #删去空缺值和重复行
+        self.trips_df.dropna(axis = 0, how = 'any', inplace = True)
+        self.trips_df.drop_duplicates(inplace=True)
+        
         in_df = self.trips_df.loc[:,['进站名称','进站时间']]
         out_df = self.trips_df.loc[:,['出站名称','出站时间']]
 
         #获取站点列表
-        self.sta_list = self.sta_df["站点名称"].tolist()
+        sta_list = self.get_station_list()
 
         # 获取所有进站行程中出现的站点
         in_sta_list = self.trips_df["进站名称"].tolist()
@@ -61,7 +63,7 @@ class DataSource(object):
         trips_sta_set = set(in_sta_list + out_sta_list)
 
         # 非法的站点名称 ['Sta104', 'Sta14', 'Sta5', 'Sta155', 'Sta98']
-        ill_sta_list = list((set(self.sta_list) ^ trips_sta_set))
+        ill_sta_list = list((set(sta_list) ^ trips_sta_set))
 
         #经验证 trips.csv中存在不存在的站点以及错误的站点名  需要删去 32583条
         index_list_in = self.trips_df[self.trips_df["进站名称"].isin(ill_sta_list)].index.tolist()
@@ -69,7 +71,7 @@ class DataSource(object):
 
         index_list_out = self.trips_df[self.trips_df["出站名称"].isin(ill_sta_list)].index.tolist()
         out_df.drop(index_list_out, axis=0, inplace=True)
-
+ 
         return in_df, out_df
 
     def get_flow_df(self):
@@ -96,7 +98,7 @@ class DataSource(object):
 
         #增加一列 显示星期 格式：1~7 
         day_name = [1, 2, 3, 4, 5, 6, 7]
-        flow_df['dayofweek'] = flow_df['day'].apply(lambda x: day_name[x.weekday()])
+        flow_df['weekday'] = flow_df['day'].apply(lambda x: day_name[x.weekday()])
 
         #增加一列 显示月份 格式：1~12
         flow_df['month'] = flow_df['day'].dt.month
@@ -126,7 +128,7 @@ class DataSource(object):
         flow_data['flow'] = 1
         flow_data = flow_data.groupby(by=['day', 'sta'], as_index=False)['flow'].count()
         return flow_data
-
+        
     @staticmethod
     def get_sta_series(flow_data, station_name):
         '''
@@ -168,4 +170,4 @@ class DataSource(object):
         month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
         return month_list
 
-
+station_list = DataSource().get_station_list()
