@@ -4,39 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css')}}">
-    <script src="https://cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
-    <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
+    <script src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
 </head>
 <body>
-    <div class="choose">
-        <form method="POST">
-            <select name="station_select" id = "" >
-                <option value="">请选择站点</option>
-                {% for i in station_list %}
-                <option value="{{ i }}">{{ i }}</option>
-                {% endfor %}
-            </select>  
-            <input type="submit" value="Submit">  
-        </form>
+    <!-- header区域 -->
+    <div class="header w">
+        <div class="logo">
+            logo
+        </div>
+        <div class="nav">
+            <ul>
+                <li><a href="/">首页</a></li>
+                <li><a href="/history/month_flow">历史数据分析</a></li>
+                <li><a href="#">数据预测</a></li>
+                <li><a href="#">关于我们</a></li>
+            </ul>
+        </div>
+        <div class="log">
+            <a href="#">xxx欢迎您</a>
+        </div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="history w">
+        <div class="type">
+            <ul>
+                <li class="addbgcorange"><a href="/history/month_flow">单月整体的客流波动分析</a></li>
+                <li><a href="/history/week_flow">工作日和周末的客流分析</a></li>
+                <li><a href="/history/station_flow">单站的点出</a></li>
+                <li><a href="/history/age">用户年龄结构分析</a></li>
+                <li><a href="/history/dayhigh">早晚高峰客流站点分布分析</a></li>
+                <li><a href="">站点OD客流量分析</a></li>
+                <li><a href="">线路断面（按站点）流量分析</a></li>
+                <li><a href="">拓展信息分析</a></li>
+            </ul>
+        </div>
+
+         <!-- 放图表的地方 -->
+         <div class="data"> 
+            <div class="choose">
+                <form method="POST">
+                    <select name="station_select" id = "" >
+                        <option value="">请选择站点</option>
+                        {% for i in station_list %}
+                        <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>  
+                    <input type="submit" value="Submit">  
+                </form>
+            </div> 
+
+            <div  id = "station_bar" class="stationgraph" ></div>
+            <script>
+                $(
+                    function(){
+                        var chart = echarts.init(document.getElementById('station_bar'), 'white', {renderer: 'canvas'});
+                        $.ajax({
+                            type: "GET",
+                            url: "http://127.0.0.1:5000/history/station_flow/bar",
+                            dataType: 'json',
+                            success: function (result) {
+                                chart.setOption(result);
+                            }
+                        });
+                    }
+                )
+            </script>
+        </div>
+    </div>
+
+    <!-- footer区域 -->
+    <div class="footer">
+        <div class="content w">
+            关于我们 简介
+        </div>
     </div>
     
-    <div id = "station_bar" class="stationsheet"></div>
-    <script>
-        $(
-            function(){
-                var chart = echarts.init(document.getElementById('station_bar'), 'white', {renderer: 'canvas'});
-                $.ajax({
-                    type: "GET",
-                    url: "http://127.0.0.1:5000/history/station_flow/bar",
-                    dataType: 'json',
-                    success: function (result) {
-                        chart.setOption(result);
-                    }
-                });
-            }
-        )
-    </script>
 </body>
 </html>

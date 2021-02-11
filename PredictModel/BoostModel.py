@@ -3,12 +3,13 @@ import numpy as np
 import os
 
 '''
-预测模型 方法待定 
+预测模型  采用xgboost集成算法
 '''
+
 abs_path = os.path.abspath(os.path.dirname(__file__)) + '/csv_data/'
 file_path = {
     'flow': abs_path + 'flow.csv',
-    'hoilday': abs_path + 'hoilday.csv'
+    'workday': abs_path + 'workdays2020.csv'
 }
 
 def get_train_data():
@@ -16,7 +17,7 @@ def get_train_data():
     获取训练数据
     '''
     flow_df = pd.read_csv(file_path['flow'], encoding='gb18030')
-    hoilday_df = pd.read_csv(file_path['hoilday'], encoding='gb18030', names = ['day', 'is_hoilday'])
+    workday_df = pd.read_csv(file_path['workday'], encoding='gb18030', names = ['day', 'type'])
 
     flow_df['flow'] =  1
     flow_df = flow_df.groupby(by=['day', 'sta', 'dayofweek', 'month'], as_index=False)['flow'].count()
@@ -62,5 +63,6 @@ def train_test_split(X, y, train_size=0.9):
     y_train, y_test = y[:split], y[split:]
 
     return X_train, X_test, y_train, y_test
+
 
 df = get_train_data()

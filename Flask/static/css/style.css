@@ -1,71 +1,150 @@
 /* 首页 */
-.bd{
+.w {
+    width: 1200px;
+    margin: 0 auto;
+}
+body {
+    background: #f3f5f7;
+}
+/* header区域 */
+.header {
+    height: 70px;
+    margin: 20px auto;
+    /* background-color: pink; */
+    line-height: 70px;
+}
+.logo {
+    float: left;
     width: 200px;
-    height: 100px;
-    margin: 200px auto;
+    background-color: red;
     text-align: center;
 }
-.bd div {
-    height: 50px;
-    line-height: 50px;
+.nav {
+    float: left;
+    margin-left: 50px;
 }
+.nav ul li {
+    float: left;
+    padding: 0 30px;
+    font-size: 18px;
+}
+.nav ul li:hover {
+    border-bottom: 2px solid rgba(0, 102, 255, 0.521);
+    background-color:  rgba(0, 102, 255, 0.137);
+}
+.log {
+    float: right;
+    width: 200px;
+    text-align: center;
+}
+.log a {
+    color: blue;
+}
+/* footer区域 */
+.footer {
+    height: 200px;
+    background-color: pink;
+}
+.footer .content {
+    height: 200px;
+    margin-top: 20px;
+    background-color: rgb(255, 0, 106);
+}
+
+/* 首页内容区域 */
+.banner {
+    background-color: rgba(0, 0, 255, 0.329);
+}
+.banner .bg {
+    height: 400px;
+    background-color: pink;
+}
+.bd {
+    height: 800px;
+    margin-top: 20px;
+    background-color: pink;
+}
+
+
 
 /* 历史数据分析 */
 .history {
-    margin: 100px auto;
-    width: 300px;
-    padding-top: 1px;
+    /* 清除浮动 */
+    overflow: hidden;
 }
-.history div {
+.history .type {
+    float: left;
+    width: 280px;
+    height: 700px;
+    background-color: #e6e6e6;
+}
+.history .type ul li {
+    position: relative;
     height: 40px;
-    margin-bottom: 15px;
-    border: 2px solid rgb(0, 153, 255);
-    border-radius: 10px;
-    text-align: center;
-    line-height: 38px;
+    padding-left: 20px;
+    line-height: 40px;
+}
+.history .type ul li:nth-child(1) {
+    margin-top: 30px;
+}
+.history .type ul li a {
+    font-size: 16px;
+}
+.history .type ul li:hover a{
+    color: blue;
+}
+.history .type ul li a::after {
+    position: absolute;
+    right: 25px;
+    content: '>';
+}
+.history .data {
+    float: left;
+    height: 700px;
+    width: 920px;
+    background-color: grey;
+}
+.addbgcorange {
+    background-color: orange;
 }
 
 /* 单月整体 */
-.wholemonthsheet {
-    width: 1000px;
-    height: 500px;
-    margin: 50px auto;
-    /* background-color: pink; */
-    border: 1px red solid;
+.history .data .wholemonthgraph {
+    height: 550px;
+    margin-top: 30px;
+    background-color: pink;
 }
 
 /* 工作日和周末 */
-.weeksheet {
-    width: 1000px;
-    height: 500px;
-    margin: 50px auto;
-    /* background-color: pink; */
-    border: 1px red solid;
+.history .data .weekgraph {
+    height: 550px;
+    margin-top: 30px;
+    background-color: pink;
 }
 
 /* 单站点入点出 */
-.stationsheet {
+.choose {
     width: 1000px;
-    height: 500px;
-    margin: 50px auto;
-    /* background-color: pink; */
-    border: 1px red solid;
+    margin: auto;
+    margin-top: 50px;
+}
+.history .data .stationgraph {
+    height: 550px;
+    margin-top: 30px;
+    background-color: pink;
 }
 
+
 /* 年龄结构 */
-.agesheet {
-    width: 1000px;
-    height: 500px;
-    margin: 50px auto;
-    /* background-color: pink; */
-    border: 1px red solid;
+.history .data .agegraph {
+    height: 550px;
+    margin-top: 30px;
+    background-color: pink;
 }
 
 /* 早晚高峰 */
-.dayhighsheet {
-    width: 1000px;
-    height: 500px;
-    margin: 50px auto;
+.history .data .dayhighgraph {
+    height: 550px;
+    margin-top: 30px;
     background-color: pink;
-    border: 1px red solid;
 }
