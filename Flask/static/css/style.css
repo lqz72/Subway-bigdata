@@ -100,9 +100,10 @@ body {
 }
 .history .data {
     float: left;
+    margin-left: 70px;
     height: 700px;
-    width: 920px;
-    background-color: grey;
+    width: 850px;
+    /* background-color: grey; */
 }
 .addbgcorange {
     background-color: orange;
@@ -112,26 +113,31 @@ body {
 .history .data .wholemonthgraph {
     height: 550px;
     margin-top: 30px;
-    background-color: pink;
+    /* background-color: pink; */
 }
 
 /* 工作日和周末 */
 .history .data .weekgraph {
     height: 550px;
     margin-top: 30px;
-    background-color: pink;
+    /* background-color: pink; */
 }
 
 /* 单站点入点出 */
-.choose {
-    width: 1000px;
-    margin: auto;
-    margin-top: 50px;
+.history .data .choose {
+    margin: 5px auto;
+}
+.history .data .choose select {
+    height: 25px;
+    width: 120px;
+}
+.history .data .choose input {
+    height: 25px;
+    width: 50px;
 }
 .history .data .stationgraph {
     height: 550px;
-    margin-top: 30px;
-    background-color: pink;
+    /* background-color: pink; */
 }
 
 
@@ -139,7 +145,7 @@ body {
 .history .data .agegraph {
     height: 550px;
     margin-top: 30px;
-    background-color: pink;
+    /* background-color: pink; */
 }
 
 /* 早晚高峰 */
