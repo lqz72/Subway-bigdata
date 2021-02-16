@@ -6,4 +6,5 @@ pip install xgboost -i http://pypi.douban.com/simple --trusted-host pypi.douban.
 pip install statsmodels -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 pip install scikit-learn -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 pip install scipy -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install joblib -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 pause
