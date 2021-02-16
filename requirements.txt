@@ -1,5 +1,8 @@
 flask
 numpy
 pandas
-matplotlib
 pyecharts
+xgboost
+statsmodels
+scikit-learn
+scipy
