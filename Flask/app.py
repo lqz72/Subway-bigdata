@@ -3,21 +3,43 @@ from flask import render_template
 from flask import redirect
 from sys import path
 import os
+import json
+import warnings
+warnings.filterwarnings('ignore')
 path.append('..')
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0])
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0] + 'PredictModel\\')
 from PredictModel import DataSource
-from PredictModel import AgeStructure, MonthFlow, StationFlow, WeekdayFlow
-app = Flask(__name__)
-
+from PredictModel import PeakFlow
+from PredictModel import MonthFlow, WeekdayFlow, AgeStructure, StationFlow
+app=Flask(__name__)
+abs_path = os.path.abspath(os.path.dirname(__file__))
+print(path)
+print(abs_path)
 #初始化站点名称 
 station_name="Sta1"
 
-#路由逻辑 控制模板的跳转和前后端的数据交互
+#网页根目录
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/echarts')
+def echarts():
+    return render_template('test.html')
+
+########echarts图表需要调用的api
+@app.route('/sta.json')
+def get_sta_json():
+    with open(abs_path + '/stations.json', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/link.json')
+def get_link_json():
+    with open(abs_path + '/links.json', 'r', encoding='utf-8') as f:
+        return f.read()
+
+########控制模板的跳转和前后端的数据交互
 @app.route('/history/age')
 def age():
     return render_template('age.html')
@@ -30,7 +52,7 @@ def month_flow():
 def week_flow():
     return render_template('week.html')
 
-@app.route('/history/station_flow', methods = ["GET", "POST"])
+@app.route('/history/station_flow', methods = ['GET', 'POST'])
 def station_flow():
     global station_name
     if request.method == "POST":
@@ -38,8 +60,12 @@ def station_flow():
     station_list = DataSource.station_list
     return render_template('station.html', station_list=station_list)
 
-@app.route('/history/dayhigh')
+@app.route('/history/dayhigh', methods = ['GET', 'POST'])
 def dayhigh():
+    # in_am, in_pm = PeakFlow.in_am, PeakFlow.in_pm
+    # out_am, out_pm = PeakFlow.out_am, PeakFlow.out_pm
+    # return render_template('dayhigh.html', in_am=in_am, in_pm=in_pm,
+    #     out_am=out_am, out_pm=out_pm)
     return render_template('dayhigh.html')
 
 #------------控制图表的展示----------------

@@ -23,12 +23,12 @@ scaler = StandardScaler() #标准化缩放器
 tscv = TimeSeriesSplit(n_splits=5)  #五折交叉验证
 
 #数据文件路径
-abs_path = os.path.abspath(os.path.dirname(__file__)) + '/csv_data/'
+abs_path = os.path.abspath(os.path.dirname(__file__)) 
 file_path = {
-    'flow': abs_path + 'flow.csv',
-    'hoilday': abs_path + 'hoilday2020.csv',
-    'weather': abs_path + 'weather2020.csv',
-    'feature': abs_path + 'feature2020.csv'
+    'flow': abs_path + '/csv_data/flow.csv',
+    'hoilday': abs_path + '/csv_data/hoilday2020.csv',
+    'weather': abs_path + '/csv_data/weather2020.csv',
+    'feature': abs_path + '/csv_data/feature2020.csv'
 }
 
 def mean_absolute_percentage_error(y_true, y_pred):
@@ -135,7 +135,7 @@ def plot_model_results(model, X_train, X_test, y_train, y_test, plot_intervals=F
     plt.legend(loc="best")
     plt.tight_layout()
     plt.grid(True)
-    plt.savefig('./predict.png')
+    plt.savefig(abs_path +'/predict.png')
 
 def short_forecast(train_df, train_size):
     '''
@@ -147,10 +147,13 @@ def short_forecast(train_df, train_size):
     X_train, X_test, y_train, y_test = train_test_split(X, y, train_size)
  
     #标准化处理
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
+    # X_train_scaled = scaler.fit_transform(X_train)
+    # X_test_scaled = scaler.transform(X_test)
 
-    best_param = get_best_param(X_train_scaled, y_train)
+    #best_param = get_best_param(X_train, y_train)
+    best_param = {'eta': 0.3, 'n_estimators': 100, 'gamma': 0.8888888888888888, 'max_depth': 7, 'min_child_weight': 1, 'colsample_bytree': 1, 'colsample_bylevel': 1, 'subsample': 
+    1, 'reg_lambda': 50.0, 'reg_alpha': 5.0, 'seed': 33}
+
 
     #调用xgboost回归器
     reg = XGBRegressor(**best_param)
@@ -222,10 +225,10 @@ def main():
     train_df = feature_coding(get_train_data())
 
     reg = short_forecast(train_df, train_size=0.9)
-    joblib.dump(reg, 'test_model.pkl')
+    joblib.dump(reg, abs_path + '/test_model.pkl')
 
     #调取训练模型
-    model = joblib.load('test_model.pkl')
+    model = joblib.load(abs_path + '/test_model.pkl')
 
     moving_avg = 3
     predict_list = []
@@ -235,7 +238,7 @@ def main():
         feature_df.MA3[index] = sum(feature_df.y.values[index - 3:index]) / moving_avg
         df = feature_df[index:index+1]
         X, y = df.drop(['y'], axis=1), df.y
-
+ 
         prediction = model.predict(X)[0]
         feature_df.y[index:index + 1] = prediction
         predict_list.append(prediction)
@@ -251,4 +254,3 @@ if __name__ == '__main__':
     # X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.9)
     
     # get_best_param(X_train, y_train)
-

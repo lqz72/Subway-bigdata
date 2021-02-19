@@ -171,3 +171,4 @@ class DataSource(object):
         return month_list
 
 station_list = DataSource().get_station_list()
+in_df, out_df = DataSource().clean_data()
