@@ -19,6 +19,7 @@ class DataSource(object):
             'users': abs_path + 'users.csv',
             'flow': abs_path + 'flow.csv',
         }
+        print(self.file_path['station'])
         self.sta_df = pd.read_csv(self.file_path['station'], encoding='gb18030')
         self.trips_df = pd.read_csv(self.file_path['trips'], encoding='gb18030')
         self.age_df = pd.read_csv(self.file_path['users'], encoding='gb18030')
@@ -71,7 +72,7 @@ class DataSource(object):
 
         index_list_out = self.trips_df[self.trips_df["出站名称"].isin(ill_sta_list)].index.tolist()
         out_df.drop(index_list_out, axis=0, inplace=True)
- 
+
         return in_df, out_df
 
     def get_flow_df(self):
@@ -110,7 +111,8 @@ class DataSource(object):
         flow_df.to_csv(self.file_path['flow'], encoding='gb18030', index=0)
         return flow_df
 
-    def get_flow_data(self):
+    @staticmethod
+    def get_flow_data(flow_df):
         '''
         获取日期序列对应站点的客流量(入站和出站之和) 返回一个dataframe
         dataframe格式如下
@@ -124,8 +126,10 @@ class DataSource(object):
 
         [30505 rows x 3 columns]
         '''
-        flow_data = self.get_flow_df() 
+        
+        flow_data = flow_df
         flow_data['flow'] = 1
+
         flow_data = flow_data.groupby(by=['day', 'sta'], as_index=False)['flow'].count()
         return flow_data
         
@@ -170,5 +174,5 @@ class DataSource(object):
         month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
         return month_list
 
-station_list = DataSource().get_station_list()
-in_df, out_df = DataSource().clean_data()
+# station_list = DataSource().get_station_list()
+# in_df, out_df = DataSource().clean_data()

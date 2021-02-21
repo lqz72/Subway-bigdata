@@ -9,15 +9,17 @@ warnings.filterwarnings('ignore')
 path.append('..')
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0])
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0] + 'PredictModel\\')
-from PredictModel import DataSource
-from PredictModel import PeakFlow
-from PredictModel import MonthFlow, WeekdayFlow, AgeStructure, StationFlow
+from DataAnalysis import DataApi
+from MakeChart import ChartApi
+from MysqlOS import SQLOS
+
 app=Flask(__name__)
 abs_path = os.path.abspath(os.path.dirname(__file__))
 print(path)
 print(abs_path)
 #初始化站点名称 
 station_name="Sta1"
+api = DataApi()
 
 #网页根目录
 @app.route('/')
@@ -57,7 +59,7 @@ def station_flow():
     global station_name
     if request.method == "POST":
         station_name = request.form.get("station_select")
-    station_list = DataSource.station_list
+    station_list = api.station_list
     return render_template('station.html', station_list=station_list)
 
 @app.route('/history/dayhigh', methods = ['GET', 'POST'])
@@ -71,25 +73,25 @@ def dayhigh():
 #------------控制图表的展示----------------
 @app.route('/history/age/pie')
 def age_pie():
-    age, percent = AgeStructure.age, AgeStructure.percent
-    age_pie = AgeStructure.age_pie(age, percent)
+    age, percent = api.age, api.percent
+    age_pie = ChartApi.age_pie(age, percent)
     return age_pie.dump_options_with_quotes()
 
 @app.route('/history/month_flow/line')
 def month_flow_line():
-    month_line = MonthFlow.month_line(MonthFlow.month_dict)
+    month_line = ChartApi.month_line(api.month_dict)
     return month_line.dump_options_with_quotes()
 
 @app.route('/history/week_flow/line')
 def week_flow_line():
-    week_line = WeekdayFlow.week_line(WeekdayFlow.week_dict)
+    week_line = ChartApi.week_line(api.week_dict)
     return week_line.dump_options_with_quotes()
 
 @app.route('/history/station_flow/bar')
 def station_flow_bar():
     global station_name
-    in_dict, out_dict = StationFlow.in_dict, StationFlow.out_dict
-    bar = StationFlow.station_bar(station_name, in_dict, out_dict)
+    in_dict, out_dict = api.in_dict, api.out_dict
+    bar = ChartApi.station_bar(station_name, in_dict, out_dict)
     return bar.dump_options_with_quotes()
 
 if __name__ == '__main__':
