@@ -14,19 +14,19 @@ class SQLOS(object):
         由于数据量的限制 使用pymysql对百万级别的数据进行读写速度很慢
         因此数据库的读取采取MySQLdb进行连接 pandas.read_sql转化为dataframe
         将dataframe导入数据库需要使用pandas.io.sql.to_sql 所以需要采取sqlalchemy引擎
-        pymysql仅仅在批量导入.txt文件时使用 
     '''
     def __init__(self):
         pass
     
     def connect_to_db():
-        #连接数据库
-        conn = MySQLdb.connect(host='localhost', port=3306, user='root', passwd='yongfufan',
-        db='data', charset = 'utf8mb4')
-        
-        #当需要使用pymysql时取消注释
-        # connection = pymysql.connect(host="localhost", port=3306, user="root",
-        #     passwd = "yongfufan", db = "data", charset='utf8mb4', local_infile=1)
+        #远程数据库连接
+        conn = MySQLdb.connect(host='118.178.88.14', port=3306, user='lqz',
+        passwd='863JTcyPGezGEXmm', db='lqz', charset='utf8mb4')
+
+        #本地数据库连接
+        # conn = MySQLdb.connect(host='localhost', port=3306, user='root',
+        # passwd='yongfufan', db='data', charset='utf8mb4')
+   
         return conn
     
     def load_data():
@@ -50,10 +50,15 @@ class SQLOS(object):
         try:
             for name, path in file_path.items():
                 print('正在载入%s中的数据' % name)
+                start = time.time()
+
                 sql = "LOAD DATA LOCAL INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\r\\n' IGNORE 1 LINES"  % (path, name)
                 cursor.execute(sql)
                 db.commit()
-                print('success!')
+
+                end = time.time()
+                print('读取时间:', end - start)
+
             db.close()
             print('seccess load all data to mysql!')
 
@@ -72,8 +77,14 @@ class SQLOS(object):
             table_name += '2020'
 
         try:
+            print('正在读取%s中的数据' % table_name)
+            start = time.time()
+
             sql = 'SELECT * FROM %s' % table_name
-            df = pd.read_sql(sql, con=conn)    
+            df = pd.read_sql(sql, con=conn)
+            
+            end = time.time()
+            print('读取时间:', end - start)
             conn.close()
             return df
         except Exception as e:
@@ -126,6 +137,7 @@ class SQLOS(object):
         trips_df.dropna(axis = 0, how = 'any', inplace = True)
         trips_df.drop_duplicates(inplace=True)
         
+    
         in_df = trips_df.loc[:,['user_id', 'in_sta_name','in_time']]
         out_df = trips_df.loc[:,['user_id', 'out_sta_name','out_time']]
 
@@ -147,8 +159,9 @@ class SQLOS(object):
         index_list_out = trips_df[trips_df['out_sta_name'].isin(ill_sta_list)].index.tolist()
         out_df.drop(index_list_out, axis=0, inplace=True)
 
-        SQLOS.write_df_data(in_df, 'in_trips')
-        SQLOS.write_df_data(out_df, 'out_trips')
+
+        # SQLOS.write_df_data(in_df, 'in_trips')
+        # SQLOS.write_df_data(out_df, 'out_trips')
 
     def get_flow_df():
         '''
@@ -200,4 +213,3 @@ class SQLOS(object):
             trip_record.append(record[0])
 
         return trip_record
-
