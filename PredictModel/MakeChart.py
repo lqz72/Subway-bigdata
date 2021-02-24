@@ -7,7 +7,7 @@ from pyecharts.charts import Bar
 
 class ChartApi(object):
     '''
-    数据分析图标接口
+    数据分析图表接口
     '''
     def __init__(self):
         pass

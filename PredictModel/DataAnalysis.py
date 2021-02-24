@@ -167,5 +167,3 @@ class DataApi(object):
 
         print(am_dict)
         return am_dict, pm_dict
-
-    

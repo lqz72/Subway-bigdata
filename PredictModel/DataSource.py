@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -9,7 +8,8 @@ from sys import path
 class DataSource(object):
     '''
     通用数据解析类:
-        用于提供数据分析所需的各种数据 
+        用于对原始数据进行预处理
+        提供数据分析所需的各种数据 
     '''
     def __init__(self):
         abs_path = os.path.abspath(os.path.dirname(__file__)) + '/csv_data/'

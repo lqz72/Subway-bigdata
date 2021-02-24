@@ -20,12 +20,12 @@ class SQLOS(object):
     
     def connect_to_db():
         #远程数据库连接
-        conn = MySQLdb.connect(host='118.178.88.14', port=3306, user='lqz',
-        passwd='863JTcyPGezGEXmm', db='lqz', charset='utf8mb4')
+        # conn = MySQLdb.connect(host='118.178.88.14', port=3306, user='lqz',
+        # passwd='863JTcyPGezGEXmm', db='lqz', charset='utf8mb4')
 
         #本地数据库连接
-        # conn = MySQLdb.connect(host='localhost', port=3306, user='root',
-        # passwd='yongfufan', db='data', charset='utf8mb4')
+        conn = MySQLdb.connect(host='localhost', port=3306, user='root',
+        passwd='yongfufan', db='data', charset='utf8mb4')
    
         return conn
     
@@ -213,3 +213,4 @@ class SQLOS(object):
             trip_record.append(record[0])
 
         return trip_record
+
