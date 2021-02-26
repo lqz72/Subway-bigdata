@@ -22,7 +22,7 @@ class PredictApi(object):
         date_flow.set_index('day', inplace =True)
         
         # 获取所有行程中出现的年月
-        month_list = DataSource.get_month_list(date_flow.index)
+        month_list = DataApi.get_month_list(date_flow.index)
 
         month_dict = {}
         for i in month_list:
@@ -45,7 +45,7 @@ class PredictApi(object):
         date_flow.set_index('day', inplace =True)
 
         # 获取所有行程中出现的年月
-        month_list = DataSource.get_month_list(date_flow.index)
+        month_list = DataApi.get_month_list(date_flow.index)
 
         week_dict = {}
         for i in month_list:
@@ -93,4 +93,4 @@ class PredictApi(object):
 
         return in_dict, out_dict
 
-#PredictApi.get_sta_flow('Sta99')
+PredictApi.get_sta_flow('Sta99')
