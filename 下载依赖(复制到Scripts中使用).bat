@@ -4,8 +4,9 @@ pip install pandas -i http://pypi.douban.com/simple --trusted-host pypi.douban.c
 pip install matplotlib -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 pip install pyecharts -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 pip install xgboost -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
-pip install statsmodels -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 pip install scikit-learn -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
-pip install scipy -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 pip install joblib -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install pymysql -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install sqlalchemy -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
+pip install Mysqlclient -i http://pypi.douban.com/simple --trusted-host pypi.douban.com
 pause

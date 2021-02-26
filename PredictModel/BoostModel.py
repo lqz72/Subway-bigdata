@@ -14,6 +14,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 from MysqlOS import SQLOS
+from DataAnalysis import DataApi
 
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体 SimHei为黑体
 plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
@@ -84,17 +85,48 @@ class Predictor(object):
 
         return feature_df
 
-    def feature_coding(train_df):
+    def get_sta_feature(series):
+        '''
+        获取单个站点的入站/出站客流特征集
+
+        Parameters
+        ----------
+        series: 某站点入站或出站的客流series 
+
+        Returns
+        --------
+        Dataframe: 特征集
+        '''
+        feature_df = SQLOS.get_df_data('feature2020')
+        feature_df.day = pd.to_datetime(feature_df.day)
+        feature_df.set_index('day', inplace =True)
+        feature_df.y['2020-01-01':'2020-07-16'] = series['2020-01-01':]
+
+        def moving_avg(x):
+            return round(sum(x.values[:-1]) / (x.shape[0] - 1), 1)
+        feature_df['MA'] = feature_df.y.rolling(4).apply(moving_avg)
+
+        feature_df.dropna(inplace=True)
+
+        feature_df[['weekday', 'month', 'is_hoilday', 'y']] = \
+            feature_df[['weekday', 'month', 'is_hoilday', 'y']].astype('int')
+        feature_df['MA'] = feature_df['MA'].astype('float')
+
+        feature_df = Predictor.feature_coding(feature_df)
+
+        return feature_df
+
+    def feature_coding(feature_df):
         '''
         对特征进行编码
         '''
         #气温信息采用label编码 
-        train_df.mean_temp = LabelEncoder().fit_transform(train_df.mean_temp)
+        feature_df.mean_temp = LabelEncoder().fit_transform(feature_df.mean_temp)
 
         #天气状况与数值无关 采用one-hot编码
-        train_df = pd.get_dummies(train_df)
+        feature_df = pd.get_dummies(feature_df)
 
-        return train_df
+        return feature_df
 
     def train_test_split(X, y, train_size=0.9):
         '''
@@ -153,44 +185,6 @@ class Predictor(object):
         plt.grid(True)
         plt.savefig(abs_path +'/predict.png')
 
-    def short_forecast(train_df, train_size):
-        '''
-        短期时序预测 
-        '''
-        if 'day' in train_df.columns: 
-            train_df.set_index('day', inplace=True)
-
-        X, y  = train_df.drop('y', axis = 1), train_df.y
-        X_train, X_test, y_train, y_test = Predictor.train_test_split(X, y, train_size)
-    
-        #标准化处理
-        # X_train_scaled = scaler.fit_transform(X_train)
-        # X_test_scaled = scaler.transform(X_test)
-
-        #best_param = get_best_param(X_train, y_train)
-        best_param = {'eta': 0.3, 'n_estimators': 100, 'gamma': 0.8888888888888888, 'max_depth': 7, 'min_child_weight': 1, 'colsample_bytree': 1, 'colsample_bylevel': 1, 'subsample': 
-        1, 'reg_lambda': 50.0, 'reg_alpha': 5.0, 'seed': 33}
-
-
-        #调用xgboost回归器
-        reg = XGBRegressor(**best_param)
-        reg.fit(X_train, y_train)
-        prediction = reg.predict(X_test)
-
-        plot_importance(reg)
-
-        Predictor.plot_model_results(reg, X_train=X_train, X_test=X_test, y_train=y_train
-            , y_test=y_test, plot_intervals=True)
-
-        mae = mean_absolute_error(prediction, y_test)
-        mape = mean_absolute_percentage_error(prediction, y_test)
-        mse = mean_squared_error(prediction, y_test)
-        r2 = r2_score(prediction, y_test)
-        
-        joblib.dump(reg, abs_path + '/test_model.pkl')
-        print('mae:', mae, 'mape:', mape, 'mse:', mse, 'r2_score:', r2)
-        return reg
-
     def get_best_param(X_train, y_train):
         '''
         xgboost参数调优 返回最优参数字典
@@ -230,20 +224,66 @@ class Predictor(object):
         print(other_params)
         return other_params
 
-    def forecast():
+    def short_forecast(train_df, train_size, file_path):
         '''
-        以每一天作为时间刻度进行预测
+        短期时序预测 返回训练好的模型
         '''
-        feature_df = Predictor.get_feature_data()
+        if 'day' in train_df.columns: 
+            train_df.set_index('day', inplace=True)
 
-        model_path = abs_path + '/test_model.pkl'
+        X, y  = train_df.drop('y', axis = 1), train_df.y
+        X_train, X_test, y_train, y_test = Predictor.train_test_split(X, y, train_size)
+    
+        #标准化处理
+        # X_train_scaled = scaler.fit_transform(X_train)
+        # X_test_scaled = scaler.transform(X_test)
+
+        #best_param = get_best_param(X_train, y_train)
+        best_param = {'eta': 0.3, 'n_estimators': 100, 'gamma': 0.8888888888888888, 'max_depth': 7, 'min_child_weight': 1, 'colsample_bytree': 1, 'colsample_bylevel': 1, 'subsample': 
+        1, 'reg_lambda': 50.0, 'reg_alpha': 5.0, 'seed': 33}
+
+
+        #调用xgboost回归器
+        reg = XGBRegressor(**best_param)
+        reg.fit(X_train, y_train)
+        prediction = reg.predict(X_test)
+
+        plot_importance(reg)
+
+        Predictor.plot_model_results(reg, X_train=X_train, X_test=X_test, y_train=y_train
+            , y_test=y_test, plot_intervals=True)
+
+        mae = mean_absolute_error(prediction, y_test)
+        mape = mean_absolute_percentage_error(prediction, y_test)
+        mse = mean_squared_error(prediction, y_test)
+        r2 = r2_score(prediction, y_test)
+        
+        joblib.dump(reg, file_path)
+        print('mae:', mae, 'mape:', mape, 'mse:', mse, 'r2_score:', r2)
+        return reg
+
+    def forecast(feature_df, file_name):
+        '''
+        以每一天作为时间刻度进行预测 
+
+        Parameters
+        ----------
+        feature_df: dataframe格式的特征集
+        file_nmae: 模型名称
+
+        Returtns
+        --------
+        Dataframe index = 'day' columns = ['weekday', 'month', 'y'] 
+        '''
+        #获取模型路径
+        model_path = abs_path + '/model/' +  file_name + '.pkl'
 
         #如果模型不存在 获取训练数据拟合模型
         if os.path.exists(model_path) is False:
             #训练集只是特征集的子集 所以直接取切片即可
             train_df = feature_df['2020-01-04':'2020-07-16']
 
-            reg = Predictor.short_forecast(train_df, train_size=0.9)
+            reg = Predictor.short_forecast(train_df, 0.9, model_path)
 
         #调取训练模型
         model = joblib.load(model_path)
@@ -267,13 +307,15 @@ class Predictor(object):
 
         predict_df = feature_df.iloc[moving_avg:]
         predict_df = predict_df[['weekday', 'month', 'y']]
-        predict_df.reset_index(level='day', inplace=True)
         
-        SQLOS.write_df_data(predict_df, 'predict')
         print(predict_df)
+        return predict_df
      
-class SeniorPredictor(object):
-    pass
-
 if __name__ == '__main__':
-    Predictor.forecast()
+    pass
+    # feature_df = Predictor.get_sta_feature('Sta101')
+    
+    # Predictor.forecast(feature_df, 'Sta101')
+    
+    
+

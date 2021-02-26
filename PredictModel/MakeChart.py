@@ -168,3 +168,4 @@ class ChartApi(object):
             # .render("station_flow.html")
         )
         return bar
+

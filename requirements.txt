@@ -4,7 +4,8 @@ pandas
 matplotlib
 pyecharts
 xgboost
-statsmodels
 scikit-learn
-scipy
 joblib
+pymysql
+sqlalchemy
+Mysqlclient

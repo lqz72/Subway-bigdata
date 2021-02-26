@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from MysqlOS import SQLOS
-from DataSource import *
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -49,11 +48,10 @@ class DataApi(object):
         返回一个字典 包含每个月份客流量的数据 格式 {'year-month':{'month':flow,},}
         '''
         flow_df = SQLOS.get_flow_df()
-        flow_data = DataSource.get_flow_data(flow_df)
-        date_flow = DataSource.get_date_series(flow_data)
+        date_flow = DataApi.get_date_series(flow_df)
 
         #获取所有行程中出现的年月
-        month_list = DataSource.get_month_list(date_flow.index)
+        month_list = DataApi.get_month_list(date_flow.index)
         
         month_dict = day_dict = {}
         for i in month_list:
@@ -62,6 +60,7 @@ class DataApi(object):
             flow = temp_series.values
             month_dict[i] = dict(zip(day, flow))
 
+        print(month_dict)
         return month_dict
 
     def get_week_flow():
@@ -73,7 +72,7 @@ class DataApi(object):
         flow_df['flow'] = 1 
 
         #获取所有行程中出现的年月
-        month_list = DataSource.get_month_list(flow_df['day'])
+        month_list = DataApi.get_month_list(flow_df['day'])
         
         flow_df.set_index('day', inplace=True)
 
@@ -92,13 +91,9 @@ class DataApi(object):
     def get_sta_flow():
         '''
         单站的点出/入站客流分析
-        返回两个字典 分别存储进站和出站数据 格式{'station_name':{'month':num,},}
+        返回两个字典 格式{'station_name':{'month':num,},}
         '''
         in_df, out_df = SQLOS.get_trips_df()
-        
-        #转换为标准时间格式
-        in_df.loc[:,"in_time"] = pd.to_datetime(in_df["in_time"])
-        out_df.loc[:,"out_time"] = pd.to_datetime(out_df["out_time"])
 
         #重组聚合
         in_data_dict = {}
@@ -122,6 +117,24 @@ class DataApi(object):
             out_data_dict[station] = dict(zip(out_time, out_amount))
 
         return in_data_dict, out_data_dict
+
+    def get_sta_series(sta_name):
+        '''
+        获取指定站点入站和出站客流的series
+        '''
+        in_df, out_df = SQLOS.get_trips_df()
+        
+        in_sta_df = in_df[in_df['in_sta_name'] == sta_name]
+        out_sta_df = out_df[out_df['out_sta_name'] == sta_name]
+
+        in_sta_df.set_index('in_time', inplace=True)
+        out_sta_df.set_index('out_time', inplace=True)
+        in_sta_df['y'] = out_sta_df['y'] = 1
+
+        in_series = in_sta_df.resample('D').sum()['y']
+        out_series = out_sta_df.resample('D').sum()['y']
+    
+        return in_series, out_series
 
     def get_hour_flow(df):
         '''
@@ -167,3 +180,51 @@ class DataApi(object):
 
         print(am_dict)
         return am_dict, pm_dict
+
+    def get_flow_data(flow_df):
+        '''
+        获取日期序列对应站点的客流量(入站和出站之和) 返回一个dataframe
+        dataframe格式如下
+                    day     sta  flow
+        0     2019-12-26    Sta1    1
+        1     2019-12-26  Sta107    1
+        2     2019-12-26  Sta108    2
+        ...          ...     ...  ...
+        30503 2020-07-16   Sta97   34
+        30504 2020-07-16   Sta99  100
+
+        [30505 rows x 3 columns]
+        '''
+        flow_data = flow_df
+        flow_data['flow'] = 1
+
+        flow_data = flow_data.groupby(by=['day', 'sta'], as_index=False)['flow'].count()
+        return flow_data
+        
+    def get_date_series(flow_df):
+        '''
+        获得对应日期的总体客流量 返回一个series
+        series格式如下
+        2019-12-26      145
+        2019-12-27      409
+        2019-12-28      711
+                    ...  
+        2020-07-15    14390
+        2020-07-16    14379
+        '''
+        flow_data = flow_df
+        flow_data['flow'] = 1
+
+        date_series = flow_data.groupby(by=['day'])['flow'].sum()
+        return date_series
+
+    def get_month_list(time_list):
+        '''
+        获取所有行程中出现的年月
+        接收一个时间序列 返回一个有序的字符串列表
+        '''
+        month_list = [i.strftime("%Y-%m") for i in time_list]
+        month_list = list(set(month_list))
+        month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
+        return month_list
+

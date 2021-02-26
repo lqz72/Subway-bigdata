@@ -7,9 +7,7 @@ from sys import path
 
 class DataSource(object):
     '''
-    通用数据解析类:
-        用于对原始数据进行预处理
-        提供数据分析所需的各种数据 
+    用于对原始数据进行预处理 
     '''
     def __init__(self):
         abs_path = os.path.abspath(os.path.dirname(__file__)) + '/csv_data/'
@@ -19,7 +17,7 @@ class DataSource(object):
             'users': abs_path + 'users.csv',
             'flow': abs_path + 'flow.csv',
         }
-        print(self.file_path['station'])
+
         self.sta_df = pd.read_csv(self.file_path['station'], encoding='gb18030')
         self.trips_df = pd.read_csv(self.file_path['trips'], encoding='gb18030')
         self.age_df = pd.read_csv(self.file_path['users'], encoding='gb18030')
@@ -110,69 +108,3 @@ class DataSource(object):
 
         flow_df.to_csv(self.file_path['flow'], encoding='gb18030', index=0)
         return flow_df
-
-    @staticmethod
-    def get_flow_data(flow_df):
-        '''
-        获取日期序列对应站点的客流量(入站和出站之和) 返回一个dataframe
-        dataframe格式如下
-                    day     sta  flow
-        0     2019-12-26    Sta1    1
-        1     2019-12-26  Sta107    1
-        2     2019-12-26  Sta108    2
-        ...          ...     ...  ...
-        30503 2020-07-16   Sta97   34
-        30504 2020-07-16   Sta99  100
-
-        [30505 rows x 3 columns]
-        '''
-        
-        flow_data = flow_df
-        flow_data['flow'] = 1
-
-        flow_data = flow_data.groupby(by=['day', 'sta'], as_index=False)['flow'].count()
-        return flow_data
-        
-    @staticmethod
-    def get_sta_series(flow_data, station_name):
-        '''
-        提取指定站点每天的客流量 返回一个index为时间序列的series
-        series格式如下
-        2020-04-01     70
-        2020-04-02     76
-                    ... 
-        2020-06-29     92
-        2020-06-30     88
-        '''
-        tag_data = flow_data[flow_data['sta'] == station_name]
-        sta_series = pd.Series(tag_data['flow'].values, index = tag_data['day'].values)
-        return sta_series
-
-    @staticmethod
-    def get_date_series(flow_data):
-        '''
-        获得对应日期的总体客流量 返回一个series
-        series格式如下
-        2019-12-26      145
-        2019-12-27      409
-        2019-12-28      711
-                    ...  
-        2020-07-15    14390
-        2020-07-16    14379
-        '''
-        date_series = flow_data.groupby(by=['day'])['flow'].sum()
-        return date_series
-
-    @staticmethod
-    def get_month_list(time_list):
-        '''
-        获取所有行程中出现的年月
-        接收一个时间序列 返回一个有序的字符串列表
-        '''
-        month_list = [i.strftime("%Y-%m") for i in time_list]
-        month_list = list(set(month_list))
-        month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
-        return month_list
-
-# station_list = DataSource().get_station_list()
-# in_df, out_df = DataSource().clean_data()

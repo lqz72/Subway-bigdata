@@ -160,8 +160,8 @@ class SQLOS(object):
         out_df.drop(index_list_out, axis=0, inplace=True)
 
 
-        # SQLOS.write_df_data(in_df, 'in_trips')
-        # SQLOS.write_df_data(out_df, 'out_trips')
+        SQLOS.write_df_data(in_df, 'in_trips')
+        SQLOS.write_df_data(out_df, 'out_trips')
 
     def get_flow_df():
         '''
@@ -178,8 +178,7 @@ class SQLOS(object):
         '''
         flow_df = SQLOS.get_df_data('flow')
         flow_df.drop('id', axis=1, inplace=True)
-        flow_df['day'] = pd.to_datetime(flow_df['day'])
-        flow_df.index = range(flow_df.shape[0])
+        flow_df.day = pd.to_datetime(flow_df.day)
     
         return flow_df
     
@@ -193,8 +192,8 @@ class SQLOS(object):
         in_df.in_time = pd.to_datetime(in_df.in_time)
         out_df.out_time = pd.to_datetime(out_df.out_time)
         
-        in_df.drop('id', axis=1, inplace=True)
-        out_df.drop('id', axis=1, inplace=True)
+        in_df.drop(['id', 'user_id'], axis=1, inplace=True)
+        out_df.drop(['id', 'user_id'], axis=1, inplace=True)
         
         return in_df, out_df
 

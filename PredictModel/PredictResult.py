@@ -1,5 +1,6 @@
 import pandas as pd
-from DataSource import *
+from DataAnalysis import DataApi
+from BoostModel import Predictor
 from MysqlOS import SQLOS
 
 class PredictApi(object):
@@ -58,3 +59,38 @@ class PredictApi(object):
 
         return week_dict
 
+    def get_sta_flow(sta_name):
+        '''
+        单站的点出/入站客流分析
+        返回两个字典 格式{'month':{'day':num,},}
+        '''
+        in_series, out_series = DataApi.get_sta_series(sta_name)
+
+        in_feature_df = Predictor.get_sta_feature(in_series)
+        in_predict_results = Predictor.forecast(in_feature_df, sta_name)
+
+        out_feature_df = Predictor.get_sta_feature(out_series)
+        out_predict_results = Predictor.forecast(out_feature_df, sta_name)
+        
+        
+        def _get_month_dict(predict_results):
+            date_flow = predict_results['y']
+
+            # 获取所有行程中出现的年月
+            month_list = DataApi.get_month_list(date_flow.index)
+
+            month_dict = {}
+            for i in month_list:
+                temp_series = date_flow[i]
+                day = [j.strftime("%d") for j in temp_series.index]
+                flow = temp_series.values
+                month_dict[i] = dict(zip(day, flow))
+
+            return month_dict
+        
+        in_dict = _get_month_dict(in_predict_results)
+        out_dict = _get_month_dict(out_predict_results) 
+
+        return in_dict, out_dict
+
+#PredictApi.get_sta_flow('Sta99')
