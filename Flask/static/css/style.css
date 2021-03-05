@@ -1,156 +1,434 @@
-/* 首页 */
 .w {
     width: 1200px;
-    margin: 0 auto;
-}
-body {
-    background: #f3f5f7;
-}
-/* header区域 */
-.header {
-    height: 70px;
-    margin: 20px auto;
-    /* background-color: pink; */
-    line-height: 70px;
-}
-.logo {
-    float: left;
-    width: 200px;
-    background-color: red;
-    text-align: center;
+    margin: auto;
 }
 .nav {
     float: left;
-    margin-left: 50px;
+    width: 250px;
+    height: 2010px;
+    background-color: #32323a;
+    color: #f5f5f5;
 }
-.nav ul li {
-    float: left;
-    padding: 0 30px;
+.nav p {
+    margin: 20px 0 20px 0;
+    padding-left: 30px;
     font-size: 18px;
 }
-.nav ul li:hover {
-    border-bottom: 2px solid rgba(0, 102, 255, 0.521);
-    background-color:  rgba(0, 102, 255, 0.137);
+.nav p::before {
+    content: '';
+    font-family: 'icomoon';
+    color: rgb(0, 162, 255);
+    font-size: 25px;
+    vertical-align: middle;
 }
-.log {
-    float: right;
-    width: 200px;
-    text-align: center;
-}
-.log a {
-    color: blue;
-}
-/* footer区域 */
-.footer {
-    height: 200px;
-    background-color: pink;
-}
-.footer .content {
-    height: 200px;
-    margin-top: 20px;
-    background-color: rgb(255, 0, 106);
-}
-
-/* 首页内容区域 */
-.banner {
-    background-color: rgba(0, 0, 255, 0.329);
-}
-.banner .bg {
-    height: 400px;
-    background-color: pink;
-}
-.bd {
-    height: 800px;
-    margin-top: 20px;
-    background-color: pink;
-}
-
-
-
-/* 历史数据分析 */
-.history {
-    /* 清除浮动 */
-    overflow: hidden;
-}
-.history .type {
-    float: left;
-    width: 280px;
-    height: 700px;
-    background-color: #e6e6e6;
-}
-.history .type ul li {
+.nav ul li {
     position: relative;
     height: 40px;
-    padding-left: 20px;
     line-height: 40px;
 }
-.history .type ul li:nth-child(1) {
-    margin-top: 30px;
+.nav ul li:nth-child(1) a::before {
+    content: '';
+    font-family: 'icomoon';
 }
-.history .type ul li a {
-    font-size: 16px;
+.nav ul li:nth-child(2) a::before {
+    content: '\ea97';
+    font-family: 'icomoon';
 }
-.history .type ul li:hover a{
-    color: blue;
+.nav ul li:nth-child(3) a::before {
+    content: '\ea99';
+    font-family: 'icomoon';
 }
-.history .type ul li a::after {
+.nav ul li:nth-child(4) a::before {
+    content: '\e906';
+    font-family: 'icomoon';
+}
+.nav ul li a::after {
     position: absolute;
-    right: 25px;
+    top: 0;
+    right: 20px;
     content: '>';
 }
-.history .data {
+.nav ul li a {
+    padding-left: 30px;
+    color: #f5f5f5;
+}
+.nav ul li:hover {
+    color: orange;
+    background-color: grey;
+}
+.content {
     float: left;
-    margin-left: 70px;
-    height: 700px;
-    width: 850px;
-    /* background-color: grey; */
-}
-.addbgcorange {
-    background-color: orange;
+    width: 950px;
+    height: 2010px;
+    background-color: #f3f3f3;
 }
 
-/* 单月整体 */
-.history .data .wholemonthgraph {
-    height: 550px;
-    margin-top: 30px;
-    /* background-color: pink; */
+.user {
+    height: 35px;
+    margin-bottom: 20px;
+    background-color:  #ffffff;
+    line-height: 35px;
+    box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.2);
+}
+.user .head {
+    overflow: hidden;
+    display: inline-block;
+    margin-left: 790px;
+    margin-bottom: 2px;
+    margin-right: 10px;
+    height: 30px;
+    width: 30px;
+    vertical-align:middle;
+    border-radius: 15px;
+    background-color: pink;
+}
+.user .head img {
+    width: 100%;
+    height: 100%;
+}
+.user .name {
+    font-size: 14px;
 }
 
-/* 工作日和周末 */
-.history .data .weekgraph {
-    height: 550px;
-    margin-top: 30px;
-    /* background-color: pink; */
+/* 历史数据 */
+.content .time {
+    float: left;
+    width: 300px;
+    height: 300px;
+    margin-left: 20px;
+    margin-right: 10px;
+    background-color: #ffffff;
 }
-
-/* 单站点入点出 */
-.history .data .choose {
-    margin: 5px auto;
+.content .time p {
+    margin-top: 20px;
+    margin-left: 25px;
+    font-size: 20px;
 }
-.history .data .choose select {
-    height: 25px;
+.content .time #date {
+    margin-top: 80px;
+    margin-left: 85px;
+}
+.content .time #date #inputdate {
+    text-align: center;
+    font-size: 16px;
+    height: 30px;
     width: 120px;
 }
-.history .data .choose input {
+.content .thismonth {
+    float: left;
+    width: 600px;
+    height: 300px;
+    background-color: #ffffff;
+}
+
+.thisdayall {
+    float: left;
+    width: 200px;
+    height: 300px;
+    margin-top:10px;
+    margin-left: 20px;
+    margin-right: 10px;
+    background-color: #ffffff;
+}
+.thisdayall P:nth-child(1) {
+    margin-top: 20px;
+    margin-left: 25px;
+    font-size: 20px;
+}
+.thisdayall P:nth-child(2) {
+    display: inline-block;
+    margin-top: 95px;
+    margin-left: 50px;
+    font-size: 30px;
+}
+.thisdayall P:nth-child(2)::after {
+    content: '人次';
+    font-size: 14px;
+    color: #c7b2aa;
+}
+
+.thisdayinfo {
+    float: left;
+    width: 300px;
+    height: 300px;
+    margin-right: 10px;
+    margin-top: 10px;
+    background-color: #ffffff;
+}
+.thisdayinfo p:nth-child(-n+2) {
+    height: 40px;
+    line-height: 40px;
+    padding-left: 25px;
+}
+.thisdayinfo p:nth-child(3) {
+    font-size: 25px;
+    padding-left: 25px;
+    margin-bottom: 10px;
+    height: 60px;
+    line-height: 60px;
+    border-top: 1px solid rgb(199, 195, 195) ;
+}
+.thisdayinfo ul {
+    position: relative;
+}
+.thisdayinfo ul li {
+    padding-left: 25px;
     height: 25px;
-    width: 50px;
+    line-height: 25px;
 }
-.history .data .stationgraph {
-    height: 550px;
+.thisdayinfo ul li span {
+    position: absolute;
+    left: 150px;
+}
+
+.thisweek {
+    float: left;
+    width: 390px;
+    height: 300px;
+    margin-top: 10px;
+    background-color: #ffffff;
+}
+.linepercent {
+    float: left;
+    width: 450px;
+    height: 300px;
+    margin-top:10px;
+    margin-left: 20px;
+    margin-right: 10px;
+    background-color: #ffffff;
+}
+.od {
+    float: left;
+    width: 450px;
+    height: 300px;
+    margin-top: 10px;
+    background-color: #ffffff;
+}
+.twograph {
+    float: left;
+    width: 650px;
+    height: 650px;
+    margin-top:10px;
+    margin-left: 20px;
+    margin-right: 10px;
+    background-color: #ffffff;
+}
+
+.leaderboard {
+    float: left;
+    width: 250px;
+    height: 650px;
+    margin-top: 10px;
+    background-color: #ffffff;
+}
+.leaderboard p {
+    text-align: center;
+    font-size: 20px;
+    height: 30px;
+    line-height: 30px;
+}
+.leaderboard table {
+    text-align: center;
+   border-collapse: collapse;
+}
+.leaderboard table tr th {
+    font-weight: normal;
+    border-bottom: 2px solid #f3f3f3;
+    border-top: 2px solid #f3f3f3;
+}
+.leaderboard table tr td {
+    height: 20px;
+    line-height: 20px;
+    font-size: 12px;
+    border-bottom: 2px solid #f3f3f3;
+}
+.leaderboard table tr td:nth-child(1) {
+    width: 40px;
+}
+.leaderboard table tr td:nth-child(2) {
+    width: 70px;
+}
+.leaderboard table tr td:nth-child(3) {
+    width: 70px;
+}
+.leaderboard table tr td:nth-child(4) {
+    width: 70px;
+}
+
+.leaderboard2 {
+    float: left;
+    width: 910px;
+    height: 350px;
+    margin-top: 10px;
+    margin-left: 20px;
+    background-color: #ffffff;
+}
+.leaderboard2 p {
+    text-align: center;
+    font-size: 20px;
+    height: 30px;
+    line-height: 30px;
+}
+.leaderboard2 table {
+    text-align: center;
+   border-collapse: collapse;
+}
+.leaderboard2 table tr th {
+    font-weight: normal;
+    border-bottom: 2px solid #f3f3f3;
+    border-top: 2px solid #f3f3f3;
+}
+.leaderboard2 table tr td {
+    height: 20px;
+    line-height: 20px;
+    font-size: 12px;
+    border-bottom: 2px solid #f3f3f3;
+}
+.leaderboard2 table tr td:nth-child(1) {
+    width: 150px;
+}
+.leaderboard2 table tr td:nth-child(2) {
+    width: 200px;
+}
+.leaderboard2 table tr td:nth-child(3) {
+    width: 150px;
+}
+.leaderboard2 table tr td:nth-child(4) {
+    width: 200px;
+}
+.leaderboard2 table tr td:nth-child(5) {
+    width: 220px;
+}
+
+/* -------------------------------------------------------------------------------- */
+/* client页面 */
+
+
+.content .agegraph1 {
+    float: left;
+    width: 450px;
+    height: 300px;
+    margin-left: 20px;
+    margin-right: 10px;
+    background-color: #ffffff;
+}
+.content .agegraph2 {
+    float: left;
+    width: 450px;
+    height: 300px;
+    background-color: #ffffff;
+}
+.content .search {
+    float: left;
+    margin-left: 20px;
+    margin-right: 20px;
+    width: 910px; 
+    height: 75px;
     /* background-color: pink; */
 }
-
-
-/* 年龄结构 */
-.history .data .agegraph {
-    height: 550px;
-    margin-top: 30px;
+.content .search input {
+    float: left;
+    height: 35px;
+    width: 250px;
+    margin-top: 20px;
+    margin-left: 300px;
+    border: 1px solid blue;
     /* background-color: pink; */
 }
+.content .search button {
+    float: left;
+    height: 35px;
+    width: 35px;
+    margin-top: 20px;
+    margin-right: 300px;
+    background-color: #fff;
+    border: none;
+    outline: none;
+    font-family:  'icomoon';
+}
+.userinfo {
+    float: left;
+    margin: 0 10px 0 20px;
+    width: 250px;
+    height:340px;
+    overflow: hidden;
+}
+.userinfo ul li {
+    position: relative;
+    height: 100px;
+    background-color: #fff;
+    text-align: right;
+}
+.userinfo ul li>span {
+    display: inline-block;
+    height: 100px;
+    width: 200px;
+    padding: 25px 10px;
+}
+.userinfo ul li span strong {
+    font-size: 20px;
+    display: block;
+}
+.userinfo ul li span span {
+    font-size: 12px;
+    color: #dcdce0;
+}
 
-/* 早晚高峰 */
-.history .data .dayhighgraph {
-    height: 550px;
-    margin-top: 30px;
-    background-color: pink;
+.userinfo ul li:nth-child(2){
+    margin: 20px 0;
+}
+.userinfo ul li:nth-child(1)::before {
+    content: '\f007';
+    position: absolute;
+    display: inline-block;
+    left: 20px;
+    top: 24px;
+    font-family: 'icomoon';
+    color: rgb(0, 162, 255);
+    font-size: 50px;
+}
+.userinfo ul li:nth-child(2)::before {
+    content: '\e90b';
+    position: absolute;
+    display: inline-block;
+    left: 20px;
+    top: 30px;
+    font-family: 'icomoon';
+    color: rgba(76, 0, 255, 0.233);
+    font-size: 40px;
+}
+.userinfo ul li:nth-child(3)::before {
+    content: '\e90c';
+    position: absolute;
+    display: inline-block;
+    left: 20px;
+    top: 30px;
+    font-family: 'icomoon';
+    color: rgb(255, 145, 0);
+    font-size: 40px;
+}
+
+
+
+.content .monthout {
+    float: left;
+    height: 340px;
+    width: 650px;
+    background-color: #fff;
+    
+}
+
+.content .outshow1 {
+    float: left;
+    height: 500px;
+    width: 350px;
+    margin: 10px 10px 0 20px;
+    background-color: #fff;
+}
+.content .outshow2 {
+    float: left;
+    margin-top: 10px;
+    height: 500px;
+    width: 550px;
+    background-color: #fff;
 }

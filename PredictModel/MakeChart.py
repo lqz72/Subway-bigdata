@@ -113,6 +113,58 @@ class ChartApi(object):
             tl.add(line, "{0}年{1}月".format(i[0:4], int(i[-2:])))
         return tl
 
+    def curr_week_line(curr_week_dict) -> Line:
+        '''
+        绘制本周客流波动 返回一个Line图表
+        '''
+        day = ['周一', '周二', '周三', '周四', '周五', '周六', '周末']
+        flow = [str(j) for j in curr_week_dict.values()]
+        line = (
+            Line()
+            .add_xaxis(xaxis_data = day)
+            .add_yaxis(
+                series_name= "客流",
+                y_axis=flow,
+                label_opts=opts.LabelOpts(is_show=False)
+            )
+            .set_global_opts(
+                title_opts=opts.TitleOpts(title="本周客流波动"),
+                tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                yaxis_opts=opts.AxisOpts(
+                    name = "客流量/人次",
+                    type_="value",
+                    splitline_opts=opts.SplitLineOpts(is_show=True),
+                ),
+                xaxis_opts=opts.AxisOpts(name = "星期", type_="category", boundary_gap=False),
+            )
+        )
+
+        return line
+
+    def day_line(month, day_dict) -> Line:
+        day = day_dict.keys()
+        flow = [str(j) for j in day_dict.values()]
+        line = (
+            Line()
+            .add_xaxis(xaxis_data = day)
+            .add_yaxis(
+                series_name= "{}月客流".format(int(month[-2:])),
+                y_axis=flow,
+                label_opts=opts.LabelOpts(is_show=False)
+            )
+            .set_global_opts(
+                title_opts=opts.TitleOpts(title="当月客流波动"),
+                tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                yaxis_opts=opts.AxisOpts(
+                    name = "客流量/人次",
+                    type_="value",
+                    splitline_opts=opts.SplitLineOpts(is_show=True),
+                ),
+                xaxis_opts=opts.AxisOpts(name = "日期", type_="category", boundary_gap=False),
+            )
+        )
+        return line
+
     def station_bar(station, in_dict, out_dict) ->Bar:
         '''
         绘制某站点出入客流分布
@@ -169,3 +221,5 @@ class ChartApi(object):
         )
         return bar
 
+    
+        

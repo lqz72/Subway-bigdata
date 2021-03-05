@@ -124,9 +124,10 @@ class SQLOS(object):
         '''
         返回有序站点列表
         '''
-        sta_list = SQLOS.get_df_data('station')['sta_name'].tolist()
+        sta_df = SQLOS.get_df_data('station')['sta_name']
+        # sta_dict = dict(zip(sta_df['sta_name'], sta_df['line'])
         sta_list.sort(key=lambda x: int(x[3:]))
-        return sta_list
+        return sta_dict
 
     def get_clean_data():
         '''
@@ -213,3 +214,46 @@ class SQLOS(object):
 
         return trip_record
 
+    def get_weather_info(date):
+        '''
+        获取当日天气信息
+        '''
+        conn = SQLOS.connect_to_db()
+
+        try:
+            sql = 'SELECT weather from weather2020 WHERE `day` = "%s"' %  date
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            conn.close()
+
+            return data
+
+        except Exception as e:
+            print('error:', e)
+            conn.rollback()
+            conn.close()
+        
+        return 'UnKnow'
+        
+    def get_hoilday_info(date):
+        '''
+        获取当日节假日信息
+        '''
+        conn = SQLOS.connect_to_db()
+
+        try:
+            sql = 'SELECT is_hoilday from hoilday2020 WHERE `day` = "%s"' %  date
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            conn.close()
+
+            return data
+
+        except Exception as e:
+            print('error:', e)
+            conn.rollback()
+            conn.close()
+        
+        return 'UnKnow'

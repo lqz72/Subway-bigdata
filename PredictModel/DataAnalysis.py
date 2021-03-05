@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from MysqlOS import SQLOS
+import pandas as pd
+import datetime
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -8,11 +10,13 @@ class DataApi(object):
     提供数据分析结果接口
     '''
     def __init__(self):
-        self.station_list = SQLOS.get_station_list()
-        self.age, self.percent = DataApi.get_age_structure()
-        self.month_dict = DataApi.get_month_flow()
-        self.week_dict = DataApi.get_week_flow()
-        self.in_dict, self.out_dict = DataApi.get_sta_flow()
+        '''
+        初始化 直接调用类属性获取数据 
+        '''
+        self.flow_df = SQLOS.get_flow_df()
+        self.month_dict = DataApi.get_month_flow(self.flow_df)
+        self.week_dict = DataApi.get_week_flow(self.flow_df) 
+        self.date_flow = DataApi.get_date_series(self.flow_df)
 
     def get_age_structure():
         '''
@@ -42,12 +46,11 @@ class DataApi(object):
 
         return label, percent
 
-    def get_month_flow():
+    def get_month_flow(flow_df):
         '''
         单月整体的客流波动分析
-        返回一个字典 包含每个月份客流量的数据 格式 {'year-month':{'month':flow,},}
+        返回一个字典 包含每个月份客流量的数据 格式 {'year-month':{'day':flow,},}
         '''
-        flow_df = SQLOS.get_flow_df()
         date_flow = DataApi.get_date_series(flow_df)
 
         #获取所有行程中出现的年月
@@ -60,15 +63,13 @@ class DataApi(object):
             flow = temp_series.values
             month_dict[i] = dict(zip(day, flow))
 
-        print(month_dict)
         return month_dict
 
-    def get_week_flow():
+    def get_week_flow(flow_df):
         '''
         获取不同月份每周客流量 
         返回一个字典 格式{'month':{'weekday':num,},}
         '''
-        flow_df = SQLOS.get_flow_df()
         flow_df['flow'] = 1 
 
         #获取所有行程中出现的年月
@@ -117,7 +118,7 @@ class DataApi(object):
             out_data_dict[station] = dict(zip(out_time, out_amount))
 
         return in_data_dict, out_data_dict
-
+                                     
     def get_sta_series(sta_name):
         '''
         获取指定站点入站和出站客流的series
@@ -135,8 +136,29 @@ class DataApi(object):
         out_series = out_sta_df.resample('D').sum()['y']
     
         return in_series, out_series
+    
+    def get_sta_hour_series(sta_name, hour): 
+        '''
+        获取指定站点指定时间入站和出站客流的series 
+        '''
+        in_df, out_df = SQLOS.get_trips_df()
+        
+        in_sta_df = in_df[in_df['in_sta_name'] == sta_name]
+        out_sta_df = out_df[out_df['out_sta_name'] == sta_name]
+        in_sta_df['y'] = out_sta_df['y'] = 1
 
-    def get_hour_flow(df):
+        in_sta_df = in_sta_df.set_index('in_time')
+        out_sta_df = out_sta_df.set_index('out_time')
+
+        in_hour_series = in_sta_df.resample('H').sum()['y']
+        out_hour_series = out_sta_df.resample('H').sum()['y']
+
+        in_series = in_hour_series.reset_index(level='in_time')
+        in_series = in_series[in_series['in_time'].astype('str').str.contains('09:')]
+        in_series.index = range(in_series.shape[0])
+        print(in_series.y.sum())
+
+    def get_hour_flow(df):              
         '''
         获取各个站点每个小时的进站/出站客流量 
         传入一个in_df 或者 out_df 
@@ -228,3 +250,37 @@ class DataApi(object):
         month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
         return month_list
 
+    def get_curr_week_flow(self, date):
+        '''
+        获取当前周的客流变化
+        '''
+        date = datetime.datetime.strptime(date, '%Y-%m-%d')
+        monday, sunday = date, date
+        one_day = datetime.timedelta(days=1)
+
+        while monday.weekday() != 0:
+            monday -= one_day
+        while sunday.weekday() != 6:
+            sunday += one_day
+        # 返回当前的星期一和星期天的日期
+        monday, sunday = monday.strftime('%Y-%m-%d'), sunday.strftime('%Y-%m-%d')
+
+        curr_week_flow = self.date_flow[monday:sunday]
+
+        day = [j.strftime("%m-%d") for j in curr_week_flow.index]
+        flow = curr_week_flow.values
+        
+        return dict(zip(day, flow))
+   
+    def get_top_sta(self):
+        flow_df = self.flow_df
+        flow_df['flow'] = 1
+        sta_flow = flow_df.groupby(by='sta')['flow'].sum()
+        
+        sta_flow = sta_flow.sort_values(ascending=False)
+        top_sta = sta_flow.index[:10].tolist()
+        print(top_sta)
+        return top_sta
+
+api = DataApi()
+api.get_top_sta()

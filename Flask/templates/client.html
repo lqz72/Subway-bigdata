@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/date.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
+</head>
+<body>
+    <div class="w">
+        <!-- 左侧导航栏 -->
+        <div class="nav">
+            <p>&nbsp;&nbsp;轨道交通智慧系统</p>
+            <ul>
+                <li><a href="/index">&nbsp;&nbsp;历史轨道数据储库</a></li>
+                <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
+                <li><a href="/client">&nbsp;&nbsp;运营规划辅助系统</a></li>
+                <li><a href="#">&nbsp;&nbsp;个人中心</a></li>
+            </ul>
+        </div>
+        <!-- 右侧内容区域 -->
+        <div class="content">
+            <!-- 用户信息 -->
+            <div class="user">
+                <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
+                <span class="name">超级管理员</span>
+            </div>
+
+            <!-- 年龄结构图1 -->
+            <div class="agegraph1">
+                年龄结构图1 柱形图
+            </div>
+            <!-- 年龄结构图2 -->
+            <div class="agegraph2">
+                年龄结构图2 扇形图
+            </div>
+            
+            <!-- 搜索框 -->
+            <div class="search">
+                <input type="text">
+                <button></button>
+            </div>
+
+            <!-- 用户信息 -->
+            <div class="userinfo">
+                <ul>
+                    <li>
+                        <span>
+                            <strong>ac23565654</strong>
+                            <span>ID</span>
+                        </span> 
+                    </li>
+                    <li>
+                        <span>
+                            <strong>26</strong>
+                            <span>年龄</span>
+                        </span> 
+                    </li>
+                    <li>
+                        <span>
+                            <strong>103</strong>
+                            <span>出行次数</span>
+                        </span> 
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 用户每月出行次数 -->
+            <div class="monthout">
+                用户每月出行次数折线图
+            </div>
+
+            <!-- 出行记录展示1 -->
+            <div class="outshow1">
+                出行记录展示1
+            </div>
+
+            <!-- 出行记录展示2 -->
+            <div class="outshow2">
+                出行记录展示2
+            </div>
+
+        </div>
+    </div>
+    
+</body>
+</html>

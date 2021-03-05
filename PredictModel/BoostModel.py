@@ -87,7 +87,7 @@ class Predictor(object):
 
     def get_sta_feature(series):
         '''
-        获取单个站点的入站/出站客流特征集
+        获取单个站点的入站/出站客流特征集   
 
         Parameters
         ----------
@@ -311,6 +311,7 @@ class Predictor(object):
         print(predict_df)
         return predict_df
      
+
 if __name__ == '__main__':
     pass
     # feature_df = Predictor.get_sta_feature('Sta101')

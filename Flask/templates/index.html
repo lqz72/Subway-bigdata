@@ -2,41 +2,135 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>地铁数据展示</title>
+    <title>Document</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
-    <script src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/date.js') }}" ></script>
+	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
 </head>
 <body>
-    <div class="header w">
-        <div class="logo">
-            logo
-        </div>
+    <div class="w">
+        <!-- 左侧导航栏 -->
         <div class="nav">
+            <p>&nbsp;&nbsp;轨道交通智慧系统</p>
             <ul>
-                <li><a href="/">首页</a></li>
-                <li><a href="/history/month_flow">历史数据分析</a></li>
-                <li><a href="#">数据预测</a></li>
-                <li><a href="www.baidu.com">关于我们</a></li>
+                <li><a href="/index">&nbsp;&nbsp;历史轨道数据储库</a></li>
+                <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
+                <li><a href="/client">&nbsp;&nbsp;运营规划辅助系统</a></li>
+                <li><a href="#">&nbsp;&nbsp;个人中心</a></li>
             </ul>
         </div>
-        <div class="log">
-            <a href="#">登录</a>
+        <!-- 右侧内容区域 -->
+        <div class="content">
+            <!-- 用户信息 -->
+            <div class="user">
+                <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
+                <span class="name">超级管理员</span>
+            </div>
+
+            <!-- 时间控件 -->
+            <div class="time">
+                <p>日期选择</p>
+                <div id='date'>
+                    <input type="text" value='' placeholder="2020-01-01" id='inputdate' />
+                </div>    
+            </div>
+            
+
+            <!-- 当月客流变化 -->
+            <div id = "month_line" class="thismonth">
+                <!-- 当月客流变化折线图 -->
+            </div>
+            <!-- 当天总客流 -->
+            <div class="thisdayall">
+                <p>今日客流总量</p>
+                <p id = "day_flow">1213</p>
+            </div>
+            <!-- 当天其他信息 -->
+            <div id = "other_info" class="thisdayinfo">
+                <p>今日天气情况：<span id = "weather">晴朗</span></p>
+                <p>是否节假日：<span id = "is_hoilday">否</span></p>
+                <p>客流量对比</p>
+                <ul>
+                    <li>较昨日：<span class='font-red'>+20%</span></li> 
+                    <li>较月平均：<span class='font-red'>+20%</span></li> 
+                    <li>较年平均：<span class='font-red'>-20%</span></li>
+                    <li>早高峰客流：<span> <em class='font-red'>231</em> 人次</span></li>
+                    <li>晚高峰客流：<span> <em class='font-red'>315</em> 人次</span></li>
+                </ul>
+            </div>
+            <!-- 这一周 -->
+            <div id = "curr_week_line" class="thisweek">
+                <!-- 本周客流变化折线图 -->
+            </div>
+            <!-- 线路流量占比 -->
+            <div class="linepercent">
+                线路流量占比扇形图/风玫瑰图
+            </div>
+            <!-- 站点od客流量 -->
+            <div class="od">
+                站点od客流量图
+            </div>
+            <!-- 早晚高峰热力图和线路断面 -->
+            <div class="twograph">
+                热力图,早晚高峰分布
+                /线路断面？选择展示方式，最简单的是折线图挨个线路统计，但不直观。看能否嵌套在热力图里面
+            </div>
+            <!-- 站点排行榜 -->
+            <div class="leaderboard">
+                <p>站点客流排行榜</p>
+                <table id = "sta_flow_list">
+                    <tr>
+                        <th>排名</th>
+                        <th>站点名</th>
+                        <th>所在线路</th>
+                        <th>客流</th>  
+                    </tr>
+                    {% for i in range(1,11) %}
+                    <tr>
+                        <td>{{i}}</td>
+                        <td>{{'Sta%d' % i}}</td>
+                        <td>{{'%d号线' % i}}</td>
+                        <td>{{i * 1000}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <!-- 线路断面流量排行榜 -->
+            <div class="leaderboard2">
+                <p>线路断面客流排行榜</p>
+                <table id = "flow_list">
+                    <tr>
+                        <th>排名</th>
+                        <th>站点名1</th>
+                        <th>站点名2</th>
+                        <th>所在线路</th>
+                        <th>客流</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>sta102</td>
+                        <td>sta2</td>
+                        <td>6号线</td>
+                        <td>1315</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>sta101</td>
+                        <td>sta1</td>
+                        <td>6号线</td>
+                        <td>1215</td>
+                    </tr>
+                </table>
+            </div>    
         </div>
     </div>
-    <div class="banner">
-        <div class="bg w">背景图片1200X400
-        </div>
-    </div>
-    <div class="bd w">
-         地铁出行有关背景介绍等等...
-    </div>
-    <div class="footer">
-        <div class="content w">
-            关于我们 简介
-        </div>
-    </div>
+    
+    <script src="{{ url_for('static',filename ='js/updata_graph.js') }}"></script>
+
 </body>
 </html>
