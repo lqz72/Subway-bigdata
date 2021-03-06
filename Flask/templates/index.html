@@ -51,7 +51,7 @@
                 <p id = "day_flow">1213</p>
             </div>
             <!-- 当天其他信息 -->
-            <div id = "other_info" class="thisdayinfo">
+            <div id = "thisday_info" class="thisdayinfo">
                 <p>今日天气情况：<span id = "weather">晴朗</span></p>
                 <p>是否节假日：<span id = "is_hoilday">否</span></p>
                 <p>客流量对比</p>
@@ -68,15 +68,15 @@
                 <!-- 本周客流变化折线图 -->
             </div>
             <!-- 线路流量占比 -->
-            <div class="linepercent">
-                线路流量占比扇形图/风玫瑰图
+            <div id = "line_percent" class="linepercent">
+                <!-- 线路流量占比扇形图/风玫瑰图 -->
             </div>
             <!-- 站点od客流量 -->
             <div class="od">
                 站点od客流量图
             </div>
             <!-- 早晚高峰热力图和线路断面 -->
-            <div class="twograph">
+            <div id = "line_graph" class="twograph">
                 热力图,早晚高峰分布
                 /线路断面？选择展示方式，最简单的是折线图挨个线路统计，但不直观。看能否嵌套在热力图里面
             </div>
@@ -92,10 +92,10 @@
                     </tr>
                     {% for i in range(1,11) %}
                     <tr>
-                        <td>{{i}}</td>
-                        <td>{{'Sta%d' % i}}</td>
-                        <td>{{'%d号线' % i}}</td>
-                        <td>{{i * 1000}}</td>
+                        <td id = "{{i}}">{{i}}</td>
+                        <td id = "Sta{{i}}">{{'Sta%d' % i}}</td>
+                        <td id = "line{{i}}">{{'%d号线' % i}}</td>
+                        <td id = "flow{{i}}">{{i * 1000}}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -130,7 +130,7 @@
         </div>
     </div>
     
-    <script src="{{ url_for('static',filename ='js/updata_graph.js') }}"></script>
+    <script src="{{ url_for('static',filename ='js/update_history.js') }}"></script>
 
 </body>
 </html>

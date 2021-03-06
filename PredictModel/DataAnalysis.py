@@ -13,11 +13,13 @@ class DataApi(object):
         '''
         初始化 直接调用类属性获取数据 
         '''
+        self.age, self.percent = DataApi.get_age_structure()
         self.flow_df = SQLOS.get_flow_df()
+        self.trips_df = SQLOS.get_df_data('trips')
+        self.sta_dict = SQLOS.get_station_dict()
         self.month_dict = DataApi.get_month_flow(self.flow_df)
-        self.week_dict = DataApi.get_week_flow(self.flow_df) 
         self.date_flow = DataApi.get_date_series(self.flow_df)
-
+    
     def get_age_structure():
         '''
         获取年龄结构 返回一个元组 分别为年龄段 和 对应的百分比
@@ -272,15 +274,72 @@ class DataApi(object):
         
         return dict(zip(day, flow))
    
-    def get_top_sta(self):
+    def get_top_sta(self, date):
+        '''
+        获取客流量前十名的站点
+        返回一个列表 格式: [(station, flow, line),]
+        '''
+        sta_dict = self.sta_dict
         flow_df = self.flow_df
+        flow_df = flow_df[flow_df['day'] == date]
         flow_df['flow'] = 1
-        sta_flow = flow_df.groupby(by='sta')['flow'].sum()
-        
-        sta_flow = sta_flow.sort_values(ascending=False)
-        top_sta = sta_flow.index[:10].tolist()
-        print(top_sta)
-        return top_sta
 
-api = DataApi()
-api.get_top_sta()
+        sta_flow = flow_df.groupby(by='sta')['flow'].sum()
+        sta_flow = sta_flow.sort_values(ascending=False)
+
+        top_sta = sta_flow.iloc[:10]
+        top_sta_list = [(i, sta_dict[i], str(top_sta[i])) for i in top_sta.index]
+        
+        return top_sta_list
+
+    def get_line_flow_percent(self, date):
+        '''
+        获取某日的线路流量占比
+        '''
+        flow_df = self.flow_df
+        sta_dict = self.sta_dict
+
+        df = flow_df[flow_df['day'] == date]
+        df['flow'] = 1
+        df = df.groupby(by='sta', as_index=False)['flow'].sum()
+        df['line'] = df.sta.apply(lambda x: sta_dict[x])
+
+        line_series = df.groupby(by='line')['flow'].sum()
+        sum_flow = line_series.sum()
+        line_series = line_series.apply(lambda x: round(x / sum_flow * 100, 1))
+
+        return line_series.index, line_series.values
+
+    def get_user_info(self, user_id):
+        '''
+        获取用户信息
+        '''
+        df = SQLOS.get_df_data('users')
+        df = df[df['user_id'] == user_id]    
+        age = 2021 - int(df['birth_year'].values[0])
+        area = df['area'].values[0]
+
+        trips_df = self.trips_df
+        trips_num = trips_df[trips_df['user_id'] == user_id].shape[0]
+
+        return {'id':user_id, 'age':str(age), 'area':area, 'trips_num':trips_num} 
+
+    def get_user_month_flow(self, user_id):
+        '''
+        获取用户每月出行次数
+        返回一个字典 格式: {year-month:num,}
+        '''
+        df = self.trips_df
+        user_trips_df = df[df['user_id'] == user_id]
+        user_trips_df['flow'] = 1
+
+        user_trips_df['in_time'] = pd.to_datetime(user_trips_df['in_time']).dt.normalize()
+        user_flow = user_trips_df.groupby(by='in_time')['flow'].sum()
+        
+        month_list = DataApi.get_month_list(user_flow.index)
+        month_dict = {}
+        for month in month_list:
+            month_dict[month] = user_flow[month].sum()
+
+        return month_dict
+

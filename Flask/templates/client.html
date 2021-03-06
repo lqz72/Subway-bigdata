@@ -33,38 +33,67 @@
             </div>
 
             <!-- 年龄结构图1 -->
-            <div class="agegraph1">
-                年龄结构图1 柱形图
+            <div id = "age_bar" class="agegraph1">
             </div>
             <!-- 年龄结构图2 -->
-            <div class="agegraph2">
-                年龄结构图2 扇形图
+            <div id = "age_pie" class="agegraph2">
             </div>
             
             <!-- 搜索框 -->
             <div class="search">
-                <input type="text">
-                <button></button>
+                <input id =  "user_search" type="text">
+                <button onclick= "search()"></button>
+                <script>
+                    function search(){
+                        var user_id = document.getElementById('user_search');
+                        $.ajax({
+                            url: '/user_info',
+                            type: 'POST',
+                            data: user_id.value,
+                            dataType: 'json',
+                            success: function(result){
+                                console.log(result)
+                                var id = document.getElementById('id');
+                                var age = document.getElementById('age');
+                                var trips_num = document.getElementById('trips_num');
+                                id.innerHTML = result.id;
+                                age.innerHTML = result.age;
+                                trips_num.innerHTML = result.trips_num;
+                            }
+                        });
+
+                        var user_flow_line = echarts.init(document.getElementById('monthout'));
+                        $.ajax({
+                            type: 'POST',
+                            url: '/history/user_flow/line',
+                            data: user_id.value,
+                            dataType: 'json',
+                            success: function (result) {        
+                                user_flow_line.setOption(result);
+                            }
+                        });
+                    }
+                </script>
             </div>
 
             <!-- 用户信息 -->
-            <div class="userinfo">
+            <div id = "user_info" class="userinfo">
                 <ul>
                     <li>
-                        <span>
-                            <strong>ac23565654</strong>
+                        <span>   
+                            <strong id = "id">ac23565654</strong>
                             <span>ID</span>
                         </span> 
                     </li>
                     <li>
                         <span>
-                            <strong>26</strong>
+                            <strong id = "age">26</strong>
                             <span>年龄</span>
                         </span> 
                     </li>
                     <li>
                         <span>
-                            <strong>103</strong>
+                            <strong id = "trips_num">103</strong>
                             <span>出行次数</span>
                         </span> 
                     </li>
@@ -72,7 +101,7 @@
             </div>
 
             <!-- 用户每月出行次数 -->
-            <div class="monthout">
+            <div id = "monthout" class="monthout">
                 用户每月出行次数折线图
             </div>
 
@@ -88,6 +117,8 @@
 
         </div>
     </div>
+
+    <script src="{{ url_for('static',filename ='js/update_client.js') }}"></script>
     
 </body>
 </html>

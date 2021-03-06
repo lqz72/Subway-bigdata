@@ -4,7 +4,7 @@ from pyecharts.charts import Radar
 from pyecharts.charts import Pie
 from pyecharts.charts import Line, Timeline
 from pyecharts.charts import Bar
-
+from DataAnalysis import DataApi
 class ChartApi(object):
     '''
     数据分析图表接口
@@ -12,23 +12,32 @@ class ChartApi(object):
     def __init__(self):
         pass
 
-    def age_radar(age, percent) -> Radar:
+    def age_bar(age, percent) -> Bar:
         '''
         绘制年龄结构分布图
-        返回一个雷达图
+        返回一个柱形图
         '''
-        c = (
-            Radar()
-            .add_schema(
-                schema=[opts.RadarIndicatorItem(name=i, max_=60) for i in age]
+        bar = (
+            Bar()
+            .add_xaxis(xaxis_data=age)
+            .add_yaxis(
+                series_name="年龄结构占比",
+                y_axis=percent,
+                yaxis_index=0,
+                label_opts=opts.LabelOpts(is_show=False)
             )
-            .add("用户年龄分布", percent)
-            .set_series_opts(label_opts=opts.LabelOpts(is_show=False))
+
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="Radar"),
+                title_opts=opts.TitleOpts(title="用户年龄结构柱状图"),
+                tooltip_opts=opts.TooltipOpts(trigger="axis", axis_pointer_type="cross"),
+                yaxis_opts=opts.AxisOpts(
+                    name="百分比%",
+                    type_="value",
+                    axislabel_opts=opts.LabelOpts(formatter="{value}"),
+                ),
             )
         )
-        return c
+        return bar
 
     def age_pie(age, percent) -> Pie:
         '''
@@ -46,7 +55,7 @@ class ChartApi(object):
                 title_opts=opts.TitleOpts(title="用户年龄结构分布"),
                 legend_opts=opts.LegendOpts(type_="scroll", pos_left="80%", orient="vertical"),
             )
-            .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}%"))
+            # .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}%"))
 
         )
         return c
@@ -221,5 +230,51 @@ class ChartApi(object):
         )
         return bar
 
-    
+    def user_month_line(month_dict) -> Line:
+        month = [i for i in month_dict.keys()]
+        flow = [str(i) for i in month_dict.values()]
         
+        line = (
+            Line()
+            .add_xaxis(xaxis_data = month)
+            .add_yaxis(
+                series_name= "出行次数",
+                y_axis=flow,  
+                label_opts=opts.LabelOpts(is_show=False)
+            )
+            .set_global_opts(
+                title_opts=opts.TitleOpts(title="各月出行次数分布"),
+                tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                yaxis_opts=opts.AxisOpts(
+                    name = "出行数/次",
+                    type_="value",
+                    splitline_opts=opts.SplitLineOpts(is_show=True),
+                ),
+                xaxis_opts=opts.AxisOpts(name = "月份", type_="category", boundary_gap=False),
+            )
+        )
+
+        return line
+
+    def line_pie(line, percent) -> Pie:
+        '''
+        返回线路流量占比图表
+        '''
+        pie = (
+            Pie()
+            .add(
+                series_name="流量占比",
+                data_pair=[list(i) for i in zip(line, percent)],
+                radius= [40, 120],
+                rosetype="area",
+            )
+            .set_colors(['#37a2da','#32c5e9','#9fe6b8','#ffdb5c','#ff9f7f','#fb7293','#e7bcf3','#8378ea'])
+            .set_global_opts(
+                title_opts=opts.TitleOpts(title="线路流量占比", pos_left='center'),
+                legend_opts=opts.LegendOpts(is_show=False),
+                tooltip_opts=opts.TooltipOpts(trigger='item', formatter="{a} <br/>{b} : {c} ({d}%)"),
+            )
+            .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}%"))
+
+        )
+        return pie

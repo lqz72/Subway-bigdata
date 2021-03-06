@@ -28,7 +28,7 @@ api = DataApi()
 def root():                             
     return redirect(url_for('index'))
 
-@app.route('/index', methods = ["POST", "GET"])
+@app.route('/index')
 def index():
     return render_template('index.html')
 
@@ -41,19 +41,19 @@ def client():
     return render_template('client.html')
 
 ########需要调用的api
-@app.route('/sta.json')
+@app.route('/sta/json')
 def get_sta_json():
     with open(abs_path + '/stations.json', 'r', encoding='utf-8') as f:
         return f.read()
 
-@app.route('/link.json')
+@app.route('/link/json')
 def get_link_json():
     with open(abs_path + '/links.json', 'r', encoding='utf-8') as f:
         return f.read()
 
-@app.route('/other_info', methods = ['POST', 'GET'])
-def other_info():
-    current_date = request.get_data().decode('utf-8')[1:-1]
+@app.route('/thisday_info', methods = ['POST', 'GET'])
+def thisday_info():
+    current_date = request.get_data().decode('utf-8')
     month, day = current_date[:-3], current_date[-2:]
 
     weather = SQLOS.get_weather_info(current_date)
@@ -65,14 +65,27 @@ def other_info():
         'is_hoilday': ('是' if is_hoilday[0][0] == '1' else '否'),
         'day_flow': day_flow,
     }
-    print(info_dict)
 
     return jsonify(info_dict)
+
+@app.route('/sta_rank', methods=['POST', 'GET'])
+def sta_rank():
+    current_date = request.get_data().decode('utf-8')
+    sta_rank_list = api.get_top_sta(current_date)
+
+    return jsonify(sta_rank_list)
+
+@app.route('/user_info', methods=['POST', 'GET'])
+def user_info():
+    user_id = request.get_data().decode('utf-8')
+    user_info = api.get_user_info(user_id)
+
+    return jsonify(user_info)
 
 #------------控制图表的展示----------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])
 def day_flow():
-    current_date = request.get_data().decode('utf-8')[1:-1]
+    current_date = request.get_data().decode('utf-8')
     month = current_date[:-3] 
     month_dict = api.month_dict
     day_dict = month_dict[month]
@@ -82,23 +95,49 @@ def day_flow():
 
 @app.route('/history/curr_week_flow/line', methods = ['POST', 'GET'])
 def curr_week_flow():
-    current_date = request.get_data().decode('utf-8')[1:-1]
+    current_date = request.get_data().decode('utf-8')
     curr_week_dict = api.get_curr_week_flow(current_date)
     curr_week_line = ChartApi.curr_week_line(curr_week_dict)
 
     return curr_week_line.dump_options_with_quotes()
 
-# @app.route('/history/age/pie')
-# def age_pie():
-#     age, percent = api.age, api.percent
-#     age_pie = ChartApi.age_pie(age, percent)
-#     return age_pie.dump_options_with_quotes()
+@app.route('/history/age/pie', methods = ['POST', 'GET'])
+def age_pie():
+    age, percent = api.age, api.percent
+    age_pie = ChartApi.age_pie(age, percent)
+    return age_pie.dump_options_with_quotes()
+
+@app.route('/history/age/bar', methods = ['POST', 'GET'])
+def age_bar():
+    age, percent = api.age, api.percent
+    age_bar = ChartApi.age_bar(age, percent)
+    return age_bar.dump_options_with_quotes()
+
+@app.route('/history/user_flow/line', methods = ['POST', 'GET'])
+def user_flow_line():
+    user_id = request.get_data().decode('utf-8')
+
+    if user_id == '' or user_id == None:
+        user_id = 'd4ec5a712f2b24ce226970a8d315dfce'
+
+    month_dict = api.get_user_month_flow(user_id)
+    flow_line = ChartApi.user_month_line(month_dict)
+
+    return flow_line.dump_options_with_quotes()
+
+@app.route('/history/line/pie', methods=['POST', 'GET'])
+def line_pie():
+    current_date = request.get_data().decode('utf-8')
+    line, percent = api.get_line_flow_percent(current_date)
+    pie = ChartApi.line_pie(line, percent)
+
+    return pie.dump_options_with_quotes()
 
 # @app.route('/history/month_flow/line')
 # def month_flow_line():
 #     month_line = ChartApi.month_line(api.month_dict)
 #     return month_line.dump_options_with_quotes()
-
+                       
 # @app.route('/history/week_flow/line')
 # def week_flow_line():
 #     week_line = ChartApi.week_line(api.week_dict)
@@ -112,4 +151,4 @@ def curr_week_flow():
 #     return bar.dump_options_with_quotes()
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)

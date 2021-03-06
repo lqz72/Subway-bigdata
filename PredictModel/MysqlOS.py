@@ -38,13 +38,13 @@ class SQLOS(object):
 
         abs_path = 'd:/Python/code/Subway-bigdata/PredictModel/txt_data/'
         file_path = {
-            'feature2020':  abs_path + 'feature2020.txt',
-            'weather2020': abs_path + 'weather2020.txt',
-            'hoilday2020': abs_path + 'hoilday2020.txt',
-            'station': abs_path + 'station.txt',
-            'users': abs_path + 'users.txt',
-            'flow': abs_path + 'flow.txt',
-            'trips': abs_path +'trips.txt', 
+            # 'feature2020':  abs_path + 'feature2020.txt',
+            # 'weather2020': abs_path + 'weather2020.txt',
+            # 'hoilday2020': abs_path + 'hoilday2020.txt',
+            # 'station': abs_path + 'station.txt',
+            #'users': abs_path + 'users.txt',
+            # 'flow': abs_path + 'flow.txt',
+            # 'trips': abs_path +'trips.txt', 
         }
 
         try:
@@ -120,13 +120,16 @@ class SQLOS(object):
         #print(age_dict)
         return age_dict
 
-    def get_station_list():
+    def get_station_dict():
         '''
-        返回有序站点列表
+        返回有序站点字典 
         '''
-        sta_df = SQLOS.get_df_data('station')['sta_name']
-        # sta_dict = dict(zip(sta_df['sta_name'], sta_df['line'])
-        sta_list.sort(key=lambda x: int(x[3:]))
+        sta_df = SQLOS.get_df_data('station')[['sta_name', 'line']]
+        sta_df = sta_df.sort_values(by='sta_name', key=lambda x:
+            x.str.lstrip('Sta').astype('int'))
+
+        sta_dict = dict(zip(sta_df['sta_name'], sta_df['line']))
+
         return sta_dict
 
     def get_clean_data():
@@ -257,3 +260,4 @@ class SQLOS(object):
             conn.close()
         
         return 'UnKnow'
+
