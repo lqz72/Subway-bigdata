@@ -1,0 +1,78 @@
+/* .add button {
+    margin-left: 20px;
+    /* height: 24px;
+    width: 50px; 
+    height: 30px;
+    line-height: 30px;
+} */
+.font-red {
+    color: red;
+    font-size: 20px;
+}
+table tr td button {
+    height: 24px;
+    width: 50px;
+}
+.add .addnew {
+    margin-left: 20px;
+    height: 35px;
+    line-height: 35px;
+    width: 60px;
+    background-color: #337ab7;
+    color: #fff;
+    outline: none;
+    border: none;
+    border-radius: 3px;
+}
+.add .modal-body table {
+    margin-left: 120px;
+}
+.add .modal-body table tr td {
+    height: 40px;
+}
+.add .modal-body table tr td:first-child {
+    width: 80px;
+}
+.add .modal-body table tr td:nth-child(2) {
+    width: 200px;
+}
+.add .modal-body table tr td input {
+    width: 100%;
+}
+.list {
+    margin-left: 20px;
+    margin-right: 10px;
+    margin-top: 20px;
+    height: 570px;
+    background-color: #fff;
+    overflow: scroll;
+}
+.list table {
+    border-left: 1px solid red;
+    border-right: 1px solid red;
+    border-collapse: collapse;
+    text-align: center;
+    /* line-height: 30px; */
+}
+.list table tr td {
+    border-bottom: 1px solid red;
+    height: 30px;
+}
+.list table tr:nth-child(1) td {
+    border-top: 1px solid red;
+}
+.list table tr td:nth-child(1) {
+    width: 200px;
+}
+.list table tr td:nth-child(2) {
+    width: 200px;
+}
+.list table tr td:nth-child(3) {
+    width: 200px;
+}
+.list table tr td:nth-child(4) {
+    width: 150px;
+}
+.list table tr td:nth-child(5) {
+    width: 150px;
+}

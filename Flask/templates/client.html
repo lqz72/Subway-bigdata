@@ -21,7 +21,7 @@
                 <li><a href="/index">&nbsp;&nbsp;历史轨道数据储库</a></li>
                 <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
                 <li><a href="/client">&nbsp;&nbsp;运营规划辅助系统</a></li>
-                <li><a href="#">&nbsp;&nbsp;个人中心</a></li>
+                <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
             </ul>
         </div>
         <!-- 右侧内容区域 -->
@@ -41,8 +41,9 @@
             
             <!-- 搜索框 -->
             <div class="search">
-                <input id =  "user_search" type="text">
-                <button onclick= "search()"></button>
+                <button id= "btn_show">&#xe663;</button>
+                <input id = "user_search" type="text">
+                <button id= "btn_search" onclick= "search()"></button>
                 <script>
                     function search(){
                         var user_id = document.getElementById('user_search');
@@ -81,7 +82,7 @@
                 <ul>
                     <li>
                         <span>   
-                            <strong id = "id">ac23565654</strong>
+                            <strong id = "id">d4ec5a712f2b24ce226970a8d315dfce</strong>
                             <span>ID</span>
                         </span> 
                     </li>
@@ -117,6 +118,17 @@
 
         </div>
     </div>
+
+    <script>
+        var btn1 = document.querySelector('#btn_show');
+        // console.log(btn1);
+        btn1.addEventListener('click',
+        function()
+        {
+            location.href = '/userinf';
+        })
+
+    </script>
 
     <script src="{{ url_for('static',filename ='js/update_client.js') }}"></script>
     

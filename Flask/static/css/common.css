@@ -9,7 +9,32 @@
     font-weight: normal;
     font-style: normal;
     font-display: block;
+}
+/* @font-face {
+    font-family: 'iconfont';
+    src: url('../fonts/iconfont.eot');
+    src: url('../fonts/iconfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/iconfont.woff2') format('woff2'),
+        url('../fonts/iconfont.woff') format('woff'),
+        url('../fonts/iconfont.ttf') format('truetype'),
+        url('../fonts/iconfont.svg#iconfont') format('svg');
+  } */
+  
+  @font-face {
+    font-family: 'iconfont';  /* project id 2411818 */
+    src: url('http://at.alicdn.com/t/font_2411818_j3l8a44afe8.eot');
+    src: url('http://at.alicdn.com/t/font_2411818_j3l8a44afe8.eot?#iefix') format('embedded-opentype'),
+    url('http://at.alicdn.com/t/font_2411818_j3l8a44afe8.woff2') format('woff2'),
+    url('http://at.alicdn.com/t/font_2411818_j3l8a44afe8.woff') format('woff'),
+    url('http://at.alicdn.com/t/font_2411818_j3l8a44afe8.ttf') format('truetype'),
+    url('http://at.alicdn.com/t/font_2411818_j3l8a44afe8.svg#iconfont') format('svg');
   }
+html {
+    overflow-y: overlay;
+}
+body {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
 * {
     margin: 0;
     padding: 0;

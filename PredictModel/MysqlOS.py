@@ -188,6 +188,25 @@ class SQLOS(object):
     
     def get_trips_df():
         '''
+        获取原始客流信息 每一条为单个用户进出站的记录 返回一个dataframe
+        dataframe格式如下
+               in_sta_name  in_time     out_sta_name  out_time
+        0      Sta18       2020-07-15   Sta9         2020-07-15
+        1      Sta74       2020-07-15   Sta133       2020-07-15
+        2      Sta69       2020-07-15   Sta96        2020-07-15
+        3      Sta110      2020-07-15   Sta123       2020-07-15
+        4      Sta36       2020-07-15   Sta28        2020-07-15
+        '''
+        trips_df = SQLOS.get_df_data('trips')
+        trips_df.drop(['price', 'id'], axis=1, inplace=True)
+
+        trips_df['in_time'] = pd.to_datetime(trips_df['in_time']).dt.normalize()
+        trips_df['out_time'] = pd.to_datetime(trips_df['out_time']).dt.normalize()
+
+        return trips_df
+
+    def get_in_out_df():
+        '''
         返回入/出站记录dataframe
         '''
         in_df = SQLOS.get_df_data('in_trips')

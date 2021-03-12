@@ -6,7 +6,7 @@ $(
         $.ajax({
             type: 'POST',
             url: 'history/age/pie',
-            async: false,
+        
             dataType: 'json',
             success: function (result) {
                 age_pie.setOption(result);
@@ -16,14 +16,14 @@ $(
         $.ajax({
             type: 'POST',
             url: 'history/age/bar',
-            async: false,
+        
             dataType: 'json',
             success: function (result) {
                 age_bar.setOption(result);
             }
         });
 
-        var user_id = "d4ec5a712f2b24ce226970a8d315dfce"
+        var user_id = "d4ec5a712f2b24ce226970a8d315dfce";
         $.ajax({
             url: '/user_info',
             type: 'POST',

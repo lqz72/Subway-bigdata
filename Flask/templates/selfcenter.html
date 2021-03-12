@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/selfcenter.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/bootstrap.min.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/bootstrap.min.js') }}"></script>
+</head>
+<style>
+    a:hover {
+    text-decoration:none;
+    color: black;
+}
+    body {
+        font-size: 16px;
+    }
+</style>
+<body>
+    <div class="w">
+        <!-- 左侧导航栏 -->
+        <div class="nav">
+            <p>&nbsp;&nbsp;轨道交通智慧系统</p>
+            <ul>
+                <li><a href="/index">&nbsp;&nbsp;历史轨道数据储库</a></li>
+                <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
+                <li><a href="/client">&nbsp;&nbsp;运营规划辅助系统</a></li>
+                <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
+            </ul>
+        </div>
+        <!-- 右侧内容区域 -->
+        <div class="content">
+            <!-- 用户信息 -->
+            <div class="user">
+                <div class="loc">轨道交通智慧系统>个人中心</div>
+                <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
+                <span class="name">超级管理员</span>
+            </div>
+            
+            <div class="add">
+                <button class="addnew" data-toggle="modal" data-target="#myModal">+ 新增</button>
+                <!-- Modal -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">个人信息</h4>
+                        </div>
+                        <div class="modal-body">
+                        <table>
+                            <tr>
+                                <td>用户名<span class="font-red"> *</span></td>
+                                <td><input type="text"></td>
+                            </tr>
+                            <tr>
+                                <td>密码<span class="font-red"> *</span></td>
+                                <td><input type="text"></td>
+                            </tr>
+                            <tr>
+                                <td>备注</td>
+                                <td><input type="text"></td>
+                            </tr>
+                            
+                        </table>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary">保存</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="list">
+                <table>
+                    <tr>
+                        <td>用户名</td>
+                        <td>密码</td>
+                        <td>备注</td>
+                        <td>修改</td>
+                        <td>删除</td>
+                    </tr>
+                    <tr>
+                        <td>admin</td>
+                        <td>123456</td>
+                        <td>测试账号</td>
+                        <td><button class="edit">修改</button> </td>
+                        <td><button class="del">删除</button></td>
+                    </tr>
+                    <tr>
+                        <td>1admin</td>
+                        <td>123456</td>
+                        <td>男</td>
+                        <td><button class="edit">修改</button> </td>
+                        <td><button class="del">删除</button></td>
+                    </tr>
+                    <tr>
+                        <td>2admin</td>
+                        <td>123456</td>
+                        <td>男</td>
+                        <td><button class="edit">修改</button> </td>
+                        <td><button class="del">删除</button></td>
+                    </tr>
+                    <tr>
+                        <td>3admin</td>
+                        <td>123456</td>
+                        <td>男</td>
+                        <td><button class="edit">修改</button> </td>
+                        <td><button class="del">删除</button></td>
+                    </tr>
+                </table>
+            </div>
+            
+
+        </div>
+    </div>
+    <script>
+        var del = document.querySelectorAll(".del");
+        for(var i=0;i<del.length;i++){
+            del[i].addEventListener('click',function(){
+                var titem = this.parentNode.parentNode;
+                var pnt = titem.parentNode;
+                pnt.removeChild(titem);
+            })
+        }
+
+        var edit = document.querySelectorAll(".edit");
+        for(var i=0;i<edit.length;i++){
+            edit[i].addEventListener('click',function(){
+                var titem = this.parentNode.parentNode;
+                var pnt = titem.parentNode;
+                pnt.removeChild(titem);
+            })
+        }
+        
+    </script>
+</body>
+</html>

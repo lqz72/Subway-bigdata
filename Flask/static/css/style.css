@@ -1,11 +1,16 @@
 .w {
+    position: relative;
     width: 1200px;
     margin: auto;
 }
 .nav {
-    float: left;
+    position: fixed;
+    left: 50%;
+    margin-left: -600px;
+    top: 0;
     width: 250px;
-    height: 2010px;
+    /* height: 2010px; */
+    height: 100vh;
     background-color: #32323a;
     color: #f5f5f5;
 }
@@ -13,13 +18,14 @@
     margin: 20px 0 20px 0;
     padding-left: 30px;
     font-size: 18px;
+    line-height: 25px;
 }
 .nav p::before {
-    content: '';
-    font-family: 'icomoon';
+    content: '\e6ae';
+    font-family: 'iconfont';
     color: rgb(0, 162, 255);
     font-size: 25px;
-    vertical-align: middle;
+    vertical-align: bottom;
 }
 .nav ul li {
     position: relative;
@@ -27,20 +33,21 @@
     line-height: 40px;
 }
 .nav ul li:nth-child(1) a::before {
-    content: '';
-    font-family: 'icomoon';
+    content: '\e654';
+    font-family: 'iconfont';
+    
 }
 .nav ul li:nth-child(2) a::before {
-    content: '\ea97';
-    font-family: 'icomoon';
+    content: '\e60e';
+    font-family: 'iconfont';
 }
 .nav ul li:nth-child(3) a::before {
-    content: '\ea99';
-    font-family: 'icomoon';
+    content: '\e624';
+    font-family: 'iconfont';
 }
 .nav ul li:nth-child(4) a::before {
-    content: '\e906';
-    font-family: 'icomoon';
+    content: '\e606';
+    font-family: 'iconfont';
 }
 .nav ul li a::after {
     position: absolute;
@@ -50,6 +57,7 @@
 }
 .nav ul li a {
     padding-left: 30px;
+    font-size: 16px;
     color: #f5f5f5;
 }
 .nav ul li:hover {
@@ -58,8 +66,13 @@
 }
 .content {
     float: left;
+    /* position: absolute; */
+    /* left: 250px; */
+    margin-left: 250px;
     width: 950px;
-    height: 2010px;
+    /* height: 2010px; */
+    padding-bottom: 20px;
+    height: 100%;
     background-color: #f3f3f3;
 }
 
@@ -70,10 +83,15 @@
     line-height: 35px;
     box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.2);
 }
+.user .loc {
+    float: left;
+    width: 600px;
+    margin-left: 10px;
+}
 .user .head {
     overflow: hidden;
     display: inline-block;
-    margin-left: 790px;
+    margin-left: 190px;
     margin-bottom: 2px;
     margin-right: 10px;
     height: 30px;
@@ -85,6 +103,7 @@
 .user .head img {
     width: 100%;
     height: 100%;
+    vertical-align: baseline;
 }
 .user .name {
     font-size: 14px;
@@ -301,13 +320,20 @@
 }
 
 /* -------------------------------------------------------------------------------- */
+/* predict */
+.left {
+    height: 800px;
+}
+
+
+/* -------------------------------------------------------------------------------- */
 /* client页面 */
 
 
 .content .agegraph1 {
     float: left;
     width: 450px;
-    height: 325px;
+    height: 320px;
     margin-left: 20px;
     margin-right: 10px;
     background-color: #ffffff;
@@ -315,7 +341,7 @@
 .content .agegraph2 {
     float: left;
     width: 450px;
-    height: 325px;
+    height: 320px;
     background-color: #ffffff;
 }
 .content .search {
@@ -331,11 +357,27 @@
     height: 35px;
     width: 250px;
     margin-top: 20px;
-    margin-left: 300px;
+    padding: 0 10px;
+    font-size: 16px;
+    /* margin-left: 300px; */
     border: 1px solid blue;
     /* background-color: pink; */
 }
-.content .search button {
+.content .search #btn_show {
+    float: left;
+    height: 35px;
+    width: 35px;
+    margin-top: 20px;
+    margin-left: 280px;
+    /* margin-right: 300px; */
+    background-color: #fff;
+    border: none;
+    outline: none;
+    font-family:  'iconfont';
+    font-size: 16px;
+    cursor: pointer;
+}
+.content .search #btn_search {
     float: left;
     height: 35px;
     width: 35px;
@@ -345,6 +387,7 @@
     border: none;
     outline: none;
     font-family:  'icomoon';
+    cursor: pointer;
 }
 .userinfo {
     float: left;
@@ -373,39 +416,43 @@
     font-size: 12px;
     color: #dcdce0;
 }
+.userinfo ul li:nth-child(1) span strong {
+    font-size: 14px;
+    /* color: #dcdce0; */
+}
 
 .userinfo ul li:nth-child(2){
     margin: 20px 0;
 }
 .userinfo ul li:nth-child(1)::before {
-    content: '\f007';
+    content: '\e649';
     position: absolute;
     display: inline-block;
     left: 20px;
-    top: 24px;
-    font-family: 'icomoon';
+    top: 22px;
+    font-family: 'iconfont';
     color: rgb(0, 162, 255);
     font-size: 50px;
 }
 .userinfo ul li:nth-child(2)::before {
-    content: '\e90b';
+    content: '\e639';
     position: absolute;
     display: inline-block;
     left: 20px;
-    top: 30px;
-    font-family: 'icomoon';
-    color: rgba(76, 0, 255, 0.233);
-    font-size: 40px;
+    top: 22px;
+    font-family: 'iconfont';
+    color: rgba(255, 0, 85, 0.233);
+    font-size: 50px;
 }
 .userinfo ul li:nth-child(3)::before {
-    content: '\e90c';
+    content: '\e63a';
     position: absolute;
     display: inline-block;
     left: 20px;
-    top: 30px;
-    font-family: 'icomoon';
+    top: 22px;
+    font-family: 'iconfont';
     color: rgb(255, 145, 0);
-    font-size: 40px;
+    font-size: 50px;
 }
 
 
@@ -431,4 +478,68 @@
     height: 500px;
     width: 550px;
     background-color: #fff;
+}
+
+
+
+
+/* 用户查询界面 */
+.search .bt {
+    float: left;
+    height: 35px;
+    width: 35px;
+    margin-top: 20px;
+    margin-right: 300px;
+    background-color: #fff;
+    border: none;
+    outline: none;
+    font-family:  'icomoon';
+}
+
+
+
+
+.userlist {
+    float: left;
+    width: 910px;
+    height: 540px;
+    /* background-color: pink; */
+    margin: 0 20px;
+}
+.userlist {
+    overflow: scroll;
+    background-color: #fff;
+}
+.userlist table{
+    text-align: center;
+    border-collapse: collapse;
+    border-left: coral 1px solid;
+    border-right: coral 1px solid;
+    
+}
+.userlist table tr td {
+    height: 30px;
+    border-bottom: coral 1px solid;
+}
+.userlist table tr:nth-child(1) td {
+    height: 30px;
+    border-bottom: coral 1px solid;
+    border-top: coral 1px solid;
+}
+
+.userlist table tr td:nth-child(1)
+{
+    width: 280px;
+}
+.userlist table tr td:nth-child(2)
+{
+    width: 200px;
+}
+.userlist table tr td:nth-child(3)
+{
+    width: 200px;
+}
+.userlist table tr td:nth-child(4)
+{
+    width: 200px;
 }

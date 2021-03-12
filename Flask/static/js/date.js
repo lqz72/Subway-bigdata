@@ -333,6 +333,12 @@
 				if (!_this.isShow) {
 					_this.dom.style.display = 'none';
 				}
+				// --------------------------------自己的代码
+				
+
+
+				// ----------------------------
+
 			});
 			this.btsDom.appendChild(now);
 			this.btsDom.appendChild(sure);

@@ -28,6 +28,10 @@ api = DataApi()
 def root():                             
     return redirect(url_for('index'))
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 @app.route('/index')
 def index():
     return render_template('index.html')
@@ -39,6 +43,14 @@ def predict():
 @app.route('/client')
 def client():
     return render_template('client.html')
+
+@app.route('/selfcenter')
+def selfcenter():
+    return render_template('selfcenter.html')
+
+@app.route('/userinf')
+def userinf():
+    return render_template('userinf.html')
 
 ########需要调用的api
 @app.route('/sta/json')

@@ -13,7 +13,7 @@ $(
         $.ajax({
             type: 'POST',
             data: d.choiceDate.date,
-            async: false,
+            
             url: 'history/day_flow/line',
             dataType: 'json',
             success: function (result) {
@@ -25,7 +25,7 @@ $(
         $.ajax({
             type: "POST",
             data: d.choiceDate.date,
-            async : false,
+       
             url: "/history/curr_week_flow/line",
             dataType: 'json',
             success: function (result) {
@@ -39,7 +39,7 @@ $(
         $.ajax({
             type: 'POST',
             data: d.choiceDate.date,
-            async: false,
+       
             url: '/thisday_info',
             dataType: 'json',
             success: function (result) {
@@ -53,12 +53,12 @@ $(
         $.ajax({
             type: 'POST',
             data: d.choiceDate.date,
-            async: false,
+      
             url: '/sta_rank',
             dataType: 'json',
             success: function (result) {
                 console.log(result);
-                for (let i = 1; i <= 10; i++){
+                for (let i = 1; i <= 25; i++){
 
                     var rank = document.getElementById(i+"");
                     var sta_name = document.getElementById('Sta' + i+"");
@@ -77,7 +77,7 @@ $(
         $.ajax({
             type: "POST",
             data: d.choiceDate.date,
-            async : false,
+    
             url: "/history/line/pie",
             dataType: 'json',
             success: function (result) {
@@ -91,7 +91,7 @@ $(
                     url: url,
                     type: "GET",
                     dataType: "json", 
-                    async: false,  //请求方式 设置为异步
+                    async: false,
                     success: function(data) {
                         js_data = data
                     }
@@ -249,7 +249,7 @@ bt.addEventListener('click',function(){
     $.ajax({
         type: 'POST',
         data: d.choiceDate.date,
-        async: false,
+     
         url: 'history/day_flow/line',
         dataType: 'json',
         success: function (result) {
@@ -261,7 +261,7 @@ bt.addEventListener('click',function(){
     $.ajax({
         type: "POST",
         data: d.choiceDate.date,
-        async : false,
+
         url: "/history/curr_week_flow/line",
         dataType: 'json',
         success: function (result) {
@@ -275,7 +275,7 @@ bt.addEventListener('click',function(){
     $.ajax({
         type: 'POST',
         data: d.choiceDate.date ,
-        async: false,
+  
         url: '/thisday_info',
         dataType: 'json',
         success: function (result) {
@@ -289,12 +289,12 @@ bt.addEventListener('click',function(){
     $.ajax({
         type: 'POST',
         data: d.choiceDate.date,
-        async: false,
+
         url: '/sta_rank',
         dataType: 'json',
         success: function (result) {
             console.log(result);
-            for (let i = 1; i <= 10; i++){
+            for (let i = 1; i <= 25; i++){
                 
                 var rank = document.getElementById(i+"");
                 var sta_name = document.getElementById('Sta' + i+"");
@@ -313,7 +313,7 @@ bt.addEventListener('click',function(){
     $.ajax({
         type: "POST",
         data: d.choiceDate.date,
-        async : false,
+      
         url: "/history/line/pie",
         dataType: 'json',
         success: function (result) {

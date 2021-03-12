@@ -21,13 +21,14 @@
                 <li><a href="/index">&nbsp;&nbsp;历史轨道数据储库</a></li>
                 <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
                 <li><a href="/client">&nbsp;&nbsp;运营规划辅助系统</a></li>
-                <li><a href="#">&nbsp;&nbsp;个人中心</a></li>
+                <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
             </ul>
         </div>
         <!-- 右侧内容区域 -->
         <div class="content">
             <!-- 用户信息 -->
             <div class="user">
+                <div class="loc">轨道交通智慧系统>历史轨道数据储库</div>
                 <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
                 <span class="name">超级管理员</span>
             </div>
@@ -37,9 +38,11 @@
                 <p>日期选择</p>
                 <div id='date'>
                     <input type="text" value='' placeholder="2020-01-01" id='inputdate' />
-                </div>    
+                </div>
+                
             </div>
             
+
 
             <!-- 当月客流变化 -->
             <div id = "month_line" class="thismonth">
@@ -90,7 +93,7 @@
                         <th>所在线路</th>
                         <th>客流</th>  
                     </tr>
-                    {% for i in range(1,11) %}
+                    {% for i in range(1,26) %}
                     <tr>
                         <td id = "{{i}}">{{i}}</td>
                         <td id = "Sta{{i}}">{{'Sta%d' % i}}</td>
@@ -103,7 +106,7 @@
             <!-- 线路断面流量排行榜 -->
             <div class="leaderboard2">
                 <p>线路断面客流排行榜</p>
-                <table id = "flow_list">
+                <table>
                     <tr>
                         <th>排名</th>
                         <th>站点名1</th>
@@ -131,6 +134,5 @@
     </div>
     
     <script src="{{ url_for('static',filename ='js/update_history.js') }}"></script>
-
 </body>
 </html>

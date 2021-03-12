@@ -127,7 +127,8 @@ class ChartApi(object):
         绘制本周客流波动 返回一个Line图表
         '''
         day = ['周一', '周二', '周三', '周四', '周五', '周六', '周末']
-        flow = [str(j) for j in curr_week_dict.values()]
+        flow = [str(i) for i in curr_week_dict.values()]
+
         line = (
             Line()
             .add_xaxis(xaxis_data = day)
@@ -136,6 +137,7 @@ class ChartApi(object):
                 y_axis=flow,
                 label_opts=opts.LabelOpts(is_show=False)
             )
+            .set_colors(['#32c5e9'])
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="本周客流波动"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
@@ -159,8 +161,9 @@ class ChartApi(object):
             .add_yaxis(
                 series_name= "{}月客流".format(int(month[-2:])),
                 y_axis=flow,
-                label_opts=opts.LabelOpts(is_show=False)
+                label_opts=opts.LabelOpts(is_show=False),
             )
+            .set_colors(['#fb7293'])
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="当月客流波动"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),

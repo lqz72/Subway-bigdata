@@ -15,7 +15,7 @@ class DataApi(object):
         '''
         self.age, self.percent = DataApi.get_age_structure()
         self.flow_df = SQLOS.get_flow_df()
-        self.trips_df = SQLOS.get_df_data('trips')
+        self.trips_df = SQLOS.get_trips_df()
         self.sta_dict = SQLOS.get_station_dict()
         self.month_dict = DataApi.get_month_flow(self.flow_df)
         self.date_flow = DataApi.get_date_series(self.flow_df)
@@ -64,7 +64,7 @@ class DataApi(object):
             day = [j.strftime("%d") for j in temp_series.index]
             flow = temp_series.values
             month_dict[i] = dict(zip(day, flow))
-
+            
         return month_dict
 
     def get_week_flow(flow_df):
@@ -252,6 +252,7 @@ class DataApi(object):
         month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
         return month_list
 
+    #--------------类方法---------------
     def get_curr_week_flow(self, date):
         '''
         获取当前周的客流变化
@@ -268,7 +269,7 @@ class DataApi(object):
         monday, sunday = monday.strftime('%Y-%m-%d'), sunday.strftime('%Y-%m-%d')
 
         curr_week_flow = self.date_flow[monday:sunday]
-
+       
         day = [j.strftime("%m-%d") for j in curr_week_flow.index]
         flow = curr_week_flow.values
         
@@ -287,7 +288,7 @@ class DataApi(object):
         sta_flow = flow_df.groupby(by='sta')['flow'].sum()
         sta_flow = sta_flow.sort_values(ascending=False)
 
-        top_sta = sta_flow.iloc[:10]
+        top_sta = sta_flow.iloc[:25]
         top_sta_list = [(i, sta_dict[i], str(top_sta[i])) for i in top_sta.index]
         
         return top_sta_list
@@ -315,7 +316,8 @@ class DataApi(object):
         获取用户信息
         '''
         df = SQLOS.get_df_data('users')
-        df = df[df['user_id'] == user_id]    
+        df = df[df['user_id'] == user_id]
+
         age = 2021 - int(df['birth_year'].values[0])
         area = df['area'].values[0]
 
@@ -333,7 +335,6 @@ class DataApi(object):
         user_trips_df = df[df['user_id'] == user_id]
         user_trips_df['flow'] = 1
 
-        user_trips_df['in_time'] = pd.to_datetime(user_trips_df['in_time']).dt.normalize()
         user_flow = user_trips_df.groupby(by='in_time')['flow'].sum()
         
         month_list = DataApi.get_month_list(user_flow.index)
