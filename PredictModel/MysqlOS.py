@@ -25,7 +25,7 @@ class SQLOS(object):
 
         #本地数据库连接
         conn = MySQLdb.connect(host='localhost', port=3306, user='root',
-        passwd='yongfufan', db='data', charset='utf8mb4')
+        passwd='5854liguo', db='data', charset='utf8mb4')
    
         return conn
     

@@ -12,6 +12,15 @@
     <script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/bootstrap.min.js') }}"></script>
 </head>
+<style>
+    a:hover {
+    text-decoration:none;
+    color: black;
+}
+    body {
+        font-size: 16px;
+    }
+</style>
 <body>
     <div class="w">
         <!-- 左侧导航栏 -->
@@ -40,7 +49,7 @@
             </div>
             
             <!-- 用户列表 -->
-            <div class="userlist">
+            <div class="userlist" id='userlist'>
                 <table>
                     <tr>
                         <td>ID</td>
@@ -67,5 +76,39 @@
         </div>
     </div>
     
+    <script>
+        $.ajax({
+            type:'POST',
+            url:'/user_info',
+            data:'4bd084423e63c9bc',
+            success: function(data) {
+                console.log(data);
+
+                
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            },
+            error: function(xhr){
+                console.log(xhr);
+            }
+        })
+    </script>
+
 </body>
 </html>
