@@ -23,7 +23,7 @@ station_name='Sta1'
 
 api = DataApi()
 
-#网页根目录
+#------------模板渲染------------
 @app.route('/')
 def root():                             
     return redirect(url_for('index'))
@@ -52,19 +52,28 @@ def selfcenter():
 def userinf():
     return render_template('userinf.html')
 
-########需要调用的api
+#------------需要调用的api------------
 @app.route('/sta/json')
-def get_sta_json():
+def get_sta_json() -> json:
     with open(abs_path + '/stations.json', 'r', encoding='utf-8') as f:
         return f.read()
 
 @app.route('/link/json')
-def get_link_json():
+def get_link_json() -> json:
     with open(abs_path + '/links.json', 'r', encoding='utf-8') as f:
         return f.read()
 
+@app.route('/user/json')
+def get_user_json() -> json:
+    """返回所有用户的信息
+    """
+    with open(abs_path + '/user_info.json', 'r', encoding='utf-8') as f:
+        return f.read()
+
 @app.route('/thisday_info', methods = ['POST', 'GET'])
-def thisday_info():
+def thisday_info() -> json:
+    """返回指定日期天气、节假日、客流信息
+    """
     current_date = request.get_data().decode('utf-8')
     month, day = current_date[:-3], current_date[-2:]
 
@@ -81,20 +90,32 @@ def thisday_info():
     return jsonify(info_dict)
 
 @app.route('/sta_rank', methods=['POST', 'GET'])
-def sta_rank():
+def sta_rank() -> json:
+    """返回站点客流排行
+    """
     current_date = request.get_data().decode('utf-8')
     sta_rank_list = api.get_top_sta(current_date)
 
     return jsonify(sta_rank_list)
 
 @app.route('/user_info', methods=['POST', 'GET'])
-def user_info():
+def user_info() -> json:
+    """返回指定用户的个人信息
+    """
     user_id = request.get_data().decode('utf-8')
     user_info = api.get_user_info(user_id)
 
     return jsonify(user_info)
 
-#------------控制图表的展示----------------
+@app.route('/admin_info', methods=['POST', 'GET'])
+def admin_info() -> json:
+    """返回管理员信息
+    """
+    user_list = SQLOS.get_admin_info()
+
+    return jsonify(user_list)
+
+#------------控制图表的展示------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])
 def day_flow():
     current_date = request.get_data().decode('utf-8')

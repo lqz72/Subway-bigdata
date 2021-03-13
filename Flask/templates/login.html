@@ -5,11 +5,33 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="../static/css/common.css">
-    <link rel="stylesheet" href="../static/css/login.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/login.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
 </head>
 <body>
     <div class="bg">
+        <script>
+            function get_data(url){
+                    var js_data;
+                    $.ajax({
+                            url: url,
+                            type: "GET",
+                            dataType: "json", 
+                            async: false,  //请求方式 设置为异步
+                            success: function(data) {
+                                js_data = data
+                            }
+                        })
+                    return js_data
+                }
+                var admin_info = get_data('/admin_info')
+                var user_info = get_data('/user/json')
+                console.log(admin_info)
+                console.log(user_info)
+
+        </script>
         <div class="log">
             <div class="title">轨道交通数据分析系统</div>
             <table class="info">

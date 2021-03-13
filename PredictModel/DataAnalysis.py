@@ -252,6 +252,32 @@ class DataApi(object):
         month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
         return month_list
 
+    def get_user_json():
+        '''
+        获取所有用户的信息 返回json文件  ##100行
+        '''
+        table = pd.read_csv('./PredictModel/txt_data/users.txt', encoding='gb18030')
+
+        df = table.iloc[0:100]
+        user_dict = {}
+
+        df.columns = ['user_id', 'area', 'age', 'sex']
+        print(df)
+        for user_id in df.user_id.values:
+            user_df = df[df['user_id'] == user_id]
+            age = 2021 - int(user_df['age'].values[0])
+            area = user_df['area'].values[0]
+            sex = '男' if user_df['sex'].values[0] == 0 else '女'
+            user_dict[user_id] = {
+                'area': str(area),
+                'age': str(age),
+                'sex': sex,
+            }
+    
+        with open('user_info.json', 'w', encoding = 'utf-8') as f:
+            f.write(json.dumps(user_dict, ensure_ascii=False, indent=2))
+            print('success!')
+
     #--------------类方法---------------
     def get_curr_week_flow(self, date):
         '''
@@ -326,24 +352,6 @@ class DataApi(object):
 
         return {'id':user_id, 'age':str(age), 'area':area, 'trips_num':trips_num} 
 
-    def get_all_user_info():
-        '''
-        获取所有用户的信息
-        '''
-        df = SQLOS.get_df_data('users')
-      
-        df['birth_year'] = df['birth_year'].apply(lambda x: str(2021 - int(x)))
-    
-        user_dict = {}
-        for user_id in df['user_id'].values[0:10]:
-            user_df = df[df['user_id'] == user_id]
-            user_dict[user_id] = {'age': user_df['birth_year'].values[0], 'area': user_df['area'].values[0]}
-
-        print(user_dict)
-        with open('user.json', 'w') as f:
-             f.write( json.dumps(user_dict,ensure_ascii=False,indent=2 ) )
-        return user_dict
-
     def get_user_month_flow(self, user_id):
         '''
         获取用户每月出行次数
@@ -362,5 +370,3 @@ class DataApi(object):
 
         return month_dict
 
-
-DataApi.get_all_user_info()

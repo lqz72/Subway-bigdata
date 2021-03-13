@@ -25,7 +25,7 @@ class SQLOS(object):
 
         #本地数据库连接
         conn = MySQLdb.connect(host='localhost', port=3306, user='root',
-        passwd='5854liguo', db='data', charset='utf8mb4')
+        passwd='yongfufan', db='data', charset='utf8mb4')
    
         return conn
     
@@ -220,6 +220,15 @@ class SQLOS(object):
         
         return in_df, out_df
 
+    def get_user_df():
+        '''
+        返回所有用户信息dataframe
+        '''
+        user_df = SQLOS.get_df_data('users')
+        user_df.drop('id', axis=1, inplace=True)
+
+        return user_df
+
     def get_user_flow(user_id):
         '''
         获取单个用户出行记录
@@ -235,6 +244,22 @@ class SQLOS(object):
             trip_record.append(record[0])
 
         return trip_record
+
+    def get_admin_info():
+        '''
+        返回管理员账号信息 返回一个列表
+        '''
+        df = SQLOS.get_df_data('admin')
+
+        admin_list = []
+        for i in range(df.shape[0]):
+            name = df['name'].values[i]
+            pwd = df['pwd'].values[i]
+            tips = df['tips'].values[i]
+            admin_dict = {'name': name, 'pwd': pwd, 'tips': tips}
+            admin_list.append(admin_dict)
+
+        return admin_list
 
     def get_weather_info(date):
         '''
