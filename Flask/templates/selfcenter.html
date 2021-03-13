@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/bootstrap.min.css') }}">
     <script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/bootstrap.min.js') }}"></script>
+    <script src="../static/js/template-web.js"></script>
 </head>
 <style>
     a:hover {
@@ -20,6 +21,7 @@
     body {
         font-size: 16px;
     }
+
 </style>
 <body>
     <div class="w">
@@ -77,7 +79,7 @@
                     </div>
                 </div>
             </div>
-            <div class="list">
+            <div class="list" id="adminlist">
                 <table>
                     <tr>
                         <td>用户名</td>
@@ -86,7 +88,20 @@
                         <td>修改</td>
                         <td>删除</td>
                     </tr>
-                    <tr>
+                    <script type="text/html id="test">
+                        {{title}}
+                    </script>
+
+                    <script>
+                        $(function(){
+                            var data = {title:'wode 测试'};
+                            var html = template('test',data);
+                            var con = document.querySelector('#adminlist');
+                            con.innerHTML = html;
+                        })
+                    </script>
+
+                    <!-- <tr>
                         <td>admin</td>
                         <td>123456</td>
                         <td>测试账号</td>
@@ -113,7 +128,7 @@
                         <td>男</td>
                         <td><button class="edit">修改</button> </td>
                         <td><button class="del">删除</button></td>
-                    </tr>
+                    </tr> -->
                 </table>
             </div>
             

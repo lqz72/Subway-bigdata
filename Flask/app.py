@@ -52,6 +52,10 @@ def selfcenter():
 def userinf():
     return render_template('userinf.html')
 
+@app.route('/test')
+def test():
+    return render_template('ts.html')
+
 #------------需要调用的api------------
 @app.route('/sta/json')
 def get_sta_json() -> json:
