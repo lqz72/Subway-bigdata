@@ -25,7 +25,7 @@ class SQLOS(object):
 
         #本地数据库连接
         conn = MySQLdb.connect(host='localhost', port=3306, user='root',
-        passwd='5854liguo', db='data', charset='utf8mb4')
+        passwd='yongfufan', db='data', charset='utf8mb4')
    
         return conn
     
@@ -213,7 +213,9 @@ class SQLOS(object):
         out_df = SQLOS.get_df_data('out_trips')
 
         in_df.in_time = pd.to_datetime(in_df.in_time)
+        in_df.set_index('in_time', inplace =True)
         out_df.out_time = pd.to_datetime(out_df.out_time)
+        out_df.set_index('out_time', inplace =True)
         
         in_df.drop(['id', 'user_id'], axis=1, inplace=True)
         out_df.drop(['id', 'user_id'], axis=1, inplace=True)

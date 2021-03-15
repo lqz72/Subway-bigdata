@@ -165,7 +165,7 @@ class ChartApi(object):
             )
             .set_colors(['#fb7293'])
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="当月客流波动"),
+                title_opts=opts.TitleOpts(title="本月客流波动"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 yaxis_opts=opts.AxisOpts(
                     name = "客流量/人次",

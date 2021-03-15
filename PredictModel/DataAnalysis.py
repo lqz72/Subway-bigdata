@@ -3,8 +3,10 @@ from MysqlOS import SQLOS
 import pandas as pd
 import datetime
 import warnings
-warnings.filterwarnings('ignore')
 import json
+import time
+warnings.filterwarnings('ignore')
+
 class DataApi(object):
     '''
     提供数据分析结果接口
@@ -19,6 +21,7 @@ class DataApi(object):
         self.sta_dict = SQLOS.get_station_dict()
         self.month_dict = DataApi.get_month_flow(self.flow_df)
         self.date_flow = DataApi.get_date_series(self.flow_df)
+        self.in_df, self.out_df = SQLOS.get_in_out_df()
     
     def get_age_structure():
         '''
@@ -160,28 +163,6 @@ class DataApi(object):
         in_series.index = range(in_series.shape[0])
         print(in_series.y.sum())
 
-    def get_hour_flow(df):              
-        '''
-        获取各个站点每个小时的进站/出站客流量 
-        传入一个in_df 或者 out_df 
-        返回值为一个字典 格式:{'station':{'hour':num,},}
-        '''
-        df.columns = ['user_id', 'sta_name', 'time']
-        df['flow'] = 1
-  
-        sta_dict = {}
-        sta_list = list(set(df['sta_name'].values))
-        for sta in sta_list:
-            sta_df = df[df['sta_name'] == sta]
-            sta_df['time'] = sta_df['time'].dt.hour
-
-            grouped = sta_df.groupby(by = ['time'], as_index = True)['flow'].sum()
-            time, flow = grouped.index, grouped.values
-            sta_dict[sta] = dict(zip(time, flow))
-
-        print(sta_dict)
-        return sta_dict
-
     def get_peak_flow(df):
         '''
         获取各个站点在早晚高峰时的进/出客流
@@ -213,7 +194,7 @@ class DataApi(object):
         0     2019-12-26    Sta1    1
         1     2019-12-26  Sta107    1
         2     2019-12-26  Sta108    2
-        ...          ...     ...  ...
+        ..          ...     ...  ...
         30503 2020-07-16   Sta97   34
         30504 2020-07-16   Sta99  100
 
@@ -281,7 +262,8 @@ class DataApi(object):
     #--------------类方法---------------
     def get_curr_week_flow(self, date):
         '''
-        获取当前周的客流变化
+        获取当前周的客流变化 
+        返回一个字典 格式: {month-day:flow,}
         '''
         date = datetime.datetime.strptime(date, '%Y-%m-%d')
         monday, sunday = date, date
@@ -315,13 +297,14 @@ class DataApi(object):
         sta_flow = sta_flow.sort_values(ascending=False)
 
         top_sta = sta_flow.iloc[:25]
-        top_sta_list = [(i, sta_dict[i], str(top_sta[i])) for i in top_sta.index]
+        top_sta_list = [(i, sta_dict[i], top_sta[i]) for i in top_sta.index]
         
         return top_sta_list
 
     def get_line_flow_percent(self, date):
         '''
-        获取某日的线路流量占比
+        获取某日的线路流量占比 
+        返回一个元组 包含线路列表和客流列表
         '''
         flow_df = self.flow_df
         sta_dict = self.sta_dict
@@ -339,7 +322,7 @@ class DataApi(object):
 
     def get_user_info(self, user_id):
         '''
-        获取用户信息
+        获取用户信息 返回一个字典
         '''
         df = SQLOS.get_df_data('users')
         df = df[df['user_id'] == user_id]
@@ -350,7 +333,7 @@ class DataApi(object):
         trips_df = self.trips_df
         trips_num = trips_df[trips_df['user_id'] == user_id].shape[0]
 
-        return {'id':user_id, 'age':str(age), 'area':area, 'trips_num':trips_num} 
+        return {'id':user_id, 'age':age, 'area':area, 'trips_num':trips_num} 
 
     def get_user_month_flow(self, user_id):
         '''
@@ -370,3 +353,61 @@ class DataApi(object):
 
         return month_dict
 
+    def get_in_hour_flow(self, date):              
+        '''
+        获取各个站点6-9点的进站客流量 
+        传入一个一个有效日期
+        返回值为一个字典 格式:{station:{hour:num,},}
+        '''
+        df = self.in_df
+
+        df = df.loc[date]
+        df['flow'] = 1 
+        df.reset_index(level='in_time', inplace=True)
+
+        sta_hour_dict = {}
+        hour_list = [str(i) for i in range(6,22)]
+        sta_dict = self.sta_dict
+    
+        sta_hour_dict = {}
+        for sta, sta_df in df.groupby(by=['in_sta_name']):
+            sta_df['in_time'] = sta_df['in_time'].dt.hour.astype('str')
+            grouped = sta_df.groupby(by='in_time')['flow'].sum()
+     
+            hour_dict = dict.fromkeys(hour_list, 0)
+            for hour in grouped.index:
+                hour_dict[hour] = grouped[hour]
+
+            sta_hour_dict[sta] = hour_dict
+
+
+        return sta_hour_dict
+
+    def get_out_hour_flow(self, date):              
+        '''
+        获取各个站点6-9点的出站客流量 
+        传入一个一个有效日期
+        返回值为一个字典 格式:{station:{hour:num,},}
+        '''
+        df = self.out_df
+
+        df = df.loc[date]
+        df['flow'] = 1 
+        df.reset_index(level='out_time', inplace=True)
+      
+        sta_hour_dict = {}
+        hour_list = [str(i) for i in range(6,22)]
+        sta_dict = self.sta_dict
+    
+        sta_hour_dict = {}
+        for sta, sta_df in df.groupby(by=['out_sta_name']):
+            sta_df['out_time'] = sta_df['out_time'].dt.hour.astype('str')
+            grouped = sta_df.groupby(by='out_time')['flow'].sum()
+     
+            hour_dict = dict.fromkeys(hour_list, 0)
+            for hour in grouped.index:
+                hour_dict[hour] = grouped[hour]
+
+            sta_hour_dict[sta] = hour_dict
+
+        return sta_hour_dict

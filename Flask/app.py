@@ -1,6 +1,7 @@
 from flask import Flask,Response,request
 from flask import render_template
 from flask import redirect, url_for, jsonify
+from flask.json import JSONEncoder
 from sys import path
 import os
 import json
@@ -9,19 +10,29 @@ warnings.filterwarnings('ignore')
 path.append('..')
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0])
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0] + 'PredictModel\\')
+
+import numpy as np
 from DataAnalysis import DataApi
 from MakeChart import ChartApi
 from MysqlOS import SQLOS
 
 app=Flask(__name__)
-abs_path = os.path.abspath(os.path.dirname(__file__))
-print(path)
-print(abs_path)
+api=DataApi()
 
-#初始化站点名称 
+abs_path = os.path.abspath(os.path.dirname(__file__))
 station_name='Sta1'
 
-api = DataApi()
+#数据格式转换类
+class NpEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super().default(obj)
 
 #------------模板渲染------------
 @app.route('/')
@@ -52,10 +63,6 @@ def selfcenter():
 def userinf():
     return render_template('userinf.html')
 
-@app.route('/test')
-def test():
-    return render_template('ts.html')
-
 #------------需要调用的api------------
 @app.route('/sta/json')
 def get_sta_json() -> json:
@@ -83,7 +90,7 @@ def thisday_info() -> json:
 
     weather = SQLOS.get_weather_info(current_date)
     is_hoilday = SQLOS.get_hoilday_info(current_date)
-    day_flow = str(api.month_dict[month][day])
+    day_flow = api.month_dict[month][day]
 
     info_dict = {
         'weather': weather[0][0], 
@@ -118,6 +125,24 @@ def admin_info() -> json:
     user_list = SQLOS.get_admin_info()
 
     return jsonify(user_list)
+
+@app.route('/in_hour_flow', methods = ['POST', 'GET'])
+def in_hour_flow() -> json:
+    """返回当前日期各站点6点-9点的进站客流量
+    """
+    current_date = request.get_data().decode('utf-8')
+    in_hour_dict = api.get_in_hour_flow(current_date)
+
+    return jsonify(in_hour_dict)
+
+@app.route('/out_hour_flow', methods = ['POST', 'GET'])
+def out_hour_flow() -> json:
+    """返回当前日期各站点6点-9点的出站客流量
+    """
+    current_date = request.get_data().decode('utf-8')
+    out_hour_dict = api.get_out_hour_flow(current_date)
+    
+    return jsonify(out_hour_dict)
 
 #------------控制图表的展示------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])
@@ -187,5 +212,9 @@ def line_pie():
 #     bar = ChartApi.station_bar(station_name, in_dict, out_dict)
 #     return bar.dump_options_with_quotes()
 
+
+
 if __name__ == '__main__':
+    app.json_encoder = NpEncoder
     app.run(debug=True)
+
