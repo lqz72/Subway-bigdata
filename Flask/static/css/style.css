@@ -418,7 +418,7 @@
 }
 .userinfo ul li:nth-child(1) span strong {
     font-size: 10px;
-    /* color: #dcdce0; */
+    transform: scale(0.8,0.8);
 }
 
 .userinfo ul li:nth-child(2){
@@ -529,7 +529,7 @@
 
 .userlist table tr td:nth-child(1)
 {
-    width: 280px;
+    width: 300px;
 }
 .userlist table tr td:nth-child(2)
 {

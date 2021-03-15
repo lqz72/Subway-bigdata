@@ -79,56 +79,9 @@
                     </div>
                 </div>
             </div>
-            <div class="list" id="adminlist">
-                <table>
-                    <tr>
-                        <td>用户名</td>
-                        <td>密码</td>
-                        <td>备注</td>
-                        <td>修改</td>
-                        <td>删除</td>
-                    </tr>
-                    <script type="text/html id="test">
-                        {{title}}
-                    </script>
-
-                    <script>
-                        $(function(){
-                            var data = {title:'wode 测试'};
-                            var html = template('test',data);
-                            var con = document.querySelector('#adminlist');
-                            con.innerHTML = html;
-                        })
-                    </script>
-
-                    <!-- <tr>
-                        <td>admin</td>
-                        <td>123456</td>
-                        <td>测试账号</td>
-                        <td><button class="edit">修改</button> </td>
-                        <td><button class="del">删除</button></td>
-                    </tr>
-                    <tr>
-                        <td>1admin</td>
-                        <td>123456</td>
-                        <td>男</td>
-                        <td><button class="edit">修改</button> </td>
-                        <td><button class="del">删除</button></td>
-                    </tr>
-                    <tr>
-                        <td>2admin</td>
-                        <td>123456</td>
-                        <td>男</td>
-                        <td><button class="edit">修改</button> </td>
-                        <td><button class="del">删除</button></td>
-                    </tr>
-                    <tr>
-                        <td>3admin</td>
-                        <td>123456</td>
-                        <td>男</td>
-                        <td><button class="edit">修改</button> </td>
-                        <td><button class="del">删除</button></td>
-                    </tr> -->
+            <div class="list">
+                <table id="adminlist">
+                    
                 </table>
             </div>
             
