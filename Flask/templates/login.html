@@ -12,26 +12,7 @@
 </head>
 <body>
     <div class="bg">
-        <script>
-            function get_data(url){
-                    var js_data;
-                    $.ajax({
-                            url: url,
-                            type: "GET",
-                            dataType: "json", 
-                            async: false,  //请求方式 设置为异步
-                            success: function(data) {
-                                js_data = data
-                            }
-                        })
-                    return js_data
-                }
-                var admin_info = get_data('/admin_info')
-                var user_info = get_data('/user/json')
-                console.log(admin_info)
-                console.log(user_info)
-
-        </script>
+        
         <div class="log">
             <div class="title">轨道交通数据分析系统</div>
             <table class="info">
@@ -57,5 +38,45 @@
         </div>
         
     </div>
+    <script>
+       var btn = document.querySelector('#confirm');
+       btn.addEventListener('click',function(){
+            $.ajax({
+                url: '/admin_info',
+                type: "GET",
+                dataType: "json", 
+                async: false,  //请求方式 设置为异步
+                success: function(data) {
+                    var user = document.querySelector('#user');
+                    var user_i = user.value;
+                    var pwd  = document.querySelector('#pwd');
+                    var pwd_i = pwd.value;
+                    for(var i=0;i<data.length;i++)
+                    {
+                        if(data[i].name===user_i)
+                        {
+                            if(data[i].pwd===pwd_i)
+                            {
+                                alert("登录成功！");
+                                location.href = '/';
+                                break;
+                            }
+                            else {
+                                alert("密码错误");
+                                break;
+                            }
+                        }
+                        if(i==data.length-1) 
+                        {
+                            alert("此用户不存在");
+                        }
+                    }
+                }
+            })
+       })
+
+        
+        
+    </script>
 </body>
 </html>

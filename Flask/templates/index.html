@@ -1,138 +1,595 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
-    <script type="text/javascript" src="{{ url_for('static',filename ='js/date.js') }}" ></script>
-	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
-</head>
-<body>
-    <div class="w">
-        <!-- 左侧导航栏 -->
-        <div class="nav">
-            <p>&nbsp;&nbsp;轨道交通智慧系统</p>
-            <ul>
-                <li><a href="/index">&nbsp;&nbsp;历史轨道数据储库</a></li>
-                <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
-                <li><a href="/client">&nbsp;&nbsp;运营规划辅助系统</a></li>
-                <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
-            </ul>
-        </div>
-        <!-- 右侧内容区域 -->
-        <div class="content">
-            <!-- 用户信息 -->
-            <div class="user">
-                <div class="loc">轨道交通智慧系统>历史轨道数据储库</div>
-                <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
-                <span class="name">超级管理员</span>
-            </div>
-
-            <!-- 时间控件 -->
-            <div class="time">
-                <p>日期选择</p>
-                <div id='date'>
-                    <input type="text" value='' placeholder="2020-01-01" id='inputdate' />
-                </div>
-                
-            </div>
+﻿<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>轨道交通智慧客流分析预测</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.jpg">
+		
+		<!-- all css here -->
+        <link rel="stylesheet" href="../static/new/assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../static/new/assets/css/magnific-popup.css">
+        <link rel="stylesheet" href="../static/new/assets/css/animate.css">
+        <link rel="stylesheet" href="../static/new/assets/css/owl.carousel.min.css">
+        <link rel="stylesheet" href="../static/new/assets/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../static/new/assets/css/et-line-icon.css">
+        <link rel="stylesheet" href="../static/new/assets/css/bicon.min.css">
+        <link rel="stylesheet" href="../static/new/assets/css/slick.css">
+        <link rel="stylesheet" href="../static/new/assets/css/meanmenu.min.css">
+        <link rel="stylesheet" href="../static/new/assets/css/bundle.css">
+        <link rel="stylesheet" href="../static/new/assets/css/style.css">
+        <link rel="stylesheet" href="../static/new/assets/css/responsive.css">
+        <script src="../static/new/assets/js/vendor/modernizr-2.8.3.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <!-- header start -->
+		<header class="header-area">
             
-
-
-            <!-- 当月客流变化 -->
-            <div id = "month_line" class="thismonth">
-                <!-- 当月客流变化折线图 -->
+            <div class="header-bottom">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-3">
+                            <div class="logo">
+                                <a href="index.html"><img src="../static/new/assets/img/logo/1.png" alt="" /></a>
+                            </div>
+                        </div>
+                        <div class="col-md-9 col-sm-9 hidden-xs">
+                            <div class="search-menu f-right">
+                                <div class="search-bar-button">
+                                    <a href="#"><i class="fa fa-search"></i></a>
+                                    <div class="widget_searchform_content">
+                                        <form action="#">
+                                            <input type="text" placeholder="Search" name="s" value="">
+                                            <button class="submit">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="main-menu f-right">
+                                <nav>
+                                    <ul>
+                                        <li><a href="/index">首页</a></li>
+                                        <li><a href="/eventdetails">服务产品</a></li>
+                                        <li><a href="/aboutus">关于我们</a></li>
+                                        <li><a href="/log">数据分析</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mobile-menu-area visible-xs hidden-sm">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mobile-menu">
+                                    <nav id="mobile-menu-active">
+                                        <ul>
+                                            <li><a href="/index">首页</a></li>
+                                            <li><a href="/eventdetails">服务产品</a></li>
+                                            <li><a href="/aboutus">关于我们</a></li>
+                                            <li><a href="/log">数据分析</a></li>
+                                        </ul>
+                                    </nav>							
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- 当天总客流 -->
-            <div class="thisdayall">
-                <p>今日客流总量</p>
-                <p id = "day_flow">1213</p>
+		</header>
+		<!-- header end -->
+		<!-- slider-area start -->
+		<div class="slider-area">
+            <div class="slider-active owl-carousel">
+                <div class="single-slider pb-340 pt-240 bg-img" style="background-image:url(../static/new/assets/img/slider/1.png);">
+                    <div class="container">
+                        <div class="slider-text text-center z-index">
+                            <h2 class="animated">轨道交通</h2>
+                            <h1 class="animated">智慧客流分析预测</h1>
+                            <p class="animated">Smart Pasenger Flow Analysis of Metro</p>
+                            <a class="button theme-bg animated" href="#">立即进行</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="single-slider pb-340 pt-240 bg-img" style="background-image:url(../static/new/assets/img/slider/2.png);">
+                    <div class="container">
+                        <div class="slider-text text-center z-index">
+                            <h2 class="animated">轨道交通</h2>
+                            <h1 class="animated">智慧客流分析预测</h1>
+                            <p class="animated">Smart Pasenger Flow Analysis of Metro</p>
+                            <a class="button theme-bg animated" href="#">立即进行</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="single-slider pb-340 pt-240 bg-img" style="background-image:url(../static/new/assets/img/slider/3.png);">
+                    <div class="container">
+                        <div class="slider-text text-center z-index">
+                            <h2 class="animated">轨道交通</h2>
+                            <h1 class="animated">智慧客流分析预测</h1>
+                            <p class="animated">Smart Pasenger Flow Analysis of Metro</p>
+                            <a class="button theme-bg animated" href="#">立即进行</a>
+                        </div>
+                    </div>
+                </div>                   
             </div>
-            <!-- 当天其他信息 -->
-            <div id = "thisday_info" class="thisdayinfo">
-                <p>今日天气情况：<span id = "weather">晴朗</span></p>
-                <p>是否节假日：<span id = "is_hoilday">否</span></p>
-                <p>客流量对比</p>
-                <ul>
-                    <li>较昨日：<span class='font-red'>+20%</span></li> 
-                    <li>较月平均：<span class='font-red'>+20%</span></li> 
-                    <li>较年平均：<span class='font-red'>-20%</span></li>
-                    <li>早高峰客流：<span> <em class='font-red'>231</em> 人次</span></li>
-                    <li>晚高峰客流：<span> <em class='font-red'>315</em> 人次</span></li>
-                </ul>
+		</div>
+        <!-- slider end -->
+        <!-- services start -->
+        <div class="services-area">
+            <div class="container">
+                <div class="all-single-service white-bg pt-120 pb-90">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="section-title text-center mb-75">
+                                <h2>关于我们</h2>
+                                <div class="icon-img">
+                                    <img src="../static/new/assets/img/icon-img/1.png" alt="">
+                                </div>
+                                <p>我们的平台提供强大的平台功能</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4 text-center mb-30">
+                            <div class="single-service">
+                                <i class="icon-happy"></i>
+                                <h3>智慧城轨倡导者 </h3>
+                                <p>我们立荐城市交通智慧运营 <br> 促进城市健康发展</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 text-center mb-30">
+                            <div class="single-service">
+                                <i class="icon-profile-male"></i>
+                                <h3>技术多元的团队架构</h3>
+                                <p>我们的团队多专业交织且分工合理 <br> 拥有多方面技术背景</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-4 text-center mb-30">
+                            <div class="single-service">
+                                <i class="icon-globe"></i>
+                                <h3>功能强大的智慧平台</h3>
+                                <p>我们的平台提供强大的分析、预测等功能助力城轨交通的稳定发展</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- 这一周 -->
-            <div id = "curr_week_line" class="thisweek">
-                <!-- 本周客流变化折线图 -->
-            </div>
-            <!-- 线路流量占比 -->
-            <div id = "line_percent" class="linepercent">
-                <!-- 线路流量占比扇形图/风玫瑰图 -->
-            </div>
-            <!-- 站点od客流量 -->
-            <div class="od">
-                站点od客流量图
-            </div>
-            <!-- 早晚高峰热力图和线路断面 -->
-            <div id = "line_graph" class="twograph">
-                热力图,早晚高峰分布
-                /线路断面？选择展示方式，最简单的是折线图挨个线路统计，但不直观。看能否嵌套在热力图里面
-            </div>
-            <!-- 站点排行榜 -->
-            <div class="leaderboard">
-                <p>站点客流排行榜</p>
-                <table id = "sta_flow_list">
-                    <tr>
-                        <th>排名</th>
-                        <th>站点名</th>
-                        <th>所在线路</th>
-                        <th>客流</th>  
-                    </tr>
-                    {% for i in range(1,26) %}
-                    <tr>
-                        <td id = "{{i}}">{{i}}</td>
-                        <td id = "Sta{{i}}">{{'Sta%d' % i}}</td>
-                        <td id = "line{{i}}">{{'%d号线' % i}}</td>
-                        <td id = "flow{{i}}">{{i * 1000}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <!-- 线路断面流量排行榜 -->
-            <div class="leaderboard2">
-                <p>线路断面客流排行榜</p>
-                <table>
-                    <tr>
-                        <th>排名</th>
-                        <th>站点名1</th>
-                        <th>站点名2</th>
-                        <th>所在线路</th>
-                        <th>客流</th>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>sta102</td>
-                        <td>sta2</td>
-                        <td>6号线</td>
-                        <td>1315</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                </table>
-            </div>    
         </div>
-    </div>
-    
-    <script src="{{ url_for('static',filename ='js/update_history.js') }}"></script>
-</body>
+        <!-- services end -->
+        <!-- causes start -->
+        <div class="causes-area pt-120 pb-90">
+            <div class="container">
+                <div class="section-title text-center mb-75">
+                    <h2>功能展示</h2>
+                    <div class="icon-img">
+                        <img src="../static/new/assets/img/icon-img/1.png" alt="">
+                    </div>
+                    <p>我们的平台提供强大的平台功能</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="single-causes mb-30">
+                            <div class="my_limit my_overflow_hidden">
+                                <a href="#"">
+                                <img class='my_img_hover' src="../static/new/assets/img/causes/4.png" alt="" /></a>
+                            </div>
+                            
+                            <div class="causes-info">
+                                <h3><a href="#">历史轨道数据储库</a></h3>
+                                <p>提供城轨历史数据客流的可视化、热力图分析、OD分析、用户行程信息追随等子功能。</p>
+                                <div class="causes-meta">
+                                    <div class="doller-target f-left">
+                                        <h4> <span></span></h4>
+                                    </div>
+                                    <div class="doller-target f-right">
+                                        <h4> <span></span></h4>
+                                    </div>
+                                </div>
+                                <a class="button theme-bg" href="#">立即进行</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="single-causes mb-30">
+                            <div class="my_limit my_overflow_hidden">
+                                <a href="#"">
+                                <img class='my_img_hover' src="../static/new/assets/img/causes/5.png" alt="" /></a>
+                            </div>
+                            <div class="causes-info">
+                                <h3><a href="#">智慧轨道预测系统</a></h3>
+                                <p>提供城轨未来客流预测，基于数据可视化、热力图分析、OD分析等进行展示。</p>
+                                <div class="causes-meta">
+                                    <div class="doller-target f-left">
+                                        <h4><span></span></h4>
+                                    </div>
+                                    <div class="doller-target f-right">
+                                        <h4> <span></span></h4>
+                                    </div>
+                                </div>
+                                <a class="button theme-bg" href="causes.html">立即进行</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="single-causes mb-30">
+                            <div class="my_limit my_overflow_hidden">
+                                <a href="#"">
+                                <img class='my_img_hover' src="../static/new/assets/img/causes/4.png" alt="" /></a>
+                            </div>
+                            <div class="causes-info">
+                                <h3><a href="#">运营规划辅助系统</a></h3>
+                                <p>基于数据预测进行未来客流评估及改进建议，优化地铁运营布局。</p>
+                                <div class="causes-meta">
+                                    <div class="doller-target f-left">
+                                        <h4> <span></span></h4>
+                                    </div>
+                                    <div class="doller-target f-right">
+                                        <h4> <span></span></h4>
+                                    </div>
+                                </div>
+                                <a class="button theme-bg" href="causes.html">立即进行</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- causes end -->
+        <!-- video start -->
+        <div class="video-area gray-bg ptb-120">
+            <div class="container">
+                <div class="video-part-1 pb-100">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="video-img">
+                                <img src="../static/new/assets/img/video/a1.png" alt="">
+                                <a class="video-popup" href="">
+                                    <img src="../static/new/assets/img/icon-img/2.png" alt="">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="video-info video-border">
+                                <h3>客流热力图分析</h3>
+                                <p>客流热力图主要分析某一时刻地铁站点或线路断面的客流密度，定性与定量地展示此时地铁的拥挤程度。分析得出结论进而指导改进措施化解拥堵。</p>
+                                <a class="button theme-bg" href="#">立即演示</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="video-part-1">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="video-info another-text">
+                                <h3>客流OD分析</h3>
+                                <p>轨道客流OD分析即客流起止点调查分析，能助力精准分析客流空间分布及未来客流变化等讯息，提供决策依据。</p>
+                                <a class="button theme-bg" href="#">立即演示</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div class="video-img">
+                                <img src="../static/new/assets/img/video/a2.png" alt="">
+                                <a class="video-popup" href="#">
+                                    <img src="../static/new/assets/img/icon-img/2.png" alt="">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- video end -->
+        <!-- funfact start -->
+        <!-- <div class="funfact-area pt-120 pb-90" style="background-image:url(assets/img/bg/1.jpg)" data-overlay="5.5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3 col-sm-3">
+                        <div class="project-count text-center mb-30">
+                            <h2 class="counter">192</h2>
+                            <span>Donations</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="project-count text-center mb-30">
+                            <h2 class="counter">80</h2>
+                            <span>Mission Done</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="project-count text-center mb-30">
+                            <h2 class="counter">252</h2>
+                            <span>Volunteers</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-3">
+                        <div class="project-count text-center mb-30">
+                            <h2 class="counter">17</h2>
+                            <span>New Project</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <!-- funfact end -->
+        <!-- help area start -->
+        <div class="help-area ptb-120 gray-bg">
+            <div class="container">
+                <div class="section-title text-center mb-75">
+                    <h2>为什么选择我们</h2>
+                    <div class="icon-img">
+                        <img src="../static/new/assets/img/icon-img/1.png" alt="">
+                    </div>
+                    <p>我们平台提供强大的平台功能</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="help-banner">
+                            <img src="../static/new/assets/img/banner/1.jpg" alt="">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="help-services">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6 text-center mb-65">
+                                    <div class="single-service">
+                                        <i class="icon-wallet"></i>
+                                        <h3>稳定的平台加密</h3>
+                                        <p>采用xxxx加密技术 <br> 便携安全的管理环境</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 text-center mb-65">
+                                    <div class="single-service">
+                                        <i class="icon-profile-male2"></i>
+                                        <h3>后台开发</h3>
+                                        <p>采用flask轻量级web框架 <br> 灵活、轻便、安全、丰富</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 text-center">
+                                    <div class="single-service mrg-30">
+                                        <i class="icon-gift"></i>
+                                        <h3>数据预测</h3>
+                                        <p>采用集成算法xgboost等技术<br>机器学习精准测算</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-6 text-center">
+                                    <div class="single-service">
+                                        <i class="icon-camera"></i>
+                                        <h3>项目部署</h3>
+                                        <p>Gunicom及Nginx等远程云服务器<br>实现高性能外网访问及动态更新</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- help area end -->
+        <!-- blog area start -->
+        <!-- <div class="blog-area pt-120 pb-90">
+            <div class="container">
+                <div class="section-title text-center mb-75">
+                    <h2>Form The Blog</h2>
+                    <div class="icon-img">
+                        <img src="assets/img/icon-img/1.png" alt="">
+                    </div>
+                    <p>There are many variations of azer duskam of Lorem Ipsum available,</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="single-blog mb-30">
+                            <div class="blog-img">
+                                <a href="blog.html"><img src="assets/img/blog/1.jpg" alt=""></a>
+                                <div class="blog-icon">
+                                    <a class="blog-link" href="blog.html">
+                                        <img src="assets/img/icon-img/4.png" alt="">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="blog-info">
+                                <span>September 06, 2017</span>
+                                <h3><a href="blog.html">Save The Child</a></h3>
+                                <a href="blog.html">Read More 
+                                    <img class="b-blog" src="assets/img/icon-img/3.png" alt="">
+                                    <img class="b-none" src="assets/img/icon-img/5.png" alt="">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="single-blog mb-30">
+                            <div class="blog-img">
+                                <a href="#"><img src="assets/img/blog/2.jpg" alt=""></a>
+                                <div class="blog-icon">
+                                    <a class="blog-link" href="blog.html">
+                                        <img src="assets/img/icon-img/4.png" alt="">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="blog-info">
+                                <span>September 06, 2017</span>
+                                <h3><a href="blog.html">For New Genaration</a></h3>
+                                <a href="blog.html">Read More 
+                                    <img class="b-blog" src="assets/img/icon-img/3.png" alt="">
+                                    <img class="b-none" src="assets/img/icon-img/5.png" alt="">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div class="single-blog mb-30">
+                            <div class="blog-img">
+                                <a href="#"><img src="assets/img/blog/3.jpg" alt=""></a>
+                                <div class="blog-icon">
+                                    <a class="blog-link" href="blog.html">
+                                        <img src="assets/img/icon-img/4.png" alt="">
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="blog-info">
+                                <span>September 06, 2017</span>
+                                <h3><a href="blog.html">For New Hope</a></h3>
+                                <a href="blog.html">Read More 
+                                    <img class="b-blog" src="assets/img/icon-img/3.png" alt="">
+                                    <img class="b-none" src="assets/img/icon-img/5.png" alt="">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+        <!-- blog area end -->
+        <!-- footer area start -->
+        <footer class="footer-area pt-120 black-bg">
+            <div class="container">
+                <div class="footer-top pb-55">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 mb-50">
+                            <div class="footer-weiget">
+                                <h3 class="weiget-title">ABOUT US</h3>
+                                <div class="weiget-info">
+                                    <p>There are many variations of passages of Lorem Ipsum available, but the.There are many variations of passages </p>
+                                    <div class="footer-social">
+                                        <ul>
+                                            <li><a href="#"><i class="icon-facebook"></i></a></li>
+                                            <li><a href="#"><i class="icon-twitter"></i></a></li>
+                                            <li><a href="#"><i class="icon-googleplus"></i></a></li>
+                                            <li><a href="#"><i class="icon-tumblr"></i></a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-50">
+                            <div class="footer-weiget">
+                                <h3 class="weiget-title">IMPORTANT INFO</h3>
+                                <div class="weiget-info">
+                                    <ul>
+                                        <li><a href="#">About Us</a></li>
+                                        <li><a href="#">Annual Reports</a></li>
+                                        <li><a href="#">Our Approch</a></li>
+                                        <li><a href="#">Statistics</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-50">
+                            <div class="footer-weiget">
+                                <h3 class="weiget-title">IMPORTANT LINKS</h3>
+                                <div class="weiget-info">
+                                    <ul>
+                                        <li><a href="#">Donate</a></li>
+                                        <li><a href="#">Media Resurces</a></li>
+                                        <li><a href="#">Quick Contact</a></li>
+                                        <li><a href="#">Address</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6 mb-50">
+                            <div class="footer-weiget">
+                                <h3 class="weiget-title">INSTAGRAM FEED</h3>
+                                <div class="weiget-info">
+                                    <div class="instra-img">
+                                        <a href="#">
+                                            <img src="assets/img/instragram/1.jpg" alt="">
+                                        </a>
+                                        <div class="instra-icon">
+                                            <a class="instra-link" href="gallery.html">
+                                                <img src="assets/img/icon-img/6.png" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="instra-img">
+                                        <a href="#">
+                                            <img src="assets/img/instragram/2.jpg" alt="">
+                                        </a>
+                                        <div class="instra-icon">
+                                            <a class="instra-link" href="gallery.html">
+                                                <img src="assets/img/icon-img/6.png" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="instra-img">
+                                        <a href="#">
+                                            <img src="assets/img/instragram/3.jpg" alt="">
+                                        </a>
+                                        <div class="instra-icon">
+                                            <a class="instra-link" href="gallery.html">
+                                                <img src="assets/img/icon-img/6.png" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="instra-img">
+                                        <a href="#">
+                                            <img src="assets/img/instragram/4.jpg" alt="">
+                                        </a>
+                                        <div class="instra-icon">
+                                            <a class="instra-link" href="gallery.html">
+                                                <img src="assets/img/icon-img/6.png" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="instra-img">
+                                        <a href="#">
+                                            <img src="assets/img/instragram/5.jpg" alt="">
+                                        </a>
+                                        <div class="instra-icon">
+                                            <a class="instra-link" href="gallery.html">
+                                                <img src="assets/img/icon-img/6.png" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="instra-img">
+                                        <a href="#">
+                                            <img src="assets/img/instragram/6.jpg" alt="">
+                                        </a>
+                                        <div class="instra-icon">
+                                            <a class="instra-link" href="gallery.html">
+                                                <img src="assets/img/icon-img/6.png" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="footer-bottom text-center">
+                            <p>Copyright &copy; 2017.Company name All rights reserved.<a target="_blank" href="">&#x7F51;&#x9875;&#x6A21;&#x677F;</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- footer area end -->
+        
+        
+		<!-- all js here -->
+        <script src="../static/new/assets/js/vendor/jquery-1.12.0.min.js"></script>
+        <script src="../static/new/assets/js/bootstrap.min.js"></script>
+        <script src="../static/new/assets/js/jquery.magnific-popup.min.js"></script>
+        <script src="../static/new/assets/js/isotope.pkgd.min.js"></script>
+        <script src="../static/new/assets/js/imagesloaded.pkgd.min.js"></script>
+        <script src="../static/new/assets/js/jquery.counterup.min.js"></script>
+        <script src="../static/new/assets/js/waypoints.min.js"></script>
+        <script src="../static/new/assets/js/ajax-mail.js"></script>
+        <script src="../static/new/assets/js/owl.carousel.min.js"></script>
+        <script src="../static/new/assets/js/plugins.js"></script>
+        <script src="../static/new/assets/js/main.js"></script>
+    </body>
 </html>
+

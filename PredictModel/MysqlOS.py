@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
-import pymysql
 from sqlalchemy import create_engine
+import pymysql
 import MySQLdb
+import configparser
 import os
 import time
 
@@ -19,13 +20,24 @@ class SQLOS(object):
         pass
     
     def connect_to_db():
+        abs_path = os.path.abspath(os.path.dirname(__file__))
+
+        cf= configparser.ConfigParser()
+        cf.read(abs_path + '/mysql.conf', encoding='utf-8')
+
         #远程数据库连接
         # conn = MySQLdb.connect(host='118.178.88.14', port=3306, user='lqz',
         # passwd='863JTcyPGezGEXmm', db='lqz', charset='utf8mb4')
 
         #本地数据库连接
-        conn = MySQLdb.connect(host='localhost', port=3306, user='root',
-        passwd='yongfufan', db='data', charset='utf8mb4')
+        conn = MySQLdb.connect(
+            host=cf.get('Default', 'DB_HOST'),
+            port=cf.getint('Default', 'DB_PORT'),
+            user=cf.get('Default', 'DB_USER'),
+            passwd=cf.get('Default', 'DB_PASSWD'),
+            db=cf.get('Default', 'DB_NAME'),
+            charset='utf8mb4',
+        )
    
         return conn
     
@@ -189,19 +201,12 @@ class SQLOS(object):
     def get_trips_df():
         '''
         获取原始客流信息 每一条为单个用户进出站的记录 返回一个dataframe
-        dataframe格式如下
-               in_sta_name  in_time     out_sta_name  out_time
-        0      Sta18       2020-07-15   Sta9         2020-07-15
-        1      Sta74       2020-07-15   Sta133       2020-07-15
-        2      Sta69       2020-07-15   Sta96        2020-07-15
-        3      Sta110      2020-07-15   Sta123       2020-07-15
-        4      Sta36       2020-07-15   Sta28        2020-07-15
         '''
         trips_df = SQLOS.get_df_data('trips')
         trips_df.drop(['price', 'id'], axis=1, inplace=True)
 
-        trips_df['in_time'] = pd.to_datetime(trips_df['in_time']).dt.normalize()
-        trips_df['out_time'] = pd.to_datetime(trips_df['out_time']).dt.normalize()
+        trips_df['in_time'] = pd.to_datetime(trips_df['in_time'])
+        trips_df['out_time'] = pd.to_datetime(trips_df['out_time'])
 
         return trips_df
 
@@ -306,4 +311,3 @@ class SQLOS(object):
             conn.close()
         
         return 'UnKnow'
-

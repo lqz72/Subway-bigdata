@@ -194,7 +194,7 @@ class DataApi(object):
         0     2019-12-26    Sta1    1
         1     2019-12-26  Sta107    1
         2     2019-12-26  Sta108    2
-        ..          ...     ...  ...
+        ...          ...     ...  ...
         30503 2020-07-16   Sta97   34
         30504 2020-07-16   Sta99  100
 
@@ -341,9 +341,12 @@ class DataApi(object):
         返回一个字典 格式: {year-month:num,}
         '''
         df = self.trips_df
+
+        df['in_time'] = df['in_time'].dt.normalize()
+        df['out_time'] = df['out_time'].dt.normalize()
         user_trips_df = df[df['user_id'] == user_id]
         user_trips_df['flow'] = 1
-
+       
         user_flow = user_trips_df.groupby(by='in_time')['flow'].sum()
         
         month_list = DataApi.get_month_list(user_flow.index)
@@ -355,7 +358,7 @@ class DataApi(object):
 
     def get_in_hour_flow(self, date):              
         '''
-        获取各个站点6-9点的进站客流量 
+        获取各个站点6-21点的进站客流量 
         传入一个一个有效日期
         返回值为一个字典 格式:{station:{hour:num,},}
         '''
@@ -379,13 +382,25 @@ class DataApi(object):
                 hour_dict[hour] = grouped[hour]
 
             sta_hour_dict[sta] = hour_dict
+        
+        # for sta in sta_dict:
+        #     hour_dict = dict.fromkeys(hour_list, 0)
+        #     sta_df = df[df['in_sta_name'] == sta]
 
+        #     sta_df['in_time'] = sta_df['in_time'].dt.hour.astype('str')
+        #     sta_df = sta_df[sta_df['in_time'].isin(hour_list)]
+          
+        #     grouped = sta_df.groupby(by = ['in_time'], as_index = True)['flow'].sum()
+            
+        #     for hour in grouped.index:
+        #         hour_dict[hour] = grouped[hour]
+        #     sta_hour_dict[sta] = hour_dict
 
         return sta_hour_dict
 
     def get_out_hour_flow(self, date):              
         '''
-        获取各个站点6-9点的出站客流量 
+        获取各个站点6-21点的出站客流量 
         传入一个一个有效日期
         返回值为一个字典 格式:{station:{hour:num,},}
         '''
@@ -398,16 +413,24 @@ class DataApi(object):
         sta_hour_dict = {}
         hour_list = [str(i) for i in range(6,22)]
         sta_dict = self.sta_dict
-    
-        sta_hour_dict = {}
-        for sta, sta_df in df.groupby(by=['out_sta_name']):
-            sta_df['out_time'] = sta_df['out_time'].dt.hour.astype('str')
-            grouped = sta_df.groupby(by='out_time')['flow'].sum()
-     
+        for sta in sta_dict:
             hour_dict = dict.fromkeys(hour_list, 0)
+            sta_df = df[df['out_sta_name'] == sta]
+
+            sta_df['out_time'] = sta_df['out_time'].dt.hour.astype('str')
+            sta_df = sta_df[sta_df['out_time'].isin(hour_list)]
+          
+            grouped = sta_df.groupby(by = ['out_time'], as_index = True)['flow'].sum()
+            
             for hour in grouped.index:
                 hour_dict[hour] = grouped[hour]
-
             sta_hour_dict[sta] = hour_dict
 
         return sta_hour_dict
+
+# api = DataApi()
+# start = time.time()
+# a = api.get_in_hour_flow('2020-07-10')
+# end = time.time()
+# print(end - start)
+# print(a)

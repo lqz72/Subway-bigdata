@@ -63,6 +63,22 @@ def selfcenter():
 def userinf():
     return render_template('userinf.html')
 
+@app.route('/history')
+def history():
+    return render_template('history.html')
+
+@app.route('/aboutus')
+def aboutus():
+    return render_template('about-us.html')
+    
+@app.route('/eventdetails')
+def eventdetails():
+    return render_template('event-details.html')
+
+@app.route('/log')
+def log():
+    return render_template('log.html')
+
 #------------需要调用的api------------
 @app.route('/sta/json')
 def get_sta_json() -> json:

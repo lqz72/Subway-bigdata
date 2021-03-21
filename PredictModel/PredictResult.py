@@ -92,5 +92,3 @@ class PredictApi(object):
         out_dict = _get_month_dict(out_predict_results) 
 
         return in_dict, out_dict
-
-PredictApi.get_sta_flow('Sta99')

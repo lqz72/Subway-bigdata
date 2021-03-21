@@ -1,0 +1,174 @@
+.index-cell {
+	display: table-cell;
+	vertical-align: middle;
+}
+.index-table {
+	display: table;
+}
+.p-title {
+	text-align: center;
+}
+.p-title .t {
+	line-height: 49px;
+	font-size: 30px;
+}
+
+.p-title .s {
+	display: block;
+	width: 20px;
+	height: 3px;
+	background: #e50012;
+	margin: 10px auto 0;
+}
+
+.p-title .c {
+	line-height: 27px;
+	font-size: 16px;
+	color: #666666;
+	margin: 13px 0 0;
+}
+.index-con {
+	/* padding: 0 100px; */
+	box-sizing: border-box;
+	width: 100%;
+}
+.mt50 {
+	margin-top: 50px;
+}
+
+.linian {
+	padding: 60px 0;
+	overflow: hidden;
+	background: #fff;
+}
+
+.linian li {
+	width: 100%;
+	overflow: hidden;
+	background: #fff;
+	margin-bottom: 4em;
+}
+
+.linian li .cont {
+	padding: 30px 60px;
+	width: 50%;
+	overflow: hidden;
+	box-sizing: border-box;
+	height: 400px;
+}
+
+.linian li .cont h1 {
+	font-size: 28px;
+	margin-bottom: 10px;
+	color: #333333;
+}
+
+.linian li .cont span {
+	display: block;
+	width: 15px;
+	height: 2px;
+	background: #666666;
+	margin: 40px 0;
+}
+
+.linian li .cont figure {
+	width: 100%;
+	overflow: hidden;
+}
+
+.linian li .cont figure p {
+	line-height: 26px;
+	font-size: 13px;
+	color: #555;
+}
+
+.linian li .ln_img {
+	width: 50%;
+	overflow: hidden;
+}
+
+.linian li .ln_img img {
+	display: block;
+	width: 100%;
+	height: 400px;
+}
+
+.linian li .ln_img img {
+	display: block;
+	width: 100%;
+	-webkit-transition: all 0.4s linear;
+	-moz-transition: all 0.4s linear;
+	-o-transition: all 0.4s linear;
+	transition: all 0.4s linear;
+}
+
+.linian li:hover .ln_img img {
+	-webkit-transform: scale(1.06);
+	-moz-transform: scale(1.06);
+	-ms-transform: scale(1.06);
+	-o-transform: scale(1.06);
+	transform: scale(1.06);
+}
+
+
+
+
+
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, caption, tbody, tfoot, thead, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video { margin: 0; padding: 0px; border: 0; font-size: 100%; outline: none; }
+html { font-size: 100%; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; overflow-x: hidden;}
+/* always display scrollbars */
+body { font:14px/30px "Microsoft Yahei","微软雅黑","Arial","Helvetica","SimHei","黑体","STXihei","华文细黑",sans-serif; margin: 0 auto; color:#000;  width: 100%; height: 100%; overflow: hidden;}
+body{overflow-x:hidden}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section { display: block; }
+input, select,button{ vertical-align: middle; outline: none; padding:0; }
+ol, ul,li{ list-style: none; }
+blockquote, q { quotes: none; }
+blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none; }
+strong,i,em,b{ font-style:normal; font-weight:normal; }
+img { border:0;}
+input[type="text"], input[type="button"], input[type="submit"], input[type="reset"] ,select{ -webkit-appearance: none; border-radius: 0;}
+textarea { -webkit-appearance: none; border-radius: 0; background:none; outline:none; padding:0; margin:0; border:none;}
+::-moz-selection { background: #ebb112; color: #fff; text-shadow: none; }
+::selection { background: #ebb112; color: #fff; text-shadow: none; }
+a{ text-decoration:none; blr: expression(this.onFocus=this.blur()); cursor: pointer; color: #666666; -webkit-transition: 0.3s; -moz-transition: 0.3s; -o-transition: 0.3s; transition: 0.3s; }
+a:link, a:visited { text-decoration: none; }
+
+.clear { clear: both; }
+.clearfix:before, .clearfix:after { display: table; content: ""; line-height: 0px; }
+.clearfix:after { clear: both; }
+.clearfix { *zoom: 1; }
+.fl{ float:left;}
+.fr{ float:right;}
+.tl{text-align: left;}
+.tc{text-align: center;}
+.tr{text-align: right;}
+h1,h2,h3,h4,h5{ font-weight:normal; display:block;}
+input,button,table,tr,td,textarea{ font-family:Microsoft yahei,Arial;}
+.bgffffff{background: #ffffff;}
+.bgf7f7f7{background: #f7f7f7;}
+.bgf5f5f5{background: #f5f5f5;}
+.w1200{ width:1200px; margin:0px auto;}
+.w1300{ width:1300px; margin:0px auto;}
+.w1260{ width:1260px; margin:0px auto;}
+.ft26{font-size: 26px;}
+.ft20{font-size: 20px;}
+.bg0{background: none !important;}
+.ml10{ margin-left: 10px;}
+.ml20{ margin-left: 20px;}
+.ml30{ margin-left: 30px;}
+.ml40{ margin-left: 40px;}
+.ml50{ margin-left: 50px;}
+.h150{height: 150px;}
+.mt40{margin-top: 40px !important;}
+.mt50{margin-top: 50PX !important;}
+
+input:required:invalid, input:focus:invalid, textarea:required:invalid, textarea:focus:invalid{box-shadow: none; -moz-box-shadow: none;}
+
+input::-webkit-input-placeholder, textarea::-webkit-input-placeholder{color: #333;} 
+
+input:-moz-placeholder, textarea:-moz-placeholder{color: #333;} 
+
+input::-moz-placeholder, textarea::-moz-placeholder{color: #333;} 
+
+input:-ms-input-placeholder, textarea:-ms-input-placeholder{color: #333;} 
