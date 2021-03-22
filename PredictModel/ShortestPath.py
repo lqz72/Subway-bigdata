@@ -1,6 +1,7 @@
+from MysqlOS import SQLOS
+import time
 import json
 import os
-abs_path = os.path.abspath(os.path.dirname(__file__))
 
 class Vertex:
     def __init__(self, key):
@@ -62,25 +63,27 @@ class Graph:
         return self.vert_dict.keys()
 
 class ShortestPath():
-    def __init__(self):
-        """用于求解最短路径 继承于图类
-        """
+    """用于求解最短路径
+    """
+    def __init__(self):    
         self.graph = Graph()
 
         #初始化graph
-        link_list = self.load_link_data()
+        link_list = ShortestPath.load_link_data()
         for link in link_list:
             self.graph.add_edge(link['head'], link['tail'], 1)
 
-    def load_link_data(self):
+    def load_link_data():
         """获取站点连接数据
         """
-        with open(abs_path + '/json/link_info.json', 'r', encoding='utf-8') as f:
+        abs_path = os.path.abspath(os.path.dirname(__file__))
+        with open(abs_path + '/json/links.json', 'r', encoding='utf-8') as f:
             link_list = json.load(f)
 
         return link_list
 
-    def get_link_json(self):
+    def get_link_json():
+        abs_path = os.path.abspath(os.path.dirname(__file__))
         with open(abs_path + '/json/links.json', 'r', encoding = 'utf-8') as f:
             links = json.load(f)
             link_list = []
@@ -92,7 +95,7 @@ class ShortestPath():
                     }
                 )
 
-            with open(abs_path + '/json/link_info.json', 'w', encoding = 'utf-8') as ff:
+            with open(abs_path + '/json/links.json', 'w', encoding = 'utf-8') as ff:
                 json.dump(link_list, ff)
 
     def Dijkstra(self, graph, start):
@@ -121,7 +124,7 @@ class ShortestPath():
             else:
                 #如果源点与该结点邻接 则直接等于权值 否则等于inf
                 table[v.id] = graph.vert_dict[start].nextarc.get(v, float('inf'))
-                #将所有于源点邻接的结点 path置为源点
+                #将所有结点的path置为源点
                 path[v.id] = start
 
         #将源点flag置为1
@@ -213,6 +216,3 @@ class ShortestPath():
    
         return path_dict
 
-if __name__ == '__main__':
-    sp = ShortestPath()
-    # print(sp.get_shortest_path('Sta95'))

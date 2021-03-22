@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from ShortestPath import *
 from MysqlOS import SQLOS
 import pandas as pd
 import datetime
 import warnings
 import json
 import time
+import os
 warnings.filterwarnings('ignore')
 
 class DataApi(object):
@@ -15,6 +17,7 @@ class DataApi(object):
         '''
         初始化 直接调用类属性获取数据 
         '''
+        self.abs_path = os.path.abspath(os.path.dirname(__file__))
         self.age, self.percent = DataApi.get_age_structure()
         self.flow_df = SQLOS.get_flow_df()
         self.trips_df = SQLOS.get_trips_df()
@@ -428,9 +431,60 @@ class DataApi(object):
 
         return sta_hour_dict
 
-# api = DataApi()
-# start = time.time()
-# a = api.get_in_hour_flow('2020-07-10')
-# end = time.time()
-# print(end - start)
-# print(a)
+    def get_line_split(self, line, flag='up'):
+        '''
+        获取线路断面字典 格式: {split:0,}
+        '''
+        try:
+            with open(self.abs_path + '/json/{}line.json'.format(flag), 'r', encoding  = 'utf-8') as f:
+                line_list = json.load(f)[line]
+            
+                line_split = []
+                for i in range(len(line_list) - 1):
+                    head = line_list[i]
+                    tail = line_list[i + 1]
+                    line_split.append(head + '-' + tail)
+
+                line_split_dict = dict.fromkeys(line_split, 0)
+
+            return line_split_dict
+        except Exception as e:
+            print('error', e)
+
+    def get_line_split_flow(self, date, line, flag='up'):
+        '''
+        获取线路断面客流 格式:{split:flow,}
+        '''
+        sp = ShortestPath()
+        line_split = self.get_line_split(line, flag)
+
+        trips_df = self.trips_df
+        trips_df.drop('user_id', axis =1, inplace=True)
+        trips_df.set_index('in_time', inplace=True)
+        date_df = trips_df.loc[date]
+        date_df.reset_index(level = 'in_time', inplace =True)
+
+        for row in date_df.itertuples(index = False):
+            start = getattr(row, 'in_sta_name')
+            end = getattr(row, 'out_sta_name')
+
+            path = sp.get_shortest_path(start).get(end, 0)
+    
+            if path != 0:
+                for i in range(len(path) - 1):
+                    split = path[i] + '-' + path[i + 1]
+                    if split not in line_split.keys():
+                        continue
+                    else:
+                        line_split[split] += 1
+
+        return line_split
+
+if __name__ == '__main__':
+    pass
+    # api = DataApi()
+    # start = time.time()
+    # a = api.get_in_hour_flow('2020-07-10')
+    # end = time.time()
+    # print(end - start)
+    # print(a)

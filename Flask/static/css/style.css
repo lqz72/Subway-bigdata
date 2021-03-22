@@ -274,6 +274,17 @@
     width: 70px;
 }
 
+/* 线路断面 */
+.cutline {
+    float: left;
+    width: 910px;
+    height: 350px;
+    margin-top: 10px;
+    margin-left: 20px;
+    background-color: #ffffff;
+}
+
+
 .leaderboard2 {
     float: left;
     width: 910px;
