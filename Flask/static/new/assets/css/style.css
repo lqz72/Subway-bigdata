@@ -633,6 +633,11 @@ h2.counter {
     display: inline-block;
     margin-bottom: 15px;
     margin-right: 13px;
+    
+}
+.instra-img>a>img {
+    width: 63px;
+    height: 63px;
 }
 .instra-img {
     position: relative;
