@@ -236,6 +236,32 @@ class DataApi(object):
         month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
         return month_list
 
+    def get_user_json():
+        '''
+        获取所有用户的信息 返回json文件  ##100行
+        '''
+        table = pd.read_csv('./PredictModel/txt_data/users.txt', encoding='gb18030')
+
+        df = table.iloc[0:100]
+        user_dict = {}
+
+        df.columns = ['user_id', 'area', 'age', 'sex']
+        print(df)
+        for user_id in df.user_id.values:
+            user_df = df[df['user_id'] == user_id]
+            age = 2021 - int(user_df['age'].values[0])
+            area = user_df['area'].values[0]
+            sex = '男' if user_df['sex'].values[0] == 0 else '女'
+            user_dict[user_id] = {
+                'area': str(area),
+                'age': str(age),
+                'sex': sex,
+            }
+    
+        with open('user_info.json', 'w', encoding = 'utf-8') as f:
+            f.write(json.dumps(user_dict, ensure_ascii=False, indent=2))
+            print('success!')
+
     #--------------类方法---------------
     def get_curr_week_flow(self, date):
         '''
@@ -262,8 +288,8 @@ class DataApi(object):
    
     def get_top_sta(self, date):
         '''
-        获取客流量前25名的站点
-        返回一个列表 格式: [(station, line, flow),]
+        获取客流量前十名的站点
+        返回一个列表 格式: [(station, flow, line),]
         '''
         sta_dict = self.sta_dict
         flow_df = self.flow_df
@@ -274,7 +300,7 @@ class DataApi(object):
         sta_flow = sta_flow.sort_values(ascending=False)
 
         top_sta = sta_flow.iloc[:25]
-        top_sta_list = [(i, sta_dict[i], int(top_sta[i])) for i in top_sta.index]
+        top_sta_list = [(i, sta_dict[i], top_sta[i]) for i in top_sta.index]
         
         return top_sta_list
 
@@ -310,31 +336,7 @@ class DataApi(object):
         trips_df = self.trips_df
         trips_num = trips_df[trips_df['user_id'] == user_id].shape[0]
 
-        return {'id':user_id, 'age':int(age), 'area':area, 'trips_num':int(trips_num)} 
-
-    def get_users_by_index(self, index):
-        '''
-        根据索引获取某页的用户数据 偏移量15
-        '''
-        user_df = SQLOS.get_user_df()
-        start = (index - 1) * 15
-        end = start + 15
-
-        user_list = []
-        for user in user_df[start:end].itertuples(index=False):
-            user_id = getattr(user, 'user_id')
-            area = getattr(user, 'area')
-            age = 2021 - int(getattr(user, 'birth_year'))
-            sex='男' if getattr(user, 'sex') == '0' else '女'
-            
-            user_list.append({
-                'user_id': user_id,
-                'area': area,
-                'age': age,
-                'sex': sex,
-            })
-
-        return user_list
+        return {'id':user_id, 'age':age, 'area':area, 'trips_num':trips_num} 
 
     def get_user_month_flow(self, user_id):
         '''
@@ -375,19 +377,28 @@ class DataApi(object):
     
         sta_hour_dict = {}
         for sta, sta_df in df.groupby(by=['in_sta_name']):
-            mid = time.time()
             sta_df['in_time'] = sta_df['in_time'].dt.hour.astype('str')
             grouped = sta_df.groupby(by='in_time')['flow'].sum()
      
             hour_dict = dict.fromkeys(hour_list, 0)
             for hour in grouped.index:
-                hour_dict[hour] = int(grouped[hour])
+                hour_dict[hour] = grouped[hour]
 
             sta_hour_dict[sta] = hour_dict
         
-            end = time.time()
-        
-        print(end - mid)
+        # for sta in sta_dict:
+        #     hour_dict = dict.fromkeys(hour_list, 0)
+        #     sta_df = df[df['in_sta_name'] == sta]
+
+        #     sta_df['in_time'] = sta_df['in_time'].dt.hour.astype('str')
+        #     sta_df = sta_df[sta_df['in_time'].isin(hour_list)]
+          
+        #     grouped = sta_df.groupby(by = ['in_time'], as_index = True)['flow'].sum()
+            
+        #     for hour in grouped.index:
+        #         hour_dict[hour] = grouped[hour]
+        #     sta_hour_dict[sta] = hour_dict
+
         return sta_hour_dict
 
     def get_out_hour_flow(self, date):              
@@ -415,7 +426,7 @@ class DataApi(object):
             grouped = sta_df.groupby(by = ['out_time'], as_index = True)['flow'].sum()
             
             for hour in grouped.index:
-                hour_dict[hour] = int(grouped[hour])
+                hour_dict[hour] = grouped[hour]
             sta_hour_dict[sta] = hour_dict
 
         return sta_hour_dict
@@ -466,15 +477,14 @@ class DataApi(object):
                         continue
                     else:
                         line_split[split] += 1
-        print(line_split)
+
         return line_split
 
-
 if __name__ == '__main__':
-    api = DataApi()
+    pass
+    # api = DataApi()
     # start = time.time()
-    a = api.get_in_hour_flow('2020-07-10')
+    # a = api.get_in_hour_flow('2020-07-10')
     # end = time.time()
     # print(end - start)
     # print(a)
-    

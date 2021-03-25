@@ -5,7 +5,6 @@ from flask.json import JSONEncoder
 from sys import path
 import os
 import json
-import time
 import warnings
 warnings.filterwarnings('ignore')
 path.append('..')
@@ -22,6 +21,18 @@ api=DataApi()
 
 abs_path = os.path.abspath(os.path.dirname(__file__))
 station_name='Sta1'
+
+#数据格式转换类
+class NpEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super().default(obj)
 
 #------------模板渲染------------
 @app.route('/')
@@ -90,7 +101,6 @@ def get_user_json() -> json:
 def thisday_info() -> json:
     """返回指定日期天气、节假日、客流信息
     """
-    start = time.time()
     current_date = request.get_data().decode('utf-8')
     month, day = current_date[:-3], current_date[-2:]
 
@@ -101,21 +111,18 @@ def thisday_info() -> json:
     info_dict = {
         'weather': weather[0][0], 
         'is_hoilday': ('是' if is_hoilday[0][0] == '1' else '否'),
-        'day_flow': int(day_flow),
+        'day_flow': day_flow,
     }
-    end = time.time()
-    print('thisday:' ,end -start)
+
     return jsonify(info_dict)
 
 @app.route('/sta_rank', methods=['POST', 'GET'])
 def sta_rank() -> json:
     """返回站点客流排行
     """
-    start = time.time()
     current_date = request.get_data().decode('utf-8')
     sta_rank_list = api.get_top_sta(current_date)
-    end = time.time()
-    print('rank:', end - start)
+
     return jsonify(sta_rank_list)
 
 @app.route('/user_info', methods=['POST', 'GET'])
@@ -126,14 +133,6 @@ def user_info() -> json:
     user_info = api.get_user_info(user_id)
 
     return jsonify(user_info)
-
-@app.route('/users_info/<int:page>', methods=['POST', 'GET'])
-def users_info(page) -> json:
-    """根据索引返回批量用户信息
-    """
-    users_info_list = api.get_users_by_index(index = page)
-    
-    return jsonify(users_info_list) 
 
 @app.route('/admin_info', methods=['POST', 'GET'])
 def admin_info() -> json:
@@ -147,11 +146,9 @@ def admin_info() -> json:
 def in_hour_flow() -> json:
     """返回当前日期各站点6点-9点的进站客流量
     """
-    start = time.time()
     current_date = request.get_data().decode('utf-8')
     in_hour_dict = api.get_in_hour_flow(current_date)
-    end = time.time()
-    print("in flow:", end -start)
+
     return jsonify(in_hour_dict)
 
 @app.route('/out_hour_flow', methods = ['POST', 'GET'])
@@ -214,7 +211,26 @@ def line_pie():
 
     return pie.dump_options_with_quotes()
 
+# @app.route('/history/month_flow/line')
+# def month_flow_line():
+#     month_line = ChartApi.month_line(api.month_dict)
+#     return month_line.dump_options_with_quotes()
+                       
+# @app.route('/history/week_flow/line')
+# def week_flow_line():
+#     week_line = ChartApi.week_line(api.week_dict)
+#     return week_line.dump_options_with_quotes()
+
+# @app.route('/history/station_flow/bar')
+# def station_flow_bar():
+#     global station_name
+#     in_dict, out_dict = api.in_dict, api.out_dict
+#     bar = ChartApi.station_bar(station_name, in_dict, out_dict)
+#     return bar.dump_options_with_quotes()
+
+
 
 if __name__ == '__main__':
+    app.json_encoder = NpEncoder
     app.run(debug=True)
 
