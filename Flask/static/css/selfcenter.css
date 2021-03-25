@@ -45,21 +45,33 @@ table tr td button {
     margin-top: 20px;
     height: 570px;
     background-color: #fff;
-    overflow: scroll;
+    /* overflow: scroll; */
+    /* border-collapse: collapse; */
+    /* border-left: 1px solid #E9E9E9;
+    border-right: 1px solid #E9E9E9; */
 }
 .list table {
-    border-left: 1px solid red;
-    border-right: 1px solid red;
+    border-left: 1px solid #E9E9E9;
+    border-right: 1px solid #E9E9E9;
     border-collapse: collapse;
     text-align: center;
+    background-color: #fff;
     /* line-height: 30px; */
 }
 .list table tr td {
-    border-bottom: 1px solid red;
+    border-bottom: 1px solid #E9E9E9;
     height: 30px;
 }
+
 .list table tr:nth-child(1) td {
-    border-top: 1px solid red;
+    /* background-color: #dad9d9; */
+    background-color: #E9E9E9;
+}
+.list table tr:hover {
+    background-color: #F2F2F2;
+}
+.list table tr:nth-child(1) td {
+    border-top: 1px solid #E9E9E9;
 }
 .list table tr td:nth-child(1) {
     width: 200px;
@@ -74,5 +86,5 @@ table tr td button {
     width: 150px;
 }
 .list table tr td:nth-child(5) {
-    width: 150px;
+    width: 183px;
 }

@@ -2,41 +2,26 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>使用 layDate 独立版</title>
+  <title>test1</title>
   <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
 </head>
 <body>
-<!-- <input type="text" id="demoTest"> -->
-
-<div id='test-n1'>
-</div>
-
-
-
-<script src="../static/layui/layui.js"></script>
-<script>
-layui.use('laydate', function(){
-  var laydate = layui.laydate;
-  
-  //执行一个laydate实例
-  laydate.render({
-    elem: '#test-n1'
-    ,position: 'static'
-    ,value: '2020-01-01'
-    ,showBottom: false
-    ,min: '2019-12-26'
-    ,max: '2020-07-16'
-    ,ready: function(date){//初始化
-        console.log(date); //得到初始的日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
-    }
-    ,change: function(value, date){ //改变日期后
-        console.log(value); //得到日期生成的值，如：2017-08-18
-        // console.log(date); //得到日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
-    }
+  <div id="test1"></div>
+ 
+  <script src="../static/layui/layui.js"></script>
+  <script>
+  layui.use('laypage', function(){
+    var laypage = layui.laypage;
+    
+    //执行一个laypage实例
+    laypage.render({
+      elem: 'test1' //注意，这里的 test1 是 ID，不用加 # 号
+      ,count: 50000 //数据总数，从服务端得到
+      ,limit:15
+      ,groups:10
+      ,layout:['prev', 'page', 'next','refresh','skip']
+    });
   });
-});
-
-
-</script>
+  </script>
 </body>
 </html>
