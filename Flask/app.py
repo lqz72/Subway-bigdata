@@ -131,6 +131,15 @@ def users_info(page) -> json:
     
     return jsonify(users_info_list) 
 
+@app.route('/user_record', methods=['POST', 'GET'])
+def user_trip_record():
+    """返回用户近期出行记录
+    """
+    user_id = request.get_data().decode('utf-8')
+    trip_record = api.get_user_trip_record(user_id)
+
+    return jsonify(trip_record)
+
 @app.route('/admin_info', methods=['POST', 'GET'])
 def admin_info() -> json:
     """返回管理员信息
