@@ -357,6 +357,24 @@ class DataApi(object):
 
         return month_dict
 
+    def get_user_trip_record(self, user_id):
+        '''
+        获取单个用户出行记录
+        返回一个有序列表 格式[('in_sta_name', 'in_time', 'out_sta_name', 'out_time'),]
+        '''
+        df = self.trips_df
+
+        user_df = df[df['user_id'].isin([user_id])].drop('user_id', axis = 1)
+        user_df = user_df.sort_values(by='in_time', ascending=True)
+
+        curr_record = user_df.iloc[-10:,:]
+        print(curr_record)
+        in_sta_name, out_sta_name = curr_record['in_sta_name'].values, curr_record['out_sta_name'].values
+        in_time = [i.strftime('%m-%d %H:%M:%S') for i in curr_record['in_time']]
+        out_time = [i.strftime('%m-%d %H:%M:%S') for i in curr_record['out_time']]
+ 
+        return list(zip(in_sta_name, in_time, out_sta_name, out_time))
+        
     def get_in_hour_flow(self, date):              
         '''
         获取各个站点6-21点的进站客流量 
@@ -375,7 +393,6 @@ class DataApi(object):
     
         sta_hour_dict = {}
         for sta, sta_df in df.groupby(by=['in_sta_name']):
-            mid = time.time()
             sta_df['in_time'] = sta_df['in_time'].dt.hour.astype('str')
             grouped = sta_df.groupby(by='in_time')['flow'].sum()
      
@@ -385,9 +402,6 @@ class DataApi(object):
 
             sta_hour_dict[sta] = hour_dict
         
-            end = time.time()
-        
-        print(end - mid)
         return sta_hour_dict
 
     def get_out_hour_flow(self, date):              
@@ -447,34 +461,33 @@ class DataApi(object):
         sp = ShortestPath()
         line_split = self.get_line_split(line, flag)
 
-        trips_df = self.trips_df
+        trips_df = self.trips_df.copy()
         trips_df.drop('user_id', axis =1, inplace=True)
         trips_df.set_index('in_time', inplace=True)
         date_df = trips_df.loc[date]
-        date_df.reset_index(level = 'in_time', inplace =True)
+        date_df.reset_index(level='in_time', inplace=True)
+        
+        all_path = {}
+        for sta in SQLOS.get_station_dict().keys():
+            try:
+                with open(self.abs_path + '/json/path/' + sta + '.json', 'r', encoding='utf-8') as f:
+                    all_path[sta] = json.load(f)
+            except Exception as e:
+                print('error', e)
 
         for row in date_df.itertuples(index = False):
             start = getattr(row, 'in_sta_name')
             end = getattr(row, 'out_sta_name')
-
-            path = sp.get_shortest_path(start).get(end, 0)
-    
+            
+            path = all_path[start].get(end, 0)
             if path != 0:
                 for i in range(len(path) - 1):
                     split = path[i] + '-' + path[i + 1]
-                    if split not in line_split.keys():
-                        continue
-                    else:
+                    if split in line_split.keys():
                         line_split[split] += 1
-        print(line_split)
+
         return line_split
 
 
 if __name__ == '__main__':
     api = DataApi()
-    # start = time.time()
-    a = api.get_in_hour_flow('2020-07-10')
-    # end = time.time()
-    # print(end - start)
-    # print(a)
-    

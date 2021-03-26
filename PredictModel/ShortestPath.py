@@ -2,6 +2,7 @@ from MysqlOS import SQLOS
 import time
 import json
 import os
+abs_path = os.path.abspath(os.path.dirname(__file__))
 
 class Vertex:
     def __init__(self, key):
@@ -75,8 +76,7 @@ class ShortestPath():
 
     def load_link_data():
         """获取站点连接数据
-        """
-        abs_path = os.path.abspath(os.path.dirname(__file__))
+        """  
         with open(abs_path + '/json/links.json', 'r', encoding='utf-8') as f:
             link_list = json.load(f)
 
@@ -114,7 +114,7 @@ class ShortestPath():
         #初始化 
         flag = dict.fromkeys(graph.get_vertexs(), 0)  #标志是否已找到最短路径
         table = dict.fromkeys(graph.get_vertexs(), 0)  #记录从源点到某站点的路径权值和
-        path = dict.fromkeys(graph.get_vertexs(), 0)  #记录某站点在最短路径中的前一个站点
+        path = dict.fromkeys(graph.get_vertexs(), start)  #记录某站点在最短路径中的前一个站点
 
         #遍历图的所有结点
         for v in graph:
@@ -124,8 +124,6 @@ class ShortestPath():
             else:
                 #如果源点与该结点邻接 则直接等于权值 否则等于inf
                 table[v.id] = graph.vert_dict[start].nextarc.get(v, float('inf'))
-                #将所有结点的path置为源点
-                path[v.id] = start
 
         #将源点flag置为1
         flag[start] = 1
@@ -211,8 +209,10 @@ class ShortestPath():
                 path_list = self.get_one_path(path, start, end)
                 path_dict[start][end] = path_list
 
-        with open(abs_path + '/json/path.json', 'w', encoding='utf-8') as f:
-            json.dump(path_dict, f)
+            with open(abs_path + '/json/path/' + start + '.json', 'w', encoding='utf-8') as f:
+                json.dump(path_dict[start], f)
    
         return path_dict
 
+# sp = ShortestPath()
+# sp.get_all_shortest_path()

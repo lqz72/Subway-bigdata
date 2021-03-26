@@ -90,7 +90,6 @@ def get_user_json() -> json:
 def thisday_info() -> json:
     """返回指定日期天气、节假日、客流信息
     """
-    start = time.time()
     current_date = request.get_data().decode('utf-8')
     month, day = current_date[:-3], current_date[-2:]
 
@@ -103,19 +102,16 @@ def thisday_info() -> json:
         'is_hoilday': ('是' if is_hoilday[0][0] == '1' else '否'),
         'day_flow': int(day_flow),
     }
-    end = time.time()
-    print('thisday:' ,end -start)
+
     return jsonify(info_dict)
 
 @app.route('/sta_rank', methods=['POST', 'GET'])
 def sta_rank() -> json:
     """返回站点客流排行
     """
-    start = time.time()
     current_date = request.get_data().decode('utf-8')
     sta_rank_list = api.get_top_sta(current_date)
-    end = time.time()
-    print('rank:', end - start)
+
     return jsonify(sta_rank_list)
 
 @app.route('/user_info', methods=['POST', 'GET'])
@@ -147,11 +143,9 @@ def admin_info() -> json:
 def in_hour_flow() -> json:
     """返回当前日期各站点6点-9点的进站客流量
     """
-    start = time.time()
     current_date = request.get_data().decode('utf-8')
     in_hour_dict = api.get_in_hour_flow(current_date)
-    end = time.time()
-    print("in flow:", end -start)
+
     return jsonify(in_hour_dict)
 
 @app.route('/out_hour_flow', methods = ['POST', 'GET'])

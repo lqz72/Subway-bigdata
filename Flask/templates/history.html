@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
     <script type="text/javascript" src="{{ url_for('static',filename ='js/date.js') }}" ></script>
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.15/lodash.js"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
 </head>
 <style>
@@ -111,7 +112,7 @@
                 </table>
             </div>
             <!-- 线路断面 -->
-            <div  class="cutline">
+            <div id = "split_bar" class="cutline">
                 线路断面
             </div>
             <!-- 线路断面流量排行榜 -->

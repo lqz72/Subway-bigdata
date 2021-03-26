@@ -134,7 +134,7 @@ layui.use('laydate', function(){
                 var links = getJsonData('/link/json');
         
                 //初始化图表
-                var myChart = echarts.init(document.getElementById('line_graph'));
+                var GraphChart = echarts.init(document.getElementById('line_graph'));
         
                 //获取线路名称列表
                 var lineNames = [];
@@ -269,8 +269,205 @@ layui.use('laydate', function(){
                     })
                 }
         
-                myChart.setOption(option);
+                GraphChart.setOption(option);
                 
+                var SplitChart = echarts.init(document.getElementById('split_bar'));
+                // var upline_flow;
+                // var downline_flow;
+                // $.ajax({
+                //     type: 'POST',
+                //     url: '/history/split_flow',
+                //     async: false,
+                //     data: value,
+                //     datatype: 'json',
+                //     success: function (result) {
+                        
+                //     }
+                // });
+                let yAxisData = ['3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月'];
+                let data1 = [5, 19, 23, 43, 34, 53, 12, 34];
+                let data2 = [5, 12, 10, 7, 32, 40, 28, 34];
+
+                option = {
+                    tooltip: {
+                        show: true,
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    },
+                    backgroundColor: '#FFF',
+                    legend: {
+                        show: false
+                    },
+                    grid: [{
+                        show: false,
+                        left: '10%',
+                        top: '15%',
+                        width: '40%',
+                        containLabel: true,
+                        bottom: 60
+                    }, {
+                        show: false,
+                        left: '6%',
+                        top: 120,
+                        bottom: 60,
+                        width: '0%',
+                    }, {
+                        show: false,
+                        left: '50%',
+                        top: '15%',
+                        bottom: 60,
+                        containLabel: true,
+                        width: '40%',
+                    }],
+                    xAxis: [{
+                        type: 'value',
+                        inverse: true,
+                        axisLabel: {
+                            show: true,
+                            color: '#979797',
+                            margin: 0
+                        },
+                        axisLine: {
+                            show: false
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    }, {
+                        gridIndex: 1,
+                        show: true,
+                        axisLabel: {
+                            color: '#979797',
+                            margin: 0
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: '#979797',
+                                type: 'dashed'
+                            }
+                        }
+                    }, {
+                        gridIndex: 2,
+                        type: 'value',
+                        axisLabel: {
+                            show: true,
+                            color: '#979797',
+                            margin: 0
+                        },
+                        axisLine: {
+                            show: false
+                        },
+                        axisTick: {
+                            show: false
+                        },
+                        splitLine: {
+                            show: false
+                        }
+                    }],
+                    yAxis: [
+                        {
+                            type: 'category',
+                            inverse: false,
+                            position: 'right',
+                            axisLabel: {
+                                show: false
+                            },
+                            axisLine: {
+                                show: true,
+                                lineStyle: {
+                                    color: '#979797'
+                                }
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            data: yAxisData
+                        },
+                        {
+                            type: 'category',
+                            inverse: false,
+                            gridIndex: 1,
+                            position: 'left',
+                            axisLabel: {
+                                align: 'left',
+                                padding: [8, 0, 0, 0],
+                                fontSize: 12,
+                                fontWeight: 500,
+                                color: `#979797`
+                            },
+                            axisLine: {
+                                show: false,
+                                lineStyle: {
+                                    color: '#979797'
+                                }
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            data: yAxisData
+                        },
+                        {
+                            type: 'category',
+                            inverse: false,
+                            gridIndex: 2,
+                            position: 'left',
+                            axisLabel: {
+                                show: false
+                            },
+                            axisLine: {
+                                show: true,
+                                lineStyle: {
+                                    color: '#979797'
+                                }
+                            },
+                            axisTick: {
+                                show: false
+                            },
+                            data: yAxisData
+                        }
+                    ],
+                    series: [{
+                            type: 'bar',
+                            barWidth: 20,
+                            name: '供应情况',
+                            label: {
+                                normal: {
+                                    show: false,
+                                },
+                            },
+                            itemStyle: {
+                                color: '#01C5B2',
+                                barBorderRadius: [4, 0, 0, 4]
+                            },
+                            data: data1
+                        },
+                        {
+                            type: 'bar',
+                            barWidth: 20,
+                            xAxisIndex: 2,
+                            yAxisIndex: 2,
+                            name: '需求情况',
+                            label: {
+                                normal: {
+                                    show: false,
+                                },
+                            },
+                            itemStyle: {
+                                color: '#FB6F6C',
+                                barBorderRadius: [0, 4, 4, 0]
+                            },
+                            data: data2
+                        }
+                    ]
+                };
+                
+                SplitChart.setOption(option);
+
             }
         )
 
