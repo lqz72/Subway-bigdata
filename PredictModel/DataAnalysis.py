@@ -345,7 +345,7 @@ class DataApi(object):
 
         df['in_time'] = df['in_time'].dt.normalize()
         df['out_time'] = df['out_time'].dt.normalize()
-        user_trips_df = df[df['user_id'] == user_id]
+        user_trips_df = df[df['user_id'].isin([user_id])]
         user_trips_df['flow'] = 1
        
         user_flow = user_trips_df.groupby(by='in_time')['flow'].sum()
@@ -367,11 +367,9 @@ class DataApi(object):
         user_df = df[df['user_id'].isin([user_id])].drop('user_id', axis = 1)
         user_df = user_df.sort_values(by='in_time', ascending=True)
 
-        curr_record = user_df.iloc[-10:,:]
-        print(curr_record)
-        in_sta_name, out_sta_name = curr_record['in_sta_name'].values, curr_record['out_sta_name'].values
-        in_time = [i.strftime('%m-%d %H:%M:%S') for i in curr_record['in_time']]
-        out_time = [i.strftime('%m-%d %H:%M:%S') for i in curr_record['out_time']]
+        in_sta_name, out_sta_name = user_df['in_sta_name'].values, user_df['out_sta_name'].values
+        in_time = [i.strftime('%m-%d %H:%M:%S') for i in user_df['in_time']]
+        out_time = [i.strftime('%m-%d %H:%M:%S') for i in user_df['out_time']]
  
         return list(zip(in_sta_name, in_time, out_sta_name, out_time))
         
@@ -448,46 +446,54 @@ class DataApi(object):
                     tail = line_list[i + 1]
                     line_split.append(head + '-' + tail)
 
-                line_split_dict = dict.fromkeys(line_split, 0)
-
-            return line_split_dict
+            return line_split
         except Exception as e:
             print('error', e)
 
-    def get_line_split_flow(self, date, line, flag='up'):
+    def get_line_split_flow(self, date, line):
         '''
         获取线路断面客流 格式:{split:flow,}
         '''
         sp = ShortestPath()
-        line_split = self.get_line_split(line, flag)
+        #获取断面字典
+        upline_split = self.get_line_split(line, flag = 'up')
+        downline_split = self.get_line_split(line, flag='down')
+        line_split_dict = {i: {'up': 0, 'down': 0} for i in upline_split} #列表分别存储上行和下行客流
 
-        trips_df = self.trips_df.copy()
-        trips_df.drop('user_id', axis =1, inplace=True)
+        #读入出行记录
+        trips_df = self.trips_df.copy().drop('user_id', axis =1)
         trips_df.set_index('in_time', inplace=True)
         date_df = trips_df.loc[date]
         date_df.reset_index(level='in_time', inplace=True)
         
+        #获取所有站点到其他站点的最短路径
         all_path = {}
-        for sta in SQLOS.get_station_dict().keys():
+        for sta in self.sta_dict.keys():
             try:
                 with open(self.abs_path + '/json/path/' + sta + '.json', 'r', encoding='utf-8') as f:
                     all_path[sta] = json.load(f)
             except Exception as e:
                 print('error', e)
 
+        #遍历当天的出行记录 
         for row in date_df.itertuples(index = False):
             start = getattr(row, 'in_sta_name')
             end = getattr(row, 'out_sta_name')
             
+            #获取最短路径 对路径上的断面进行统计
             path = all_path[start].get(end, 0)
             if path != 0:
                 for i in range(len(path) - 1):
                     split = path[i] + '-' + path[i + 1]
-                    if split in line_split.keys():
-                        line_split[split] += 1
-
-        return line_split
+                    
+                    if split in upline_split:
+                        line_split_dict[split]['up'] += 1
+                    elif split in downline_split:
+                        line_split_dict[path[i + 1] + '-' + path[i]]['down'] += 1               
+        
+        return line_split_dict
 
 
 if __name__ == '__main__':
     api = DataApi()
+    api.get_line_split_flow('2020-07-01', '1号线')

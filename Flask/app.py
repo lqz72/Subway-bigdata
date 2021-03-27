@@ -79,13 +79,6 @@ def get_link_json() -> json:
     with open(abs_path + '/links.json', 'r', encoding='utf-8') as f:
         return f.read()
 
-@app.route('/user/json')
-def get_user_json() -> json:
-    """返回所有用户的信息
-    """
-    with open(abs_path + '/user_info.json', 'r', encoding='utf-8') as f:
-        return f.read()
-
 @app.route('/thisday_info', methods = ['POST', 'GET'])
 def thisday_info() -> json:
     """返回指定日期天气、节假日、客流信息
@@ -129,8 +122,8 @@ def users_info(page) -> json:
     """
     users_info_list = api.get_users_by_index(index = page)
     
-    return jsonify(users_info_list) 
-
+    return jsonify(users_info_list)
+    
 @app.route('/user_record', methods=['POST', 'GET'])
 def user_trip_record():
     """返回用户近期出行记录
@@ -165,6 +158,15 @@ def out_hour_flow() -> json:
     out_hour_dict = api.get_out_hour_flow(current_date)
     
     return jsonify(out_hour_dict)
+
+@app.route('/split_flow/<int:line>', methods=['POST', 'GET'])
+def split_flow(line) -> json:
+    """返回地铁断面客流
+    """ 
+    current_date = request.get_data().decode('utf-8')
+    split_flow= api.get_line_split_flow(current_date, '%s号线' % line)
+
+    return jsonify(split_flow)
 
 #------------控制图表的展示------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])

@@ -19,7 +19,7 @@ layui.use('laydate', function(){
                 $.ajax({
                     type: 'POST',
                     data: value,
-                    async: false,
+                    async: true,
                     url: 'history/day_flow/line',
                     dataType: 'json',
                     success: function (result) {
@@ -31,7 +31,7 @@ layui.use('laydate', function(){
                 $.ajax({
                     type: "POST",
                     data: value,
-                    async: false,
+                    async: true,
                     url: "/history/curr_week_flow/line",
                     dataType: 'json',
                     success: function (result) {
@@ -45,7 +45,7 @@ layui.use('laydate', function(){
                 $.ajax({
                     type: 'POST',
                     data: value,
-               
+                    async: true,
                     url: '/thisday_info',
                     dataType: 'json',
                     success: function (result) {
@@ -59,7 +59,7 @@ layui.use('laydate', function(){
                 $.ajax({
                     type: 'POST',
                     data: value,
-                    async: false,
+                    async: true,
                     url: '/sta_rank',
                     dataType: 'json',
                     success: function (result) {
@@ -83,7 +83,7 @@ layui.use('laydate', function(){
                 $.ajax({
                     type: "POST",
                     data: value,
-                    async: false,
+                    async: true,
                     url: "/history/line/pie",
                     dataType: 'json',
                     success: function (result) {
@@ -174,7 +174,7 @@ layui.use('laydate', function(){
                                 sta.symbolSize = 10;  //如果客流量为0 设置最小size为10
                             else 
                                 //否则取对数降低增长速度
-                                sta.symbolSize = Math.log(in_hour_flow[sta_name][`${i}`]) * 5 + 10;
+                                sta.symbolSize = Math.log(in_hour_flow[sta_name][`${i}`]) * 10 + 10;
                         } else {
                             sta.value = 0;
                             sta.symbolSize = 10;
@@ -224,10 +224,9 @@ layui.use('laydate', function(){
                             xAxis:0,
                             yAxis:0,
                             symbolSize: 3,
-                            roam:true,
+                            roam:false,
                             label: {
-                                show: false,
-                                rotate: '30', 
+                                show: false, 
                                 color: 'black',
                                 position: 'right'
                             },
@@ -241,8 +240,6 @@ layui.use('laydate', function(){
                                     }
                                 }
                             },
-                            // data: stations_lq[0]['lq'],
-                            // links: links,
                             categories: categories,
                             lineStyle: {
                                 normal: {
@@ -272,200 +269,133 @@ layui.use('laydate', function(){
                 GraphChart.setOption(option);
                 
                 var SplitChart = echarts.init(document.getElementById('split_bar'));
-                // var upline_flow;
-                // var downline_flow;
-                // $.ajax({
-                //     type: 'POST',
-                //     url: '/history/split_flow',
-                //     async: false,
-                //     data: value,
-                //     datatype: 'json',
-                //     success: function (result) {
-                        
-                //     }
-                // });
-                let yAxisData = ['3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月'];
-                let data1 = [5, 19, 23, 43, 34, 53, 12, 34];
-                let data2 = [5, 12, 10, 7, 32, 40, 28, 34];
-
+                var splitFlow;
+                $.ajax({
+                    type: 'POST',
+                    url: '/split_flow/2',
+                    async: false,
+                    data: value,
+                    datatype: 'json',
+                    success: function (result) {
+                        splitFlow = result;
+                    }
+                });
+                
+                var uplineFlow = [];
+                var downlineFlow = [];
+                splitNames = Object.keys(splitFlow);
+                for (let index = 0; index < splitNames.length; index++){
+                    let split = splitFlow[splitNames[index]];
+                    uplineFlow.push(split.up);
+                    downlineFlow.push(split.down);
+                }
+  
                 option = {
+                    title: {
+                        text: '地铁线路断面客流',
+                        left:"center",
+                        subtext: '2号线',
+                        textStyle:{
+                            color:"#000"
+                        }
+                    },
+                    color:['#9E87FF', '#73ACFF'],
                     tooltip: {
-                        show: true,
                         trigger: 'axis',
                         axisPointer: {
                             type: 'shadow'
-                        }
+                        },
                     },
-                    backgroundColor: '#FFF',
                     legend: {
+                        left:"right",
+                        data: ['上行','下行'],
+                        textStyle:{fontSize:16}
+                    },
+                    toolbox: {
                         show: false
                     },
-                    grid: [{
-                        show: false,
-                        left: '10%',
-                        top: '15%',
-                        width: '40%',
-                        containLabel: true,
-                        bottom: 60
-                    }, {
-                        show: false,
-                        left: '6%',
-                        top: 120,
-                        bottom: 60,
-                        width: '0%',
-                    }, {
-                        show: false,
-                        left: '50%',
-                        top: '15%',
-                        bottom: 60,
-                        containLabel: true,
-                        width: '40%',
-                    }],
-                    xAxis: [{
-                        type: 'value',
-                        inverse: true,
-                        axisLabel: {
-                            show: true,
-                            color: '#979797',
-                            margin: 0
-                        },
-                        axisLine: {
-                            show: false
-                        },
-                        axisTick: {
-                            show: false
-                        },
-                        splitLine: {
-                            show: false
-                        }
-                    }, {
-                        gridIndex: 1,
-                        show: true,
-                        axisLabel: {
-                            color: '#979797',
-                            margin: 0
-                        },
-                        splitLine: {
-                            lineStyle: {
-                                color: '#979797',
-                                type: 'dashed'
-                            }
-                        }
-                    }, {
-                        gridIndex: 2,
-                        type: 'value',
-                        axisLabel: {
-                            show: true,
-                            color: '#979797',
-                            margin: 0
-                        },
-                        axisLine: {
-                            show: false
-                        },
-                        axisTick: {
-                            show: false
-                        },
-                        splitLine: {
-                            show: false
-                        }
-                    }],
-                    yAxis: [
+                    grid: [{bottom:"50%"},{top:'50%'}],
+                    xAxis: [
                         {
                             type: 'category',
-                            inverse: false,
-                            position: 'right',
-                            axisLabel: {
-                                show: false
-                            },
-                            axisLine: {
-                                show: true,
-                                lineStyle: {
-                                    color: '#979797'
-                                }
-                            },
-                            axisTick: {
-                                show: false
-                            },
-                            data: yAxisData
+                            show:true,
+                            axisLine: {show: true, onZero: false},
+                            axisTick: {show: false},
+                            axisLabel: {show: false,color:"grey",fontSize:20},
+                            splitArea: {show: false},
+                            splitLine: {show: false},
+                            position:"bottom",
+                            nameTextStyle:{fontSize:16},
+                            data: splitNames
                         },
                         {
                             type: 'category',
-                            inverse: false,
-                            gridIndex: 1,
-                            position: 'left',
-                            axisLabel: {
-                                align: 'left',
-                                padding: [8, 0, 0, 0],
-                                fontSize: 12,
-                                fontWeight: 500,
-                                color: `#979797`
-                            },
-                            axisLine: {
-                                show: false,
-                                lineStyle: {
-                                    color: '#979797'
-                                }
-                            },
-                            axisTick: {
-                                show: false
-                            },
-                            data: yAxisData
-                        },
-                        {
-                            type: 'category',
-                            inverse: false,
-                            gridIndex: 2,
-                            position: 'left',
-                            axisLabel: {
-                                show: false
-                            },
-                            axisLine: {
-                                show: true,
-                                lineStyle: {
-                                    color: '#979797'
-                                }
-                            },
-                            axisTick: {
-                                show: false
-                            },
-                            data: yAxisData
+                            show:true,
+                            axisLine: {show: false, onZero: false},
+                            axisTick: {show: false},
+                            axisLabel: {show: false,color:"grey",fontSize:16},
+                            splitArea: {show: false},
+                            splitLine: {show: false},
+                            gridIndex:1,
+                            position:"bottom",
+                            nameTextStyle: { fontSize: 16 },
+                            data: splitNames
                         }
                     ],
-                    series: [{
-                            type: 'bar',
-                            barWidth: 20,
-                            name: '供应情况',
-                            label: {
-                                normal: {
-                                    show: false,
-                                },
+                    yAxis: [
+                        {
+                            type: 'value',
+                            name: "上行客流 /人次",
+                            position:"left",
+                            splitLine: true,
+                            splitNumber:5,
+                            gridIndex:0,
+                            axisLabel: {
+                                color: '#949AA8',
                             },
-                            itemStyle: {
-                                color: '#01C5B2',
-                                barBorderRadius: [4, 0, 0, 4]
-                            },
-                            data: data1
                         },
                         {
-                            type: 'bar',
-                            barWidth: 20,
-                            xAxisIndex: 2,
-                            yAxisIndex: 2,
-                            name: '需求情况',
-                            label: {
-                                normal: {
-                                    show: false,
-                                },
+                            type: 'value',
+                            name:"下行客流 /人次",
+                            position:"left",
+                            splitLine: true,
+                            splitNumber:5,
+                            gridIndex:1,
+                            inverse:true, 
+                            axisLabel: {
+                                color: '#949AA8',
                             },
+                        }
+                    ],
+                    series: [
+                        {
+                            type:"bar",
+                            name:"上行",
+                            barMaxWidth:40,
+                            data: uplineFlow,
+                            xAxisIndex: 0,
+                            yAxisIndex: 0,
                             itemStyle: {
-                                color: '#FB6F6C',
-                                barBorderRadius: [0, 4, 4, 0]
+                                color: '#9E87FF',
+                                barBorderRadius: [4, 4, 0, 0]
                             },
-                            data: data2
+                        },
+                        {
+                            type:"bar",
+                            name:"下行",
+                            barMaxWidth:40,
+                            data:downlineFlow,
+                            xAxisIndex: 1,
+                            yAxisIndex: 1,
+                            itemStyle: {
+                                color: '#73ACFF',
+                                barBorderRadius: [0, 0, 4, 4]
+                            },
+                            
                         }
                     ]
                 };
-                
+
                 SplitChart.setOption(option);
 
             }
@@ -483,7 +413,7 @@ layui.use('laydate', function(){
             $.ajax({
                 type: 'POST',
                 data: value,
-                async: false,
+                async: true,
                 url: 'history/day_flow/line',
                 dataType: 'json',
                 success: function (result) {
@@ -495,7 +425,7 @@ layui.use('laydate', function(){
             $.ajax({
                 type: "POST",
                 data: value,
-                async: false,
+                async: true,
                 url: "/history/curr_week_flow/line",
                 dataType: 'json',
                 success: function (result) {
@@ -509,7 +439,7 @@ layui.use('laydate', function(){
             $.ajax({
                 type: 'POST',
                 data: value ,
-                async: false,
+                async: true,
                 url: '/thisday_info',
                 dataType: 'json',
                 success: function (result) {
@@ -523,7 +453,7 @@ layui.use('laydate', function(){
             $.ajax({
                 type: 'POST',
                 data: value,
-                async: false,
+                async: true,
                 url: '/sta_rank',
                 dataType: 'json',
                 success: function (result) {
@@ -547,7 +477,7 @@ layui.use('laydate', function(){
             $.ajax({
                 type: "POST",
                 data: value,
-            
+                async: true,
                 url: "/history/line/pie",
                 dataType: 'json',
                 success: function (result) {
@@ -565,7 +495,6 @@ layui.use('laydate', function(){
                 async: false,
                 success: function (result) {
                     in_hour_flow = result;
-                    console.log(in_hour_flow);
                 }
             });
             
@@ -640,7 +569,7 @@ layui.use('laydate', function(){
                             sta.symbolSize = 10;  //如果客流量为0 设置最小size为10
                         else 
                             //否则取对数降低增长速度
-                            sta.symbolSize = Math.log(in_hour_flow[sta_name][`${i}`]) * 5 + 10;
+                            sta.symbolSize = Math.log(in_hour_flow[sta_name][`${i}`]) * 10 + 10;
                     } else {
                         sta.value = 0;
                         sta.symbolSize = 10;
@@ -691,10 +620,9 @@ layui.use('laydate', function(){
                         xAxis:0,
                         yAxis:0,
                         symbolSize: 3,
-                        roam:true,
+                        roam:false,
                         label: {
                             show: false,
-                            rotate: '30', 
                             color: 'black',
                             position: 'right'
                         },
@@ -735,7 +663,136 @@ layui.use('laydate', function(){
             }
         
             myChart.setOption(option);
-          
+
+            var SplitChart = echarts.init(document.getElementById('split_bar'));
+            var splitFlow;
+            $.ajax({
+                type: 'POST',
+                url: '/split_flow/2',
+                async: false,
+                data: value,
+                datatype: 'json',
+                success: function (result) {
+                    splitFlow = result;
+                }
+            });
+            
+            var uplineFlow = [];
+            var downlineFlow = [];
+            splitNames = Object.keys(splitFlow);
+            for (let index = 0; index < splitNames.length; index++){
+                let split = splitFlow[splitNames[index]];
+                uplineFlow.push(split.up);
+                downlineFlow.push(split.down);
+            }
+
+            option = {
+                title: {
+                    text: '地铁线路断面客流',
+                    left:"center",
+                    subtext: '2号线',
+                    textStyle:{
+                        color:"#000"
+                    }
+                },
+                color:['#9E87FF', '#73ACFF'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                },
+                legend: {
+                    left:"right",
+                    data: ['上行','下行'],
+                    textStyle:{fontSize:16}
+                },
+                toolbox: {
+                    show: false
+                },
+                grid: [{bottom:"50%"},{top:'50%'}],
+                xAxis: [
+                    {
+                        type: 'category',
+                        show:true,
+                        axisLine: {show: true, onZero: false},
+                        axisTick: {show: false},
+                        axisLabel: {show: false,color:"grey",fontSize:20},
+                        splitArea: {show: false},
+                        splitLine: {show: false},
+                        position:"bottom",
+                        nameTextStyle:{fontSize:16},
+                        data: splitNames
+                    },
+                    {
+                        type: 'category',
+                        show:true,
+                        axisLine: {show: false, onZero: false},
+                        axisTick: {show: false},
+                        axisLabel: {show: false,color:"grey",fontSize:16},
+                        splitArea: {show: false},
+                        splitLine: {show: false},
+                        gridIndex:1,
+                        position:"bottom",
+                        nameTextStyle: { fontSize: 16 },
+                        data: splitNames
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: "上行客流 /人次",
+                        position:"left",
+                        splitLine: true,
+                        splitNumber:5,
+                        gridIndex:0,
+                        axisLabel: {
+                            color: '#949AA8',
+                        },
+                    },
+                    {
+                        type: 'value',
+                        name:"下行客流 /人次",
+                        position:"left",
+                        splitLine: true,
+                        splitNumber:5,
+                        gridIndex:1,
+                        inverse:true, 
+                        axisLabel: {
+                            color: '#949AA8',
+                        },
+                    }
+                ],
+                series: [
+                    {
+                        type:"bar",
+                        name:"上行",
+                        barMaxWidth:40,
+                        data: uplineFlow,
+                        xAxisIndex: 0,
+                        yAxisIndex: 0,
+                        itemStyle: {
+                            color: '#9E87FF',
+                            barBorderRadius: [4, 4, 0, 0]
+                        },
+                    },
+                    {
+                        type:"bar",
+                        name:"下行",
+                        barMaxWidth:40,
+                        data:downlineFlow,
+                        xAxisIndex: 1,
+                        yAxisIndex: 1,
+                        itemStyle: {
+                            color: '#73ACFF',
+                            barBorderRadius: [0, 0, 4, 4]
+                        },
+                        
+                    }
+                ]
+            };
+
+            SplitChart.setOption(option);
         }
     });
 })
