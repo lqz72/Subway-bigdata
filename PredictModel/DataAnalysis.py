@@ -266,8 +266,7 @@ class DataApi(object):
         返回一个列表 格式: [(station, line, flow),]
         '''
         sta_dict = self.sta_dict
-        flow_df = self.flow_df
-        flow_df = flow_df[flow_df['day'] == date]
+        flow_df = self.flow_df[self.flow_df['day'] == date]
         flow_df['flow'] = 1
 
         sta_flow = flow_df.groupby(by='sta')['flow'].sum()
@@ -283,10 +282,9 @@ class DataApi(object):
         获取某日的线路流量占比 
         返回一个元组 包含线路列表和客流列表
         '''
-        flow_df = self.flow_df
         sta_dict = self.sta_dict
 
-        df = flow_df[flow_df['day'] == date]
+        df = self.flow_df[self.flow_df['day'] == date]
         df['flow'] = 1
         df = df.groupby(by='sta', as_index=False)['flow'].sum()
         df['line'] = df.sta.apply(lambda x: sta_dict[x])
@@ -341,7 +339,7 @@ class DataApi(object):
         获取用户每月出行次数
         返回一个字典 格式: {year-month:num,}
         '''
-        df = self.trips_df
+        df = self.trips_df.copy()
 
         df['in_time'] = df['in_time'].dt.normalize()
         df['out_time'] = df['out_time'].dt.normalize()
@@ -362,11 +360,11 @@ class DataApi(object):
         获取单个用户出行记录
         返回一个有序列表 格式[('in_sta_name', 'in_time', 'out_sta_name', 'out_time'),]
         '''
-        df = self.trips_df
+        df = self.trips_df.copy()
 
         user_df = df[df['user_id'].isin([user_id])].drop('user_id', axis = 1)
         user_df = user_df.sort_values(by='in_time', ascending=True)
-
+        print(user_df)
         in_sta_name, out_sta_name = user_df['in_sta_name'].values, user_df['out_sta_name'].values
         in_time = [i.strftime('%m-%d %H:%M') for i in user_df['in_time']]
         out_time = [i.strftime('%m-%d %H:%M') for i in user_df['out_time']]
@@ -379,7 +377,7 @@ class DataApi(object):
         传入一个一个有效日期
         返回值为一个字典 格式:{station:{hour:num,},}
         '''
-        df = self.in_df
+        df = self.in_df.copy()
 
         df = df.loc[date]
         df['flow'] = 1 
@@ -408,7 +406,7 @@ class DataApi(object):
         传入一个一个有效日期
         返回值为一个字典 格式:{station:{hour:num,},}
         '''
-        df = self.out_df
+        df = self.out_df.copy()
 
         df = df.loc[date]
         df['flow'] = 1 
@@ -499,15 +497,12 @@ class DataApi(object):
         传入一个一个有效日期
         返回值为一个字典 格式:{Sta1 :[lin1,{Sta:[line2, flow],} ],}
         '''
-        trips_df = self.trips_df
-        station_dict = self.sta_dict
-
         #读取od站点信息
         with open(self.abs_path + '/json/sta_od.json', 'r', encoding='utf-8') as f:
             od_dict = json.load(f)
    
         #读入出行记录
-        trips_df = trips_df.copy().drop('user_id', axis =1)
+        trips_df = self.trips_df.copy().drop('user_id', axis =1)
         trips_df.set_index('in_time', inplace=True)
         date_df = trips_df.loc[date]
         date_df.reset_index(level='in_time', inplace=True)
@@ -527,7 +522,7 @@ class DataApi(object):
 
 if __name__ == '__main__':
     api = DataApi()
-    a = api.get_user_trip_record('d4ec5a712f2b24ce226970a8d315dfce')
+    a = api.get_od_flow('2020-07-01')
     print(a)
     # station_dict = SQLOS.get_station_dict()
 
