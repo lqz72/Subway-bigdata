@@ -493,7 +493,38 @@ class DataApi(object):
         
         return line_split_dict
 
+    def get_od_flow(self, date):
+        '''
+        获取一个OD客流量数据
+        传入一个一个有效日期
+        返回值为一个字典 格式:{Sta1 :[lin1,{Sta:[line2, flow],} ],}
+        '''
+        trips_df = self.trips_df
+        station_dict = self.sta_dict
+
+        #读取od站点信息
+        with open(self.abs_path + '/json/sta_od.json', 'r', encoding='utf-8') as f:
+            od_dict = json.load(f)
+   
+        #读入出行记录
+        trips_df = trips_df.copy().drop('user_id', axis =1)
+        trips_df.set_index('in_time', inplace=True)
+        date_df = trips_df.loc[date]
+        date_df.reset_index(level='in_time', inplace=True)
+
+        try:
+            for each in date_df.itertuples(index=False):
+                in_sta = getattr(each, 'in_sta_name')
+                out_sta = getattr(each, 'out_sta_name')
+
+                if in_sta == out_sta:
+                    continue
+
+                od_dict[in_sta][1][out_sta][1] += 1
+        except Exception as e:
+            print(e, in_sta, out_sta)
 
 if __name__ == '__main__':
     api = DataApi()
-    api.get_line_split_flow('2020-07-01', '1号线')
+
+    
