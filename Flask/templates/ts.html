@@ -5,7 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script type="text/javascript" src="{{ url_for('static',filename ='js/template-web.js') }}"></script>
+    <!-- <script type="text/javascript" src="{{ url_for('static',filename ='js/template-web.js') }}"></script> -->
+    <script src="../static/js/template-web.js"></script>
 </head>
 <body>
     <div id="content"></div>
@@ -37,5 +38,6 @@
     var html = template('test', data);
     document.getElementById('content').innerHTML = html;
     </script>
+
     </body>
 </html>

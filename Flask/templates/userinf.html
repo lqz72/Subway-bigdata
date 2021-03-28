@@ -11,6 +11,9 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/bootstrap.min.css') }}">
     <script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/bootstrap.min.js') }}"></script>
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <script src="../static/js/template-web.js"></script>
+    
 </head>
 <style>
     a:hover {
@@ -53,32 +56,36 @@
                 <table id='userlist'>
                    
                 </table>
+                <!-- <div id='userlist'></div> -->
+                <div class="pageselector" id='pageselector'></div>
             </div>
 
         </div>
     </div>
     
-    <script>
-        $.ajax({
-            type:'get',
-            url:'/user/json',
-            success: function(data){
-                data = JSON.parse(data);
-                var tag = '<tr><td>ID</td> <td>区域</td><td>年龄</td><td>性别</td></tr>';
-                for(var k in data)
-                {
-                    tag += '<tr> <td>'+ k +'</td>';
-                    for(var it in data[k])
-                    {
-                        tag += '<td>' + data[k][it] + '</td>';
-                    }
-                    tag += '</tr>';
-                }
-                var list = document.querySelector('#userlist');
-                list.innerHTML = tag;
-            }
-        })
+    <script src="../static/layui/layui.js"></script>
+    <script id="test" type="text/html">
+        {%raw%}
+        <tr>
+            <td>ID</td> 
+            <td>区域</td>
+            <td>年龄</td>
+            <td>性别</td>
+        </tr>
+            {{each val value i}}
+                <tr>
+                    <td>{{value.user_id}}</td>
+                    <td>{{value.area}}</td>
+                    <td>{{value.age}}</td>
+                    <td>{{value.sex}}</td>
+                </tr>
+            {{/each}}
+            
+
+        {%endraw%}  
+        
     </script>
+    <script src="../static/js/userinf.js"></script>
 
 </body>
 </html>

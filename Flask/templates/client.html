@@ -8,9 +8,12 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
     <script type="text/javascript" src="{{ url_for('static',filename ='js/date.js') }}"></script>
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
+    <script src="../static/js/template-web.js"></script>
+    <script src="../static/layui/layui.js"></script>
 </head>
 <body>
     <div class="w">
@@ -44,38 +47,7 @@
             <div class="search">
                 <button id= "btn_show">&#xe663;</button>
                 <input id = "user_search" type="text">
-                <button id= "btn_search" onclick= "search()"></button>
-                <script>
-                    function search(){
-                        var user_id = document.getElementById('user_search');
-                        $.ajax({
-                            url: '/user_info',
-                            type: 'POST',
-                            data: user_id.value,
-                            dataType: 'json',
-                            success: function(result){
-                                console.log(result)
-                                var id = document.getElementById('id');
-                                var age = document.getElementById('age');
-                                var trips_num = document.getElementById('trips_num');
-                                id.innerHTML = result.id;
-                                age.innerHTML = result.age;
-                                trips_num.innerHTML = result.trips_num;
-                            }
-                        });
-
-                        var user_flow_line = echarts.init(document.getElementById('monthout'));
-                        $.ajax({
-                            type: 'POST',
-                            url: '/history/user_flow/line',
-                            data: user_id.value,
-                            dataType: 'json',
-                            success: function (result) {        
-                                user_flow_line.setOption(result);
-                            }
-                        });
-                    }
-                </script>
+                <button id= "btn_search"></button>
             </div>
 
             <!-- 用户信息 -->
@@ -83,7 +55,7 @@
                 <ul>
                     <li>
                         <span>   
-                            <strong id = "id" value = "d4ec5a712f2b24ce226970a8d315dfce">d4ec5a712f2b24ce226970a8d315dfce</strong>
+                            <strong id = "id">d4ec5a712f2b24ce226970a8d315dfce</strong>
                             <span>ID</span>
                         </span> 
                     </li>
@@ -95,7 +67,7 @@
                     </li>
                     <li>
                         <span>
-                            <strong id = "trips_num">103</strong>
+                            <strong id = "trips_num">53</strong>
                             <span>出行次数</span>
                         </span> 
                     </li>
@@ -108,30 +80,92 @@
             </div>
 
             <!-- 出行记录展示1 -->
-            <div class="outshow1">
+            <div class="outshow1" id="outshow1">
                 出行记录展示1
             </div>
 
             <!-- 出行记录展示2 -->
-            <div class="outshow2">
+            <div class="outshow2" id="outshow2">
                 出行记录展示2
             </div>
 
         </div>
     </div>
 
-    <script>
-        var btn1 = document.querySelector('#btn_show');
-        // console.log(btn1);
-        btn1.addEventListener('click',
-        function()
-        {
-            location.href = '/userinf';
-        })
+    <script  id="historyshow" type="text/html">
+        {%raw%}
+        <p>近期用户出行记录</p>
+        <ul class="layui-timeline">
+            <li class="layui-timeline-item">
+              <i class="layui-icon layui-timeline-axis"></i>
+              <div class="layui-timeline-content layui-text">
+                <div class="layui-timeline-title">{{list[9][3]}} 离开站点{{list[9][2]}}</div>
+              </div>
+            </li>
+            <li class="layui-timeline-item">
+              <i class="layui-icon layui-timeline-axis"></i>
+              <div class="layui-timeline-content layui-text">
+                <div class="layui-timeline-title">{{list[9][1]}} 进入站点{{list[9][0]}}</div>
+              </div>
+            </li>
+            <li class="layui-timeline-item">
+              <i class="layui-icon layui-timeline-axis"></i>
+              <div class="layui-timeline-content layui-text">
+                <div class="layui-timeline-title">{{list[8][3]}} 离开站点{{list[8][2]}}</div>
+              </div>
+            </li>
+            <li class="layui-timeline-item">
+              <i class="layui-icon layui-timeline-axis"></i>
+              <div class="layui-timeline-content layui-text">
+                <div class="layui-timeline-title">{{list[8][1]}} 进入站点{{list[8][0]}}</div>
+              </div>
+            </li>
+            <li class="layui-timeline-item">
+                <i class="layui-icon layui-timeline-axis"></i>
+                <div class="layui-timeline-content layui-text">
+                  <div class="layui-timeline-title">{{list[7][3]}} 离开站点{{list[7][2]}}</div>
+                </div>
+              </li>
+              <li class="layui-timeline-item">
+                <i class="layui-icon layui-timeline-axis"></i>
+                <div class="layui-timeline-content layui-text">
+                  <div class="layui-timeline-title">{{list[7][1]}} 进入站点{{list[7][0]}}</div>
+                </div>
+              </li>
+              <li class="layui-timeline-item">
+                <i class="layui-icon layui-timeline-axis"></i>
+                <div class="layui-timeline-content layui-text">
+                  <div class="layui-timeline-title">{{list[6][3]}} 离开站点{{list[6][2]}}</div>
+                </div>
+              </li>
+              <li class="layui-timeline-item">
+                <i class="layui-icon layui-timeline-axis"></i>
+                <div class="layui-timeline-content layui-text">
+                  <div class="layui-timeline-title">{{list[6][1]}} 进入站点{{list[6][0]}}</div>
+                </div>
+              </li>
+          </ul>
 
+
+        {{each list as value}}
+            
+        {{/each}}
+        {%endraw%}  
+    </script>
+    <script id='historylist' type="text/html">
+        <table>
+            <tr>
+                <td>进站时间</td>
+                <td>进站站点</td>
+                <td>出站时间</td>
+                <td>出站站点</td>
+            </tr>
+        </table>
     </script>
 
+    
     <script src="{{ url_for('static',filename ='js/update_client.js') }}"></script>
+    
     
 </body>
 </html>
