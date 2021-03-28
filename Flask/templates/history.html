@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
     <script type="text/javascript" src="{{ url_for('static',filename ='js/date.js') }}" ></script>
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
-    <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.15/lodash.js"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/lodash.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
 </head>
 <style>
@@ -83,7 +83,7 @@
                 <!-- 线路流量占比扇形图/风玫瑰图 -->
             </div>
             <!-- 站点od客流量 -->
-            <div class="od">
+            <div id = "od_graph" class="od">
                 站点od客流量图
             </div>
             <!-- 早晚高峰热力图和线路断面 -->
@@ -236,7 +236,7 @@
         </div>
     </div>
 
-    <script src="../static/layui/layui.js"></script>
+    <script src="{{ url_for('static',filename ='layui/layui.js') }}"></script>
     <script src="{{ url_for('static',filename ='js/update_history.js') }}"></script>
     <script>
         var tab = document.querySelector('#sta_flow_list');

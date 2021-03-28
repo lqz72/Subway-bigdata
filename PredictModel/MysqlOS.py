@@ -54,7 +54,7 @@ class SQLOS(object):
             # 'weather2020': abs_path + 'weather2020.txt',
             # 'hoilday2020': abs_path + 'hoilday2020.txt',
             # 'station': abs_path + 'station.txt',
-            #'users': abs_path + 'users.txt',
+            # 'users': abs_path + 'users.txt',
             # 'flow': abs_path + 'flow.txt',
             # 'trips': abs_path +'trips.txt', 
         }
@@ -72,7 +72,7 @@ class SQLOS(object):
                 print('读取时间:', end - start)
 
             db.close()
-            print('seccess load all data to mysql!')
+            print('success load all data to mysql!')
 
         except Exception as e:
             print('error:', e)
@@ -146,7 +146,7 @@ class SQLOS(object):
 
     def get_clean_data():
         '''
-        数据清洗 并将进站和出站信息存入mysql
+        数据清洗 并将合法数据存入mysql
         '''
         #删去空缺值和重复行
         trips_df = SQLOS.get_df_data('trips')
@@ -158,23 +158,12 @@ class SQLOS(object):
         out_df = trips_df.loc[:,['user_id', 'out_sta_name','out_time']]
 
         #获取站点列表
-        sta_list = SQLOS.get_station_list()
+        sta_list = SQLOS.get_station_dict().keys()
 
         # 获取所有进站行程中出现的站点
         in_sta_list = trips_df['in_sta_name'].tolist()
         out_sta_list = trips_df['out_sta_name'].tolist()
         trips_sta_set = set(in_sta_list + out_sta_list)
-
-        # 非法的站点名称 ['Sta104', 'Sta14', 'Sta5', 'Sta155', 'Sta98']
-        ill_sta_list = list((set(sta_list) ^ trips_sta_set))
-
-        #经验证 trips.csv中存在不存在的站点以及错误的站点名  需要删去 32583条
-        index_list_in = trips_df[trips_df['in_sta_name'].isin(ill_sta_list)].index.tolist()
-        in_df.drop(index_list_in, axis = 0, inplace = True)
-
-        index_list_out = trips_df[trips_df['out_sta_name'].isin(ill_sta_list)].index.tolist()
-        out_df.drop(index_list_out, axis=0, inplace=True)
-
 
         SQLOS.write_df_data(in_df, 'in_trips')
         SQLOS.write_df_data(out_df, 'out_trips')
@@ -221,7 +210,7 @@ class SQLOS(object):
         in_df.set_index('in_time', inplace =True)
         out_df.out_time = pd.to_datetime(out_df.out_time)
         out_df.set_index('out_time', inplace =True)
-        
+  
         in_df.drop(['id', 'user_id'], axis=1, inplace=True)
         out_df.drop(['id', 'user_id'], axis=1, inplace=True)
         
@@ -235,22 +224,6 @@ class SQLOS(object):
         user_df.drop('id', axis=1, inplace=True)
 
         return user_df
-
-    def get_user_flow(user_id):
-        '''
-        获取单个用户出行记录
-        返回一个列表 格式[('in_sta_name', 'in_time', 'out_sta_name', 'out_time'),]
-        '''
-        df = SQLOS.get_df_data('trips')
-        df = df[df['user_id'] == user_id]
-        grouped = df.groupby(['in_sta_name', 'in_time', 'out_sta_name', 'out_time'],
-            as_index=False)['in_time']
-
-        trip_record = []
-        for record in grouped:
-            trip_record.append(record[0])
-
-        return trip_record
 
     def get_admin_info():
         '''
@@ -311,3 +284,4 @@ class SQLOS(object):
             conn.close()
         
         return 'UnKnow'
+

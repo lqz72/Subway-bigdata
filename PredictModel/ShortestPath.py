@@ -213,6 +213,3 @@ class ShortestPath():
                 json.dump(path_dict[start], f)
    
         return path_dict
-
-# sp = ShortestPath()
-# sp.get_all_shortest_path()

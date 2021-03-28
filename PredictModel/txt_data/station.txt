@@ -1,4 +1,4 @@
-编号,站点名称,线路,行政区域
+id,station_name,line_name,district
 1004,Sta1,1号线,Dist1
 1006,Sta159,1号线,Dist1
 1008,Sta108,1号线,Dist1
@@ -162,3 +162,8 @@
 1187,Sta87,10号线,Dist8
 1188,Sta84,4号线,Dist5
 1191,Sta111,11号线,Dist5
+1173,Sta5,3号线,Dist8
+1174,Sta98,3号线,Dist8
+1170,Sta104,1号线,Dist1
+1172,Sta155,3号线,Dist7
+1175,Sta14,12号线,Dist2

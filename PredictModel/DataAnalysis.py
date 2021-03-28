@@ -368,9 +368,9 @@ class DataApi(object):
         user_df = user_df.sort_values(by='in_time', ascending=True)
 
         in_sta_name, out_sta_name = user_df['in_sta_name'].values, user_df['out_sta_name'].values
-        in_time = [i.strftime('%m-%d %H:%M:%S') for i in user_df['in_time']]
-        out_time = [i.strftime('%m-%d %H:%M:%S') for i in user_df['out_time']]
- 
+        in_time = [i.strftime('%m-%d %H:%M') for i in user_df['in_time']]
+        out_time = [i.strftime('%m-%d %H:%M') for i in user_df['out_time']]
+        
         return list(zip(in_sta_name, in_time, out_sta_name, out_time))
         
     def get_in_hour_flow(self, date):              
@@ -523,8 +523,23 @@ class DataApi(object):
                 od_dict[in_sta][1][out_sta][1] += 1
         except Exception as e:
             print(e, in_sta, out_sta)
+        return od_dict
 
 if __name__ == '__main__':
     api = DataApi()
+    a = api.get_user_trip_record('d4ec5a712f2b24ce226970a8d315dfce')
+    print(a)
+    # station_dict = SQLOS.get_station_dict()
+
+    # links = []
+    # i = 0
+    # for source in station_dict:
+    #     for target in station_dict:
+    #         if source == target:
+    #             continue
+    #         links.append({'source': source, 'target': target})
+            
+    # with open('./PredictModel/relation.json', 'w', encoding='utf-8') as f:
+    #     json.dump(links, f)
 
     

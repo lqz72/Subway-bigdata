@@ -83,11 +83,11 @@ def get_link_json() -> json:
 def thisday_info() -> json:
     """返回指定日期天气、节假日、客流信息
     """
-    current_date = request.get_data().decode('utf-8')
-    month, day = current_date[:-3], current_date[-2:]
+    curr_date = request.get_data().decode('utf-8')
+    month, day = curr_date[:-3], curr_date[-2:]
 
-    weather = SQLOS.get_weather_info(current_date)
-    is_hoilday = SQLOS.get_hoilday_info(current_date)
+    weather = SQLOS.get_weather_info(curr_date)
+    is_hoilday = SQLOS.get_hoilday_info(curr_date)
     day_flow = api.month_dict[month][day]
 
     info_dict = {
@@ -102,8 +102,8 @@ def thisday_info() -> json:
 def sta_rank() -> json:
     """返回站点客流排行
     """
-    current_date = request.get_data().decode('utf-8')
-    sta_rank_list = api.get_top_sta(current_date)
+    curr_date = request.get_data().decode('utf-8')
+    sta_rank_list = api.get_top_sta(curr_date)
 
     return jsonify(sta_rank_list)
 
@@ -145,8 +145,8 @@ def admin_info() -> json:
 def in_hour_flow() -> json:
     """返回当前日期各站点6点-9点的进站客流量
     """
-    current_date = request.get_data().decode('utf-8')
-    in_hour_dict = api.get_in_hour_flow(current_date)
+    curr_date = request.get_data().decode('utf-8')
+    in_hour_dict = api.get_in_hour_flow(curr_date)
 
     return jsonify(in_hour_dict)
 
@@ -154,8 +154,8 @@ def in_hour_flow() -> json:
 def out_hour_flow() -> json:
     """返回当前日期各站点6点-9点的出站客流量
     """
-    current_date = request.get_data().decode('utf-8')
-    out_hour_dict = api.get_out_hour_flow(current_date)
+    curr_date = request.get_data().decode('utf-8')
+    out_hour_dict = api.get_out_hour_flow(curr_date)
     
     return jsonify(out_hour_dict)
 
@@ -163,10 +163,19 @@ def out_hour_flow() -> json:
 def split_flow(line) -> json:
     """返回地铁断面客流
     """ 
-    current_date = request.get_data().decode('utf-8')
-    split_flow= api.get_line_split_flow(current_date, '%s号线' % line)
+    curr_date = request.get_data().decode('utf-8')
+    split_flow= api.get_line_split_flow(curr_date, '%s号线' % line)
 
     return jsonify(split_flow)
+
+@app.route('/od_flow', methods=['POST', 'GET']) 
+def od_flow() -> json:
+    """返回OD客流
+    """
+    curr_date = request.get_data().decode('utf-8')
+    od_flow = api.get_od_flow(curr_date)
+
+    return jsonify(od_flow)
 
 #------------控制图表的展示------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])

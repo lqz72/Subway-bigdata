@@ -282,45 +282,4 @@ class ChartApi(object):
 
         )
         return pie
-
-    # def split_line_bar(up_split, down_split) -> Bar:
-    #     '''
-    #     返回线路断面客流柱状图
-    #     '''
-    #     stations = [i.split('-')[0] for i in up_split.keys()]
-    #     up_flow = [str(i) for i in up_split.values()]
-    #     down_flow = [str(i) for i in down_split.values()]
-    #     colors = ['#73ACFF', '#9E87FF']
-    #     c = (
-    #         Bar()
-    #         .add_xaxis(xaxis_data = stations)
-    #         .add_yaxis(
-    #             series_name="上行",
-    #             y_axis=up_flow,
-    #             color=colors[0],
-    #             stack = 1,
-    #             label_opts=opts.LabelOpts(is_show=False)
-                
-    #         )
-    #         .add_yaxis(
-    #             series_name="下行",
-    #             y_axis=down_flow,
-    #             color=colors[1],
-    #             stack = 1,
-    #             label_opts=opts.LabelOpts(is_show = False)
-    #         )
-      
-    #         .set_global_opts(
-    #             title_opts=opts.TitleOpts(title="断面客流分布"),
-    #             tooltip_opts=opts.TooltipOpts(
-    #                 is_show=true,
-    #                 trigger='axis',
-    #                 axis_pointer_type='shadow'
-    #             )
-    #             legend_opts=opts.LegendOpts(is_show=true),
-    #             yaxis_opts=opts.AxisOpts(name="客流量"),
-    #             xaxis_opts=opts.AxisOpts(name="线路断面", type_="category"),
-    #         )
-    #         .render("section_flow.html")
-    #     )
-    #     return c
+        
