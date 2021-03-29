@@ -44,13 +44,15 @@ $(function(){
             data: user_id.value,
             success: function(data)
             {
-                console.log(data);
                 test = {title:'用户记录'};
-                test['list'] = data;
+                test['list'] = data.reverse();
                 test['length'] = data.length;
                 console.log(test);
                 var html = template('historyshow', test);
                 document.getElementById('outshow1').innerHTML = html;
+
+                var html2 = template('historylist', test);
+                document.getElementById('outshow2').innerHTML = html2;
             }
         });
     }
@@ -114,11 +116,14 @@ $(function(){
         data: init_id,
         success: function(data)
         {
-            console.log(data);
             test = {title:'用户记录'};
-            test['list'] = data;
+            test['list'] = data.reverse();
+            test['length'] = data.length;
             var html = template('historyshow', test);
             document.getElementById('outshow1').innerHTML = html;
+
+            var html2 = template('historylist', test);
+            document.getElementById('outshow2').innerHTML = html2;
         }
     });
 }
