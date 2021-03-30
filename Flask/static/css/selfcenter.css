@@ -80,11 +80,35 @@ table tr td button {
     width: 200px;
 }
 .list table tr td:nth-child(3) {
-    width: 200px;
+    width: 300px;
 }
 .list table tr td:nth-child(4) {
-    width: 150px;
+    width: 300px;
 }
-.list table tr td:nth-child(5) {
-    width: 183px;
+/* ???????????????啥时候写的
+element.style {
+}
+.layui-btn-group .layui-btn+.layui-btn {
+    margin-left: 0;
+}
+.layui-btn-group .layui-btn:last-child {
+    border-radius: 0 2px 2px 0;
+}
+.layui-btn-group .layui-btn {
+    margin-left: 0!important;
+    margin-right: 0!important;
+    border-left: 1px solid rgba(255,255,255,.5);
+    border-radius: 0;
+}
+.layui-btn+.layui-btn {
+    margin-left: 10px;
+}
+.layui-btn-sm {
+    height: 30px;
+    line-height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+} */
+.layui-btn {
+    background-color: #1E9FFF !important;
 }

@@ -5,10 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
     <script type="text/javascript" src="{{ url_for('static',filename ='js/date.js') }}" ></script>
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/lodash.js') }}"></script>
@@ -18,6 +19,41 @@
     .layui-laydate, .layui-laydate-hint {
         box-shadow: none !important;
         border: none !important;
+    }
+    .layui-input-block {
+        position:absolute;
+        z-index: 9999999;
+        margin-left: 0;
+    }
+    .m-radio {
+        position: absolute;
+        left: 475px;
+        top: 60px;
+    }
+    .twograph {
+        position: relative;
+        overflow: hidden;
+        padding-top: 0;
+    }
+    #line_graph {
+        width: 100%;
+        height: 100%;
+    }
+    .layui-form-item {
+    margin-bottom: 0px;
+    }
+    .cutline {
+        position: relative;
+    }
+    .cmb {
+        position: absolute;
+        width: 87px;
+        left: 810px;
+        top: 40px;
+    }
+    #split_bar {
+        width: 100%;
+        height: 100%;
     }
 </style>
 <body>
@@ -84,12 +120,20 @@
             </div>
             <!-- 站点od客流量 -->
             <div id = "od_graph" class="od">
-                站点od客流量图
+
             </div>
             <!-- 早晚高峰热力图和线路断面 -->
-            <div id = "line_graph" class="twograph">
-                热力图,早晚高峰分布
-                /线路断面？选择展示方式，最简单的是折线图挨个线路统计，但不直观。看能否嵌套在热力图里面
+            <div class="twograph layui-form">
+                <div class="layui-form-item">
+                    <!-- <label class="layui-form-label">客流方向</label> -->
+                    <div class="layui-input-block m-radio">
+                      <input type="radio" name="sex" value="0" title="入站">
+                      <input type="radio" name="sex" value="1" title="出站" checked>
+                    </div>
+                </div>
+                <div id = "line_graph">
+
+                </div>
             </div>
             <!-- 站点排行榜 -->
             <div class="leaderboard">
@@ -112,8 +156,25 @@
                 </table>
             </div>
             <!-- 线路断面 -->
-            <div id = "split_bar" class="cutline">
-                线路断面
+            <div class="cutline layui-form">
+                <div class="layui-form-item cmb">
+                    <!-- <label class="layui-form-label">选择线路</label> -->
+                    <div class="layui-input-block">
+                      <select name="interest" lay-filter="aihao">
+                        <option value="1">1号线</option>
+                        <option value="2">2号线</option>
+                        <option value="3">3号线</option>
+                        <option value="4">4号线</option>
+                        <option value="5">5号线</option>
+                        <option value="10">10号线</option>
+                        <option value="11">11号线</option>
+                        <option value="12">12号线</option>
+                      </select>
+                    </div>
+                </div>
+                <div id = "split_bar">
+
+                </div>
             </div>
             <!-- 线路断面流量排行榜 -->
             <div class="leaderboard2">
@@ -238,10 +299,6 @@
 
     <script src="{{ url_for('static',filename ='layui/layui.js') }}"></script>
     <script src="{{ url_for('static',filename ='js/update_history.js') }}"></script>
-    <script>
-        var tab = document.querySelector('#sta_flow_list');
-        var td;
-    </script>
     
 </body>
 </html>

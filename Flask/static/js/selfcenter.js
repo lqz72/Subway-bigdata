@@ -4,71 +4,47 @@ $(function(){
         url:'/admin_info',
 
         success: function(data){
-            console.log(typeof(data));
-            tag = '<tr> <td>用户名</td> <td>密码</td> <td>备注</td> <td>修改</td> <td>删除</td> </tr>';
+            var t = {};
+            t.list = data;
+            var html = template('admindata', t);
+            document.getElementById('adminlist').innerHTML = html;
+
+            var ad_list = document.querySelector('#adminlist').children[0];
+            console.log(data.length);
             for(var i=0;i<data.length;i++)
             {
-                tag += '<tr>'+'<td>'+data[i].name+'</td>'+'<td>'+data[i].pwd+'</td>'+'<td>'+data[i].tips
-                +'</td>'+'<td><a href="javascript:;">修改</a></td><td><a href="javascript:;">删除</a></td>'+'</tr>';
+                // console.log(ad_list.children[0].children[1]);
+                ad_list.children[i+1].children[3].children[0].children[0].addEventListener('click',function(){
+                    console.log(this.parentNode.parentNode.parentNode.children[0].innerText);
+                })
             }
-            var ct = document.querySelector('#adminlist');
-            ct.innerHTML = tag;
         }
     })
+
+    var save = document.querySelector('#saveitem');
+    
+    save.addEventListener('click',function(){
+        var username = document.querySelector('#username');
+        var pwd = document.querySelector('#pwd');
+        var tips = document.querySelector('#tips');
+        var inf = {};
+        inf.username = username.value;
+        inf.pwd = pwd.value;
+        inf.tips = tips.value;
+        $.ajax({
+            type:'GET',
+            url:'',
+            data:inf,
+            success: function()
+            {
+                alert("创建用户成功！");
+                location.href = '/selfcenter';
+            }
+        })
+
+    })
+
+
 })
 
 
-
-// var del = document.querySelectorAll(".del");
-// for(var i=0;i<del.length;i++){
-//     del[i].addEventListener('click',function(){
-//         var titem = this.parentNode.parentNode;
-//         var pnt = titem.parentNode;
-//         pnt.removeChild(titem);
-//     })
-// }
-
-// var edit = document.querySelectorAll(".edit");
-// for(var i=0;i<edit.length;i++){
-//     edit[i].addEventListener('click',function(){
-//         var titem = this.parentNode.parentNode;
-//         var pnt = titem.parentNode;
-//         pnt.removeChild(titem);
-//     })
-// }
-
-//error try
-// success: function(data){
-//     console.log(data);
-//     tag = '';
-//     for(var i=0;i<data.length;i++)
-//     {
-//         tag += '<tr>'+'<td>'+data[i].name+'</td>'+'<td>'+data[i].pwd+'</td>'+'<td>'+data[i].tips
-//         +'</td>'+'</tr>';
-//     }
-//     console.log(tag);
-//     var ct = document.querySelector('#adminlist');
-//     ct.innerHTML = tag;
-// }
-
-// success: function(data) {
-//     var ct = document.querySelector('#adminlist');
-//     for(var i=0;i<data.length;i++)
-//     {
-//         var tr = document.createElement('tr');
-//         ct.appendChild(tr);
-//         for(var j in data[i])
-//         {
-//             var td = document.createElement('td');
-//             td.innerHTML = data[i][j];
-//             tr.appendChild(td);
-//         }
-//         var edit = document.createElement('td');
-//         edit.innerHTML = '<a href="javascript:;">修改</a>';
-//         tr.appendChild(edit);
-//         var del = document.createElement('td');
-//         del.innerHTML = '<a href="javascript:;">删除</a>';
-//         tr.appendChild(del);
-//         $("#adminlist").trigger("create"); 
-//     }
-// }

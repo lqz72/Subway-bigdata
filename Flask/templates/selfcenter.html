@@ -9,9 +9,11 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/selfcenter.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="../static/layui/css/layui.css">
     <script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/bootstrap.min.js') }}"></script>
     <script src="../static/js/template-web.js"></script>
+    <script src="../static/layui/layui.js"></script>
 </head>
 <style>
     a:hover {
@@ -58,22 +60,22 @@
                         <table>
                             <tr>
                                 <td>用户名<span class="font-red"> *</span></td>
-                                <td><input type="text"></td>
+                                <td><input type="text" id='username'></td>
                             </tr>
                             <tr>
                                 <td>密码<span class="font-red"> *</span></td>
-                                <td><input type="text"></td>
+                                <td><input type="text" id='pwd'></td>
                             </tr>
                             <tr>
                                 <td>备注</td>
-                                <td><input type="text"></td>
+                                <td><input type="text" id='tips'></td>
                             </tr>
                             
                         </table>
                         </div>
                         <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary">保存</button>
+                        <button type="button" class="btn btn-primary" id='saveitem'>保存</button>
                         </div>
                     </div>
                     </div>
@@ -88,6 +90,33 @@
 
         </div>
     </div>
+    <script type="text/html" id='admindata'>
+        {%raw%}
+        <tr> 
+            <td>用户名</td> 
+            <td>密码</td> 
+            <td>备注</td> 
+            <td>操作</td> 
+        </tr>
+        {{each list as value}}
+            <tr>
+                <td>{{value.name}}</td>
+                <td>{{value.pwd}}</td>
+                <td>{{value.tips}}</td>
+                <td>
+                    <div class="layui-btn-group">
+                        <button type="button" class="layui-btn layui-btn-sm">
+                          <i class="layui-icon">&#xe642;</i>
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-sm">
+                          <i class="layui-icon">&#xe640;</i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        {{/each}}
+        {%endraw%}
+    </script>
     <!-- <script type="text/javascript" src="{{ url_for('static',filename ='js/selfcenter.js') }}"></script> -->
     <script src="../static/js/selfcenter.js"></script>
 </body>

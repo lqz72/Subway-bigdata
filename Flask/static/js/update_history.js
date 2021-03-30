@@ -1,3 +1,27 @@
+layui.use('form', function(){
+    var form = layui.form;
+    
+    //各种基于事件的操作，下面会有进一步介绍
+     
+    form.on('radio', function(data){
+        console.log(data.value); //被点击的radio的value值
+        console.log(n_date);
+        //切换 上行、下行 0表示上行 代码写这儿
+
+
+
+    }); 
+
+    form.on('select', function(data){
+        console.log(data.value); //得到被选中的值
+        console.log(n_date);
+        //切换线路代码写这儿
+
+    }); 
+});
+
+
+var n_date;
 layui.use('laydate', function(){
     var laydate = layui.laydate;
     
@@ -10,12 +34,13 @@ layui.use('laydate', function(){
         ,min: '2019-12-26'
         ,max: '2020-07-16'
         ,ready: function(date){//初始化
-            console.log(date); //得到初始的日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
+            n_date = '2020-01-01';
+            //console.log(date); //得到初始的日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
             $(
                 function(){
                     value = '2020-01-01';
                     var month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
-                    console.log(value);
+                    // console.log(value);
                     $.ajax({
                         type: 'POST',
                         data: value,
@@ -49,7 +74,7 @@ layui.use('laydate', function(){
                         url: '/thisday_info',
                         dataType: 'json',
                         success: function (result) {
-                            console.log(result);
+                            // console.log(result);
                             weather_info.innerHTML = result.weather;
                             is_hoilday.innerHTML = result.is_hoilday;
                             day_flow.innerHTML = result.day_flow;
@@ -63,7 +88,7 @@ layui.use('laydate', function(){
                         url: '/sta_rank',
                         dataType: 'json',
                         success: function (result) {
-                            console.log(result);
+                            // console.log(result);
                             for (let i = 1; i <= 25; i++){
             
                                 var rank = document.getElementById(i+"");
@@ -397,6 +422,12 @@ layui.use('laydate', function(){
                     };
 
                     splitChart.setOption(option);
+
+                    layui.use('form', function(){
+                        var form = layui.form;
+                        
+                        //各种基于事件的操作，下面会有进一步介绍
+                        });
                     
                     // var ODChart = echarts.init(document.getElementById('od_graph'));
                     // var ODFlow;
@@ -501,12 +532,7 @@ layui.use('laydate', function(){
 
         }
         ,change: function(value, date){ //改变日期后
-            //   console.log(value); //得到日期生成的值，如：2017-08-18
-            //   // console.log(date); //得到日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
-            //   var bt = document.querySelectorAll('.bts>.bt')[1];
-            //   bt.addEventListener('click',function(){
-            console.log(value);
-            
+            n_date = value;
             var month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
             $.ajax({
                 type: 'POST',
@@ -541,7 +567,7 @@ layui.use('laydate', function(){
                 url: '/thisday_info',
                 dataType: 'json',
                 success: function (result) {
-                    console.log(result);
+                    // console.log(result);
                     weather_info.innerHTML = result.weather;
                     is_hoilday.innerHTML = result.is_hoilday;
                     day_flow.innerHTML = result.day_flow;
@@ -555,7 +581,7 @@ layui.use('laydate', function(){
                 url: '/sta_rank',
                 dataType: 'json',
                 success: function (result) {
-                    console.log(result);
+                    // console.log(result);
                     for (let i = 1; i <= 25; i++){
                         
                         var rank = document.getElementById(i+"");
