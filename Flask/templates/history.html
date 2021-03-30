@@ -132,7 +132,7 @@
                     </div>
                 </div>
                 <div id = "line_graph">
-
+                    <!-- 早晚高峰热力图 -->
                 </div>
             </div>
             <!-- 站点排行榜 -->
@@ -187,111 +187,17 @@
                         <th>所在线路</th>
                         <th>客流</th>
                     </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>sta102</td>
-                        <td>sta2</td>
-                        <td>6号线</td>
-                        <td>1315</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>sta101</td>
-                        <td>sta1</td>
-                        <td>6号线</td>
-                        <td>1215</td>
-                    </tr>
+                    {% for i in range(1, 7)%}
+                        <tr>
+                            <td id = "split_rank{{i}}">1</td>
+                            <td id = "source{{i}}">sta102</td>
+                            <td id = "target{{i}}">sta2</td>
+                            <td id = "split_line{{i}}">6号线</td>
+                            <td id = "split_flow{{i}}">1315</td>
+                        </tr>
+                    {% endfor %}
+                    
+                    
                 </table>
             </div>    
         </div>

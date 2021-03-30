@@ -1,24 +1,22 @@
-layui.use('form', function(){
-    var form = layui.form;
+// layui.use('form', function(){
+//     var form = layui.form;
     
-    //各种基于事件的操作，下面会有进一步介绍
+//     //各种基于事件的操作，下面会有进一步介绍
      
-    form.on('radio', function(data){
-        console.log(data.value); //被点击的radio的value值
-        console.log(n_date);
-        //切换 上行、下行 0表示上行 代码写这儿
+//     form.on('radio', function(data){
+//         console.log(data.value); //被点击的radio的value值
+//         console.log(n_date);
+//         //切换 上行、下行 0表示上行 代码写这儿
+        
+//     }); 
 
+//     form.on('select', function(data){
+//         console.log(data.value); //得到被选中的值
+//         console.log(n_date);
+//         //切换线路代码写这儿
 
-
-    }); 
-
-    form.on('select', function(data){
-        console.log(data.value); //得到被选中的值
-        console.log(n_date);
-        //切换线路代码写这儿
-
-    }); 
-});
+//     }); 
+// });
 
 
 var n_date;
@@ -88,7 +86,6 @@ layui.use('laydate', function(){
                         url: '/sta_rank',
                         dataType: 'json',
                         success: function (result) {
-                            // console.log(result);
                             for (let i = 1; i <= 25; i++){
             
                                 var rank = document.getElementById(i+"");
@@ -116,32 +113,20 @@ layui.use('laydate', function(){
                         }
                     });
             
-                    var in_hour_flow;
-                    var out_hour_flow;
+                    var hourFlow;
                     $.ajax({
                         type: "POST",
                         data: value,
-                        url: "/in_hour_flow",
+                        url: '/out_hour_flow',
                         dataType: 'json',
                         async: false,
                         success: function (result) {
-                            in_hour_flow = result;
+                            hourFlow = result;
                         }
                     });
-                    
-                    // $.ajax({
-                    //     type: "POST",
-                    //     data: value,
-                    //     url: "/out_hour_flow",
-                    //     dataType: 'json',
-                    //     async: false,
-                    //     success: function (result) {
-                    //         out_hour_flow = result;
-                    //     }
-                    // });
             
                     function getJsonData(url){
-                        var js_data;
+                        var jsData;
                         $.ajax({
                                 url: url,
                                 type: "GET",
@@ -149,10 +134,10 @@ layui.use('laydate', function(){
                                 dataType: "json", 
                                 async: false,
                                 success: function(data) {
-                                    js_data = data;
+                                    jsData = data;
                                 }
                             })
-                        return js_data;
+                        return jsData;
                     }
             
                     var stations = getJsonData('/sta/json');
@@ -184,38 +169,57 @@ layui.use('laydate', function(){
                     }
             
                     //生成6-21点的客流数据
-                    var stations_lq = [];
-                    for (let i = 6; i <= 21; i++) {
-                        let lq_tmp = {};
-                        lq_tmp.lq = [];
-                        stations.forEach(function (station) {
-                            var sta_name = station.name;
-            
-                            var sta = JSON.parse(JSON.stringify(station));
-                            
-                            if (in_hour_flow[sta_name]) {
-                                sta.value = in_hour_flow[sta_name][`${i}`];
-                                if (sta.value == 0) 
-                                    sta.symbolSize = 10;  //如果客流量为0 设置最小size为10
-                                else 
-                                    //否则取对数降低增长速度
-                                    sta.symbolSize = Math.log(in_hour_flow[sta_name][`${i}`]) * 10 + 10;
-                            } else {
-                                sta.value = 0;
-                                sta.symbolSize = 10;
-                            }
-                            
-                            sta.itemStyle.color = station.itemStyle.borderColor;
-                            sta.itemStyle.borderWidth = 0;
-                            sta.itemStyle.opacity = 0.75;
-            
-                            lq_tmp.lq.push(sta);
-                        });
-                        stations_lq.push(lq_tmp);
+                    function getHourFlowData(hourFlow, stations) {
+                        var hourFlow = [];
+                        for (let i = 6; i <= 21; i++) {
+                            var hour = {};
+                            hour.staList = [];
+                            stations.forEach(function (station) {
+                                var staName = station.name;
+                
+                                var sta = JSON.parse(JSON.stringify(station));
+                                
+                                if (hourFlow[staName]) {
+                                    sta.value = hourFlow[staName][`${i}`];
+                                    if (sta.value == 0) 
+                                        sta.symbolSize = 10;  //如果客流量为0 设置最小size为10
+                                    else 
+                                        //否则取对数降低增长速度
+                                        sta.symbolSize = Math.log(hourFlow[staName][`${i}`]) * 10 + 10;
+                                } else {
+                                    sta.value = 0;
+                                    sta.symbolSize = 10;
+                                }
+                                
+                                sta.itemStyle.color = station.itemStyle.borderColor;
+                                sta.itemStyle.borderWidth = 0;
+                                sta.itemStyle.opacity = 0.75;
+                
+                                hour.staList.push(sta);
+                            });
+                            hourFlow.push(hour);
+                        }
+                        return hourFlow;
                     }
                     
-                
-                    option = {
+                    //配置图表属性
+                    function setGraphOptions(option, hourFlowData, type = "出站") {
+                        option.options = [];
+                        for (let i = 0; i <= 15; i++){ 
+                            option.options.push({
+                                title: {
+                                    text: '轨道交通' + type + '客流分布 ' + timelist()[i]
+                                },
+                                series: [{
+                                    data: hourFlowData[i].staList,
+                                    links: links,
+                                }]
+                            })
+                            
+                        }
+                    }
+
+                    var graphOption = {
                         timeline: {
                             axisType: 'category',
                             show: true,
@@ -278,20 +282,10 @@ layui.use('laydate', function(){
                         ],
                         options: []
                     }
-                
-                    for (let i = 0; i <= 15; i++){
-                        option.options.push({
-                            title: {
-                                text: '轨道交通进站客流分布 ' + timelist()[i]
-                            },
-                            series: [{
-                                data: stations_lq[i]['lq'],
-                                links: links,
-                            }]
-                        })
-                    }
-            
-                    graphChart.setOption(option);
+                    
+                    var hourFlowData = getHourFlowData(hourFlow, stations);
+                    setGraphOptions(graphOption, hourFlowData);
+                    graphChart.setOption(graphOption);
                     
                     var splitChart = echarts.init(document.getElementById('split_bar'));
                     var splitFlow;
@@ -306,16 +300,22 @@ layui.use('laydate', function(){
                         }
                     });
                     
-                    var uplineFlow = [];
-                    var downlineFlow = [];
-                    splitNames = Object.keys(splitFlow);
+                    var uplineFlow = downlineFlow = [];
+                    var splitNames = Object.keys(splitFlow);
                     for (let index = 0; index < splitNames.length; index++){
-                        let split = splitFlow[splitNames[index]];
+                        var split = splitFlow[splitNames[index]];
                         uplineFlow.push(split.up);
                         downlineFlow.push(split.down);
                     }
-    
-                    option = {
+                                  
+                    function setBarOption(option, y1, y2, x) {
+                        option.xAxis[0].data = x;
+                        option.xAxis[1].data = x;
+                        option.series[0].data = y1;
+                        option.series[1].data = y2;
+                    }
+
+                    var barOption = {
                         title: {
                             text: '地铁线路断面客流',
                             left:"center",
@@ -421,112 +421,83 @@ layui.use('laydate', function(){
                         ]
                     };
 
-                    splitChart.setOption(option);
+                    setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
+                    splitChart.setOption(barOption);
 
+                    //设置排行榜
+                    
+
+                    //响应控件事件
                     layui.use('form', function(){
                         var form = layui.form;
                         
                         //各种基于事件的操作，下面会有进一步介绍
-                        });
-                    
-                    // var ODChart = echarts.init(document.getElementById('od_graph'));
-                    // var ODFlow;
-                    // $.ajax({
-                    //     type: 'POST',
-                    //     url: '/od_flow',
-                    //     async: false,
-                    //     data: value,
-                    //     dataType: 'json',
-                    //     success: function (result) {
-                    //         ODFlow = result;
-                    //         console.log(ODFlow);
-                    //     }
-                    // });
+                        form.on('radio', function(data){
+                            console.log(data.value); //被点击的radio的value值
+                            console.log(n_date);
+                     
+                            var hourFlowUrl;
+                            var type;
+                            if (data.value == "0") {
+                                hourFlowUrl = '/in_hour_flow';
+                                type = "入站";
+                            }
+                            else if (data.value == "1"){
+                                hourFlowUrl = '/out_hour_flow';
+                                type = "出站";
+                            }
+                            else {
+                                console.log('error');
+                            }
 
-                    // var stationNames = Object.keys(ODFlow);
+                            $.ajax({
+                                type: "POST",
+                                data: value,
+                                url: hourFlowUrl,
+                                dataType: 'json',
+                                async: false,
+                                success: function (result) {
+                                    //更新数据
+                                    hourFlow = result;
+                                    hourFlowData = getHourFlowData(hourFlow, stations);
 
-                    // var staColor = {
-                    //     '1号线': '#73DDFF',
-                    //     '2号线': '#73ACFF',
-                    //     '3号线': '#FDD56A',
-                    //     '4号线': '#FDB36A',
-                    //     '5号线': '#FD866A',
-                    //     '10号线': '#9E87FF',
-                    //     '11号线': '#58D5FF',
-                    //     '12号线': '#E271DE'
-                    // }
-
-                    // var links = [];
-                    // for (let source in ODFlow) {
+                                    //更新图表
+                                    setGraphOptions(graphOption, hourFlowData, type);
+                                    graphChart.setOption(graphOption);
+                                }
+                            });
+                            
+                        }); 
                         
-                    //     let targetDict = ODFlow[source][1];
-                    //     for (let target in targetDict) {
-                    //         links.push({
-                    //             'source': source,
-                    //             'target': target,
-                    //             'value': targetDict[target][1]
-                    //         });
-                    //     }
-                    // }
-                    
-                    // var stations = [];
-                    // stationNames.forEach(function (station) {
-                    //     stations.push({
-                    //         'name': station,
-                    //         'symbolSize': 2,
-                    //         'color': staColor[ODFlow[station][0]]
-                    //     });
-                    // })
-                    
-                    // option = {
-                    //     animationDurationUpdate: 1500,
-                    //     animationEasingUpdate: 'quinticInOut',
-                    //     series: [{
-                    //         name: "relation",
-                    //         type: 'graph',
-                    //         layout: 'circular',
-                    //         circular: {
-                    //             rotateLabel: true
-                    //         },
-                    //         data: stations,
-                    //         links: links,
-                    //         roam: true,
-                    //         label: {
-                    //             show: true,
-                    //             position: 'right',
-                    //             formatter: '{b}',
-                    //             interval: 0
-                    //         },
-                    //         emphasis: {
-                    //             lineStyle: {
-                    //                 width: "3"
-                    //             }
-                    //         },
-                    //         focusNodeAdjacency: true,
-                    //         lineStyle: {
-                    //             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                    //                     offset: 0,
-                    //                     color: '#4e8ebf'
-                    //                 },
-                    //                 {
-                    //                     offset: 0.45,
-                    //                     color: '#9ac8e0'
-                    //                 },
-                    //                 {
-                    //                     offset: 0.65,
-                    //                     color: '#ba3036'
-                    //                 },
-                    //                 {
-                    //                     offset: 1,
-                    //                     color: '#c84641'
-                    //                 }
-                    //             ]),
-                    //             curveness: 0.3
-                    //         }
-                    //     }]
-                    // };
+                        form.on('select', function(data){
+                            console.log(data.value); //得到被选中的值
+                            console.log(n_date);
+                            //切换线路代码写这儿
+                            $.ajax({
+                                type: 'POST',
+                                url: '/split_flow/' + data.value,
+                                async: false,
+                                data: value,
+                                datatype: 'json',
+                                success: function (result) {
+                                    splitFlow = result;
 
-                    // ODChart.setOption(option);
+                                    uplineFlow = downlineFlow = [];
+                                    splitNames = Object.keys(splitFlow);
+                                    for (let index = 0; index < splitNames.length; index++){
+                                        var split = splitFlow[splitNames[index]];
+                                        uplineFlow.push(split.up);
+                                        downlineFlow.push(split.down);
+                                    }
+
+                                    setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
+                                    splitChart.setOption(barOption);
+                                }
+                            });
+                        }); 
+                    });
+                    
+                    
                 }
             )
 
@@ -609,33 +580,20 @@ layui.use('laydate', function(){
                 }
             });
         
-            var in_hour_flow;
-            var out_hour_flow;
+            var hourFlow;
             $.ajax({
                 type: "POST",
                 data: value,
-                url: "/in_hour_flow",
+                url: '/out_hour_flow',
                 dataType: 'json',
                 async: false,
                 success: function (result) {
-                    in_hour_flow = result;
+                    hourFlow = result;
                 }
             });
-            
-            // $.ajax({
-            //     type: "POST",
-            //     data: value,
-            //     url: "/out_hour_flow",
-            //     dataType: 'json',
-            //     async: false,
-            //     success: function (result) {
-            //         out_hour_flow = result;
-            //     }
-            // });
-        
-        
+    
             function getJsonData(url){
-                var js_data;
+                var jsData;
                 $.ajax({
                         url: url,
                         type: "GET",
@@ -643,74 +601,92 @@ layui.use('laydate', function(){
                         dataType: "json", 
                         async: false,
                         success: function(data) {
-                            js_data = data;
+                            jsData = data;
                         }
                     })
-                return js_data;
+                return jsData;
             }
-        
-            var stations = getJsonData('sta/json');
-            var links = getJsonData('link/json');
-        
+    
+            var stations = getJsonData('/sta/json');
+            var links = getJsonData('/link/json');
+    
             //初始化图表
             var graphChart = echarts.init(document.getElementById('line_graph'));
-        
+    
             //获取线路名称列表
-            var lineNames = []
+            var lineNames = [];
             for (let index = 0; index < stations.length - 1; index++) {
                 if (lineNames.indexOf(stations[index].category) == -1) {
-                    lineNames.push(stations[index].category)
+                    lineNames.push(stations[index].category);
                 }
             }
-        
+    
             //图例的数据数组 数组中的每一项代表一个系列的name
-            var legend = [{data: lineNames , top:"5%"}]
-        
+            var legend = [{ data: lineNames, top: "5%" }];
+    
             //获取类目名称数组 用于和 legend 对应以及格式化 tooltip 的内容
-            var categories = lineNames.map(lineName => {return {name: lineName}})
+            var categories = lineNames.map(lineName => { return { name: lineName } });
             
             function timelist() {
-                var timelist = []
+                var timelist = [];
                 for(let i = 6; i <= 21; i++){
-                    timelist.push(`${i}:00`)
+                    timelist.push(`${i}:00`);
                 }
-                return timelist
+                return timelist;
             }
-        
+    
             //生成6-21点的客流数据
-            var stations_lq = [];
-            for (let i = 6; i <= 21; i++) {
-                let lq_tmp = {};
-                lq_tmp.lq = [];
-                stations.forEach(function (station) {
-                    var sta_name = station.name;
+            function getHourFlowData(hourFlow, stations) {
+                var hourFlow = [];
+                for (let i = 6; i <= 21; i++) {
+                    var hour = {};
+                    hour.staList = [];
+                    stations.forEach(function (station) {
+                        var staName = station.name;
         
-                    var sta = JSON.parse(JSON.stringify(station));
-                    
-                    if (in_hour_flow[sta_name]) {
-                        sta.value = in_hour_flow[sta_name][`${i}`];
-                        if (sta.value == 0) 
-                            sta.symbolSize = 10;  //如果客流量为0 设置最小size为10
-                        else 
-                            //否则取对数降低增长速度
-                            sta.symbolSize = Math.log(in_hour_flow[sta_name][`${i}`]) * 10 + 10;
-                    } else {
-                        sta.value = 0;
-                        sta.symbolSize = 10;
-                    }
-                    
-                    // sta.name = sta_name;
-                    sta.itemStyle.color = station.itemStyle.borderColor;
-                    sta.itemStyle.borderWidth = 0;
-                    sta.itemStyle.opacity = 0.75;
+                        var sta = JSON.parse(JSON.stringify(station));
+                        
+                        if (hourFlow[staName]) {
+                            sta.value = hourFlow[staName][`${i}`];
+                            if (sta.value == 0) 
+                                sta.symbolSize = 10;  //如果客流量为0 设置最小size为10
+                            else 
+                                //否则取对数降低增长速度
+                                sta.symbolSize = Math.log(hourFlow[staName][`${i}`]) * 10 + 10;
+                        } else {
+                            sta.value = 0;
+                            sta.symbolSize = 10;
+                        }
+                        
+                        sta.itemStyle.color = station.itemStyle.borderColor;
+                        sta.itemStyle.borderWidth = 0;
+                        sta.itemStyle.opacity = 0.75;
         
-                    lq_tmp.lq.push(sta);
-                });
-                stations_lq.push(lq_tmp);
+                        hour.staList.push(sta);
+                    });
+                    hourFlow.push(hour);
+                }
+                return hourFlow;
             }
             
-        
-            option = {
+            //配置图表属性
+            function setGraphOptions(option, hourFlowData, type = "出站") {
+                option.options = [];
+                for (let i = 0; i <= 15; i++){ 
+                    option.options.push({
+                        title: {
+                            text: '轨道交通' + type + '客流分布 ' + timelist()[i]
+                        },
+                        series: [{
+                            data: hourFlowData[i].staList,
+                            links: links,
+                        }]
+                    })
+                    
+                }
+            }
+
+            var graphOption = {
                 timeline: {
                     axisType: 'category',
                     show: true,
@@ -746,7 +722,7 @@ layui.use('laydate', function(){
                         symbolSize: 3,
                         roam:false,
                         label: {
-                            show: false,
+                            show: false, 
                             color: 'black',
                             position: 'right'
                         },
@@ -769,25 +745,15 @@ layui.use('laydate', function(){
                             }
                         }
                     },
-                
+
                 ],
                 options: []
             }
-        
-            for (let i = 0; i <= 15; i++){
-                option.options.push({
-                    title: {
-                        text: '轨道交通进站客流分布 ' + timelist()[i]
-                    },
-                    series: [{
-                        data: stations_lq[i]['lq'],
-                        links: links,
-                    }]
-                })
-            }
-        
-            graphChart.setOption(option);
-
+            
+            var hourFlowData = getHourFlowData(hourFlow, stations);
+            setGraphOptions(graphOption, hourFlowData);
+            graphChart.setOption(graphOption);
+            
             var splitChart = echarts.init(document.getElementById('split_bar'));
             var splitFlow;
             $.ajax({
@@ -801,16 +767,22 @@ layui.use('laydate', function(){
                 }
             });
             
-            var uplineFlow = [];
-            var downlineFlow = [];
-            splitNames = Object.keys(splitFlow);
+            var uplineFlow = downlineFlow = [];
+            var splitNames = Object.keys(splitFlow);
             for (let index = 0; index < splitNames.length; index++){
-                let split = splitFlow[splitNames[index]];
+                var split = splitFlow[splitNames[index]];
                 uplineFlow.push(split.up);
                 downlineFlow.push(split.down);
             }
+                            
+            function setBarOption(option, y1, y2, x) {
+                option.xAxis[0].data = x;
+                option.xAxis[1].data = x;
+                option.series[0].data = y1;
+                option.series[1].data = y2;
+            }
 
-            option = {
+            var barOption = {
                 title: {
                     text: '地铁线路断面客流',
                     left:"center",
@@ -915,9 +887,78 @@ layui.use('laydate', function(){
                     }
                 ]
             };
-            
-            splitChart.setOption(option);
 
+            setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
+            splitChart.setOption(barOption);
+
+            layui.use('form', function(){
+                var form = layui.form;
+                
+                //各种基于事件的操作，下面会有进一步介绍
+                form.on('radio', function(data){
+                    console.log(data.value); //被点击的radio的value值
+                    console.log(n_date);
+                
+                    var hourFlowUrl;
+                    var type;
+                    if (data.value == "0") {
+                        hourFlowUrl = '/in_hour_flow';
+                        type = "入站";
+                    }
+                    else if (data.value == "1"){
+                        hourFlowUrl = '/out_hour_flow';
+                        type = "出站";
+                    }
+                    else {
+                        console.log('error');
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        data: value,
+                        url: hourFlowUrl,
+                        dataType: 'json',
+                        async: false,
+                        success: function (result) {
+                            //更新数据
+                            hourFlow = result;
+                            hourFlowData = getHourFlowData(hourFlow, stations);
+
+                            //更新图表
+                            setGraphOptions(graphOption, hourFlowData, type);
+                            graphChart.setOption(graphOption);
+                        }
+                    });
+                    
+                }); 
+                
+                form.on('select', function(data){
+                    console.log(data.value); //得到被选中的值
+                    console.log(n_date);
+                    //切换线路代码写这儿
+                    $.ajax({
+                        type: 'POST',
+                        url: '/split_flow/' + data.value,
+                        async: false,
+                        data: value,
+                        datatype: 'json',
+                        success: function (result) {
+                            splitFlow = result;
+
+                            uplineFlow = downlineFlow = [];
+                            splitNames = Object.keys(splitFlow);
+                            for (let index = 0; index < splitNames.length; index++){
+                                var split = splitFlow[splitNames[index]];
+                                uplineFlow.push(split.up);
+                                downlineFlow.push(split.down);
+                            }
+
+                            setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
+                            splitChart.setOption(barOption);
+                        }
+                    });
+                }); 
+            });
         }
     });
 })
