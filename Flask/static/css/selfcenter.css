@@ -9,10 +9,10 @@
     color: red;
     font-size: 20px;
 }
-table tr td button {
+/* table tr td button {
     height: 24px;
     width: 50px;
-}
+} */
 .add .addnew {
     margin-left: 20px;
     height: 35px;
@@ -112,3 +112,6 @@ element.style {
 .layui-btn {
     background-color: #1E9FFF !important;
 }
+/* .layui-btn-sm  {
+    padding: 0!important;
+} */

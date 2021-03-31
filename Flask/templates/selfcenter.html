@@ -49,35 +49,34 @@
             <div class="add">
                 <button class="addnew" data-toggle="modal" data-target="#myModal">+ 新增</button>
                 <!-- Modal -->
-                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
                     <div class="modal-dialog" role="document">
-                    <div class="modal-content">
+                      <div class="modal-content">
                         <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">个人信息</h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title" id="exampleModalLabel">个人信息</h4>
                         </div>
                         <div class="modal-body">
-                        <table>
-                            <tr>
-                                <td>用户名<span class="font-red"> *</span></td>
-                                <td><input type="text" id='username'></td>
-                            </tr>
-                            <tr>
-                                <td>密码<span class="font-red"> *</span></td>
-                                <td><input type="text" id='pwd'></td>
-                            </tr>
-                            <tr>
-                                <td>备注</td>
-                                <td><input type="text" id='tips'></td>
-                            </tr>
-                            
-                        </table>
+                          <form>
+                            <div class="form-group">
+                              <label for="recipient-name" class="control-label">用户名:</label>
+                              <input type="text" class="form-control" id="username">
+                            </div>
+                            <div class="form-group">
+                                <label for="recipient-name" class="control-label">密码:</label>
+                                <input type="text" class="form-control" id="pwd">
+                            </div>
+                            <div class="form-group">
+                              <label for="message-text" class="control-label">备注:</label>
+                              <textarea class="form-control" id="tips"></textarea>
+                            </div>
+                          </form>
                         </div>
                         <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary" id='saveitem'>保存</button>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+                          <button type="button" class="btn btn-primary" id="saveitem">确认</button>
                         </div>
-                    </div>
+                      </div>
                     </div>
                 </div>
             </div>
@@ -90,6 +89,38 @@
 
         </div>
     </div>
+
+    <div class="modal fade" id="testmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="exampleModalLabel">个人信息</h4>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <label for="recipient-name" class="control-label">用户名:</label>
+                  <input type="text" class="form-control" id="m-username">
+                </div>
+                <div class="form-group">
+                    <label for="recipient-name" class="control-label">密码:</label>
+                    <input type="text" class="form-control" id="m-pwd">
+                </div>
+                <div class="form-group">
+                  <label for="message-text" class="control-label">备注:</label>
+                  <textarea class="form-control" id="m-tips"></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
+              <button type="button" class="btn btn-primary" id = "confirm_edit">确认修改</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
     <script type="text/html" id='admindata'>
         {%raw%}
         <tr> 
