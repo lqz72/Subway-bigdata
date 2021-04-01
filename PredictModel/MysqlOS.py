@@ -310,18 +310,17 @@ class SQLOS(object):
             curosr.close()
             conn.close()
 
-    def update_user_info(username, pwd, tips):
+    def update_user_info(index, username, pwd, tips):
         '''
         修改用户信息
         '''
         try:
             df = SQLOS.get_df_data('admin')
     
-            new_info = pd.DataFrame({'name': [username], 'pwd': [pwd], 'tips': [tips]})
-            print(new_info)  
-            # df[df['name'] == username] = new_info
+            new_info = pd.Series({'name': username, 'pwd': pwd, 'tips': tips})
+            df.iloc[index, :] = new_info
 
-            # SQLOS.write_df_data(df, 'admin')
+            SQLOS.write_df_data(df, 'admin')
             return 1
         except Exception as e:
             print('error', e)
@@ -341,5 +340,3 @@ class SQLOS(object):
         except Exception as e:
             print('error', e)
             return 0
-
-# SQLOS.update_user_info('xxx', 'sss', 'aaa')

@@ -181,12 +181,12 @@ def od_flow() -> json:
 def add_user():
     """新增用户信息
     """
-    info = request.get_data().decode('utf-8')
-    print(info)
-
-    username = info.split('&')[0].split('=')[1]
-    pwd = info.split('&')[1].split('=')[1]
-    tips = info.split('&')[2].split('=')[1]
+    info_json = request.get_data().decode('utf-8')
+    info_dict = json.loads(info_json)
+    
+    username  = info_dict['username']
+    pwd = info_dict['pwd']
+    tips = info_dict['tips']
 
     res = SQLOS.add_user_to_db(username, pwd, tips)
 
@@ -196,15 +196,16 @@ def add_user():
 def update_user():
     """修改用户信息
     """
-    info = request.get_data().decode('utf-8')
-    print(info)
+    info_json = request.get_data().decode('utf-8')
+    info_dict = json.loads(info_json)
 
-    username = info.split('&')[0].split('=')[1]
-    pwd = info.split('&')[1].split('=')[1]
-    tips = info.split('&')[2].split('=')[1]
+    index = info_dict['index']
+    username  = info_dict['inf']['username']
+    pwd = info_dict['inf']['pwd']
+    tips = info_dict['inf']['tips']
 
-    res = SQLOS.update_user_info(username, pwd, tips)
-    
+    res = SQLOS.update_user_info(int(index), username, pwd, tips)
+
     return str(res)
 
 @app.route('/del_inf', methods=['POST', 'GET'])
@@ -212,7 +213,6 @@ def del_user():
     """删除用户信息
     """
     index = request.get_data().decode('utf-8')
-    print(index)
     res = SQLOS.del_user_info(int(index))
     
     return str(res)

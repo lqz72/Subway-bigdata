@@ -55,10 +55,11 @@ $(function(){
                         $.ajax({
                             type:'POST',
                             url:'/update_database',
-                            data:JSON.stringify(data_to_back),
+                            data: JSON.stringify(data_to_back),
+                            datatype: 'text',
                             success: function(data)
                             {
-                                if(data)
+                                if(data == "1")
                                 {
                                     alert("修改成功！");
                                     location.href = '/selfcenter';
@@ -80,11 +81,12 @@ $(function(){
                             $.ajax({
                                 type:'POST',
                                 url:'/del_inf',
-                                data:String(index),
+                                data: String(index),
+                                datatype: 'text',
                                 contentType:"application/json",
                                 success: function(data)
                                 {
-                                    if(data)
+                                    if(data == "1")
                                     {
                                         alert("删除成功！");
                                         location.href = '/selfcenter';
@@ -116,12 +118,13 @@ $(function(){
         $.ajax({
             type:'POST',
             url:'/wirte_to_database',
-            data:JSON.stringify(inf),
+            data: JSON.stringify(inf),
+            datatype: 'text',
             // contentType:"application/json",
             // processData:"false",
             success: function(data)
             {
-                if(data)
+                if(data == "1")
                 {
                     alert("创建用户成功！");
                     location.href = '/selfcenter';
