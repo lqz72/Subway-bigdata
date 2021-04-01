@@ -45,8 +45,8 @@ class SQLOS(object):
         '''
         将本地txt文件上传到mysql
         '''
-        db = SQLOS.connect_to_db()
-        cursor = db.cursor()
+        conn = SQLOS.connect_to_db()
+        cursor = conn.cursor()
 
         abs_path = 'd:/Python/code/Subway-bigdata/PredictModel/txt_data/'
         file_path = {
@@ -66,18 +66,19 @@ class SQLOS(object):
 
                 sql = "LOAD DATA LOCAL INFILE '%s' INTO TABLE %s FIELDS TERMINATED BY ',' LINES TERMINATED BY '\\r\\n' IGNORE 1 LINES"  % (path, name)
                 cursor.execute(sql)
-                db.commit()
+                conn.commit()
 
                 end = time.time()
                 print('读取时间:', end - start)
 
-            db.close()
             print('success load all data to mysql!')
 
         except Exception as e:
             print('error:', e)
-            db.rollback()
-            db.close() 
+            conn.rollback()
+        finally:
+            cursor.close()
+            conn.close()      
 
     def get_df_data(table_name):
         '''
@@ -97,12 +98,13 @@ class SQLOS(object):
             
             end = time.time()
             print('读取时间:', end - start)
-            conn.close()
             return df
+
         except Exception as e:
             conn.rollback()
-            conn.close()
             print('error', e)
+        finally:
+            conn.close()
 
     def write_df_data(df, table_name):
 
@@ -285,3 +287,57 @@ class SQLOS(object):
         
         return 'UnKnow'
 
+    def add_user_to_db(username, pwd, tips):
+        '''
+        新增用户信息
+        '''
+        conn = SQLOS.connect_to_db()
+        curosr = conn.cursor()
+
+        try:
+            sql = 'INSERT INTO admin(`name`, `pwd`, `tips`) VALUES ("%s", "%s", "%s")' % (username, pwd, tips) 
+            curosr.execute(sql)
+            conn.commit()
+
+            print('success add a new user!')
+            return 1
+
+        except Exception as e:
+            conn.rollback()
+            print('error', e)
+            return 0
+        finally:
+            curosr.close()
+            conn.close()
+
+    def update_user_info(username, pwd, tips):
+        '''
+        修改用户信息
+        '''
+        try:
+            df = SQLOS.get_df_data('admin')
+    
+            new_info = pd.DataFrame({'name': [username], 'pwd': [pwd], 'tips': [tips]})
+            print(new_info)  
+            # df[df['name'] == username] = new_info
+
+            # SQLOS.write_df_data(df, 'admin')
+            return 1
+        except Exception as e:
+            print('error', e)
+            return 0
+
+    def del_user_info(index):
+        '''
+        删除用户信息
+        '''
+        try:
+            df = SQLOS.get_df_data('admin')
+            df = df.drop(index=index, axis=0)
+
+            SQLOS.write_df_data(df, 'admin')
+            return 1
+
+        except Exception as e:
+            print('error', e)
+            return 0
