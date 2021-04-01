@@ -182,6 +182,7 @@ def add_user():
     """新增用户信息
     """
     info = request.get_data().decode('utf-8')
+    print(info)
 
     username = info.split('&')[0].split('=')[1]
     pwd = info.split('&')[1].split('=')[1]
@@ -193,9 +194,10 @@ def add_user():
 
 @app.route('/update_database', methods=['POST', 'GET'])
 def update_user():
-    """新增用户信息
+    """修改用户信息
     """
     info = request.get_data().decode('utf-8')
+    print(info)
 
     username = info.split('&')[0].split('=')[1]
     pwd = info.split('&')[1].split('=')[1]
@@ -207,9 +209,10 @@ def update_user():
 
 @app.route('/del_inf', methods=['POST', 'GET'])
 def del_user():
-    """新增用户信息
+    """删除用户信息
     """
     index = request.get_data().decode('utf-8')
+    print(index)
     res = SQLOS.del_user_info(int(index))
     
     return str(res)

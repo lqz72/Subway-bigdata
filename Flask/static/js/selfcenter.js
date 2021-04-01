@@ -2,8 +2,8 @@ $(function(){
     $.ajax({
         type:'GET',
         url:'/admin_info',
-
         success: function(data){
+            console.log(data)
             var t = {};
             t.list = data;
             var html = template('admindata', t);
@@ -46,11 +46,16 @@ $(function(){
                     data_to_back.index = this.getAttribute("index");
                     var confirm = document.querySelector('#confirm_edit');
                     confirm.addEventListener('click',function(){
+                        inf.username = username.value;
+                        inf.pwd = pwd.value;
+                        inf.tips = tips.value;
+                        data_to_back.inf = inf;
                         // console.log(data_to_back);
+                        //修改用户
                         $.ajax({
-                            type:'GET',
-                            url:'/updata_database',
-                            data:inf,
+                            type:'POST',
+                            url:'/update_database',
+                            data:JSON.stringify(data_to_back),
                             success: function(data)
                             {
                                 if(data)
@@ -71,10 +76,12 @@ $(function(){
                     var r=confirm("你确定要删除吗？")
                     if (r==true)
                         {
+                            //删除用户
                             $.ajax({
-                                type:'GET',
+                                type:'POST',
                                 url:'/del_inf',
-                                data:index,
+                                data:String(index),
+                                contentType:"application/json",
                                 success: function(data)
                                 {
                                     if(data)
@@ -105,10 +112,13 @@ $(function(){
         inf.username = username.value;
         inf.pwd = pwd.value;
         inf.tips = tips.value;
+        //新建用户
         $.ajax({
-            type:'GET',
-            url:'',
-            data:inf,
+            type:'POST',
+            url:'/wirte_to_database',
+            data:JSON.stringify(inf),
+            // contentType:"application/json",
+            // processData:"false",
             success: function(data)
             {
                 if(data)
