@@ -170,7 +170,7 @@ layui.use('laydate', function(){
             
                     //生成6-21点的客流数据
                     function getHourFlowData(hourFlow, stations) {
-                        var hourFlowData = [];
+                        var hourFlow = [];
                         for (let i = 6; i <= 21; i++) {
                             var hour = {};
                             hour.staList = [];
@@ -197,9 +197,9 @@ layui.use('laydate', function(){
                 
                                 hour.staList.push(sta);
                             });
-                            hourFlowData.push(hour);
+                            hourFlow.push(hour);
                         }
-                        return hourFlowData;
+                        return hourFlow;
                     }
                     
                     //配置图表属性
@@ -290,7 +290,7 @@ layui.use('laydate', function(){
                     var splitChart = echarts.init(document.getElementById('split_bar'));
                     var splitFlow;
                     $.ajax({
-                        type: 'GET',
+                        type: 'POST',
                         url: '/split_flow/2',
                         async: false,
                         data: value,
@@ -425,39 +425,7 @@ layui.use('laydate', function(){
                     splitChart.setOption(barOption);
 
                     //设置排行榜
-                    function getSplitRank(splitFlow, line) {
-                        var splitRank = [];
-                        var tmpSplitFlow = splitFlow;
-                        var tmpSplitNames = Object.keys(tmpSplitFlow);
-
-                        while (tmpSplitNames.length != 0) {
-                            var maxFlow = tmpSplitFlow[tmpSplitNames[0]].up;
-                            var maxSplit = tmpSplitNames[0];
-
-                            for (split in tmpSplitFlow) {
-                                if (tmpSplitFlow[split].up > maxFlow) {
-                                    maxFlow = tmpSplitFlow[split].up;
-                                    maxSplit = split;
-                                }
-                            }
-                            var source = maxSplit.split('-')[0];
-                            var target = maxSplit.split('-')[1];
-                            splitRank.push({
-                                'source': source,
-                                'target': target,
-                                'line': line,
-                                'flow': maxFlow
-                            });
-
-                            delete tmpSplitFlow[maxSplit];
-                            tmpSplitNames = Object.keys(tmpSplitFlow);
-                        }
-
-                        return splitRank;
-                    }
                     
-                    var splitRank = getSplitRank(splitFlow, '1号线');
-                    console.log(splitRank);
 
                     //响应控件事件
                     layui.use('form', function(){

@@ -44,7 +44,7 @@ def predict():
 def client():
     return render_template('client.html')
 
-@app.route('/selfcenter')  
+@app.route('/selfcenter')
 def selfcenter():
     return render_template('selfcenter.html')
 
@@ -176,43 +176,6 @@ def od_flow() -> json:
     od_flow = api.get_od_flow(curr_date)
 
     return jsonify(od_flow)
-
-@app.route('/wirte_to_database', methods=['POST', 'GET'])
-def add_user():
-    """新增用户信息
-    """
-    info = request.get_data().decode('utf-8')
-
-    username = info.split('&')[0].split('=')[1]
-    pwd = info.split('&')[1].split('=')[1]
-    tips = info.split('&')[2].split('=')[1]
-
-    res = SQLOS.add_user_to_db(username, pwd, tips)
-
-    return str(res)
-
-@app.route('/update_database', methods=['POST', 'GET'])
-def update_user():
-    """新增用户信息
-    """
-    info = request.get_data().decode('utf-8')
-
-    username = info.split('&')[0].split('=')[1]
-    pwd = info.split('&')[1].split('=')[1]
-    tips = info.split('&')[2].split('=')[1]
-
-    res = SQLOS.update_user_info(username, pwd, tips)
-    
-    return str(res)
-
-@app.route('/del_inf', methods=['POST', 'GET'])
-def del_user():
-    """新增用户信息
-    """
-    index = request.get_data().decode('utf-8')
-    res = SQLOS.del_user_info(int(index))
-    
-    return str(res)
 
 #------------控制图表的展示------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])

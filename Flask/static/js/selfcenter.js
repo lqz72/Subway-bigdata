@@ -48,14 +48,12 @@ $(function(){
                     confirm.addEventListener('click',function(){
                         // console.log(data_to_back);
                         $.ajax({
-                            type:'POST',
-                            url:'/update_database',
-                            data: inf,
-                            contentType: "application/json",
-                            datatype: 'text',
+                            type:'GET',
+                            url:'/updata_database',
+                            data:inf,
                             success: function(data)
                             {
-                                if(data == '1')
+                                if(data)
                                 {
                                     alert("修改成功！");
                                     location.href = '/selfcenter';
@@ -74,13 +72,12 @@ $(function(){
                     if (r==true)
                         {
                             $.ajax({
-                                type:'POST',
+                                type:'GET',
                                 url:'/del_inf',
-                                data: index,
-                                datatype: 'text',
+                                data:index,
                                 success: function(data)
                                 {
-                                    if(data == '1')
+                                    if(data)
                                     {
                                         alert("删除成功！");
                                         location.href = '/selfcenter';
@@ -108,15 +105,13 @@ $(function(){
         inf.username = username.value;
         inf.pwd = pwd.value;
         inf.tips = tips.value;
-        console.log(inf);
         $.ajax({
-            type: 'POST',
-            url:'/wirte_to_database',
-            data: inf,
-            dtatype: 'text',
+            type:'GET',
+            url:'',
+            data:inf,
             success: function(data)
             {
-                if(data == '1')
+                if(data)
                 {
                     alert("创建用户成功！");
                     location.href = '/selfcenter';
