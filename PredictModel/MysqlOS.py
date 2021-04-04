@@ -111,7 +111,17 @@ class SQLOS(object):
         '''
         将dataframe写入mysql对应的表中
         '''
-        conn = create_engine('mysql+pymysql://root:yongfufan@localhost:3306/data?charset=utf8mb4')
+        abs_path = os.path.abspath(os.path.dirname(__file__))
+        cf= configparser.ConfigParser()
+        cf.read(abs_path + '/mysql.conf', encoding='utf-8')
+        host=cf.get('Default', 'DB_HOST')
+        port=cf.getint('Default', 'DB_PORT')
+        user=cf.get('Default', 'DB_USER')
+        passwd=cf.get('Default', 'DB_PASSWD')
+        db=cf.get('Default', 'DB_NAME')
+
+        conn = create_engine('mysql+pymysql://{user}:{passwd}@{host}:{port}/{db}?charset=utf8mb4'.format(
+            user=user, passwd=passwd, host=host, port=port, db=db))
 
         pd.io.sql.to_sql(df, table_name, con=conn, if_exists='replace', index=None)
 
@@ -340,3 +350,4 @@ class SQLOS(object):
         except Exception as e:
             print('error', e)
             return 0
+

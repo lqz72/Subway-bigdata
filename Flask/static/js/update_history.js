@@ -170,7 +170,7 @@ layui.use('laydate', function(){
             
                     //生成6-21点的客流数据
                     function getHourFlowData(hourFlow, stations) {
-                        var hourFlow = [];
+                        var hourFlowList = [];
                         for (let i = 6; i <= 21; i++) {
                             var hour = {};
                             hour.staList = [];
@@ -197,9 +197,9 @@ layui.use('laydate', function(){
                 
                                 hour.staList.push(sta);
                             });
-                            hourFlow.push(hour);
+                            hourFlowList.push(hour);
                         }
-                        return hourFlow;
+                        return hourFlowList;
                     }
                     
                     //配置图表属性
@@ -291,7 +291,7 @@ layui.use('laydate', function(){
                     var splitFlow;
                     $.ajax({
                         type: 'POST',
-                        url: '/split_flow/2',
+                        url: '/split_flow/1',
                         async: false,
                         data: value,
                         datatype: 'json',
@@ -308,7 +308,8 @@ layui.use('laydate', function(){
                         downlineFlow.push(split.down);
                     }
                                   
-                    function setBarOption(option, y1, y2, x) {
+                    function setBarOption(option, y1, y2, x, line) {
+                        option.title.subtext = line + '号线';
                         option.xAxis[0].data = x;
                         option.xAxis[1].data = x;
                         option.series[0].data = y1;
@@ -319,7 +320,7 @@ layui.use('laydate', function(){
                         title: {
                             text: '地铁线路断面客流',
                             left:"center",
-                            subtext: '2号线',
+                            subtext: '1号线',
                             textStyle:{
                                 color:"#000"
                             }
@@ -424,8 +425,178 @@ layui.use('laydate', function(){
                     setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
                     splitChart.setOption(barOption);
 
-                    //设置排行榜
+                    //断面排行榜
+                    var splitRank = [];
+                    function getSplitRank(splitRank, line) {
+                        for (let i = 0; i < splitNames.length - 1; i++){
+                            var k = i;
+                            var maxFlow = splitFlow[splitNames[i]].up;
+                            for (let j = i + 1; j < splitNames.length; j++){
+                                if (splitFlow[splitNames[j]].up > maxFlow) {
+                                    k = j;
+                                    maxFlow = splitFlow[splitNames[j]].up;
+                                }
+                            }
+                            splitRank.push({ 'split': splitNames[k], 'flow': maxFlow });
+                            delete splitFlow[splitNames[k]];
+                            splitNames = Object.keys(splitFlow);
+                        }
+                        
+         
+                        for (let i = 1; i <= 6; i++){
+                            var split_rank = document.getElementById('split_rank' + `${i}`);
+                            var source = document.getElementById('source' + `${i}`);
+                            var target = document.getElementById('target' + `${i}`);
+                            var split_line = document.getElementById('split_line' + `${i}`);
+                            var split_flow = document.getElementById('split_flow' + `${i}`);
+    
+                            split_rank.innerHTML = i;
+                            source.innerHTML = splitRank[i - 1]['split'].split('-')[0];
+                            target.innerHTML = splitRank[i - 1]['split'].split('-')[1];
+                            split_line.innerHTML = line + '号线';
+                            split_flow.innerHTML = splitRank[i - 1]['flow'];
+                        }
+                    }
                     
+                    getSplitRank(splitRank, '1');
+
+                    //od关系图
+                    var ODChart = echarts.init(document.getElementById('od_graph'));
+                    var ODFlow;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/od_flow',
+                        async: false,
+                        data: value,
+                        dataType: 'json',
+                        success: function (result) {
+                            ODFlow = result;
+                        }
+                    });
+
+                    function compare(name)
+                    {
+                        return function(a,b){
+                            var sta1 = a[name];
+                            var sta2 = b[name];
+                            var line1 = parseInt(ODFlow[sta1][0].split('号')[0]);
+                            var line2 =parseInt(ODFlow[sta2][0].split('号')[0]);
+                            
+                            return line1-line2;
+                        }
+                    }
+
+                    var staColor = {
+                        '1号线': '#73DDFF',
+                        '2号线': '#73ACFF',
+                        '3号线': '#FDD56A',
+                        '4号线': '#FDB36A',
+                        '5号线': '#FD866A',
+                        '10号线': '#9E87FF',
+                        '11号线': '#58D5FF',
+                        '12号线': '#E271DE'
+                    }
+
+                    var ODLinks = [];
+                    var ODstations = [];
+                    var stationNames = Object.keys(ODFlow);
+
+                    function getODFlowData(ODLinks, ODstations, stationNames) {
+                        for (let i = 0; i < (stationNames.length / 2); i++){
+                            let source = stationNames[i];
+    
+                            let targetDict = ODFlow[source][1];
+                            let targetList = Object.keys(targetDict);
+                            for (let j = 0; j < (targetList.length / 2); j++) {
+                                let target = targetList[j];
+                                if (targetDict[target][1] != 0) {
+                                    ODLinks.push({
+                                        'source': source,
+                                        'target': target,
+                                        'value': targetDict[target][1]
+                                    });
+                                }
+                            }
+    
+                            ODstations.push({
+                                name: source,
+                                symbolSize: 6,
+                                itemStyle: {
+                                    color: staColor[ODFlow[source][0]]
+                                },
+                                category: ODFlow[source][0]
+                            });
+                        }
+                        ODstations = ODstations.sort(compare('name'));
+                    }
+
+                    function setODOption(ODOption, ODstations, ODLinks) {
+                        ODOption.series.data = ODstations;
+                        ODOption.series.links = ODLinks;
+                        return ODOption;
+                    }
+
+                    var ODOption = {
+                        title: {
+                            text: '地铁站点OD关系图',
+                            left:"center",
+                            textStyle:{
+                                color:"#000"
+                            }
+                        },
+                        legend: [{ data: lineNames, orient: 'vertical', right: '2%' }],
+                        tooltip: {trigger:'item'},
+                        animationDurationUpdate: 1500,
+                        animationEasingUpdate: 'quinticInOut',
+                        series: [{
+                            name: "relation",
+                            type: 'graph',
+                            layout: 'circular',
+                            circular: {
+                                rotateLabel: true
+                            },
+                            data: ODstations,
+                            links: ODLinks,
+                            roam: true,
+                            label: {
+                                show: false,
+                                position: 'right',
+                                formatter: '{b}',
+                                interval: 0
+                            },
+                            categories:categories,
+                            emphasis: {
+                                lineStyle: {
+                                    width: "3"
+                                }
+                            },
+                            focusNodeAdjacency: true,
+                            lineStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                        offset: 0,
+                                        color: '#4e8ebf'
+                                    },
+                                    {
+                                        offset: 0.45,
+                                        color: '#9ac8e0'
+                                    },
+                                    {
+                                        offset: 0.65,
+                                        color: '#ba3036'
+                                    },
+                                    {
+                                        offset: 1,
+                                        color: '#c84641'
+                                    }
+                                ]),
+                                curveness: 0.3
+                            }
+                        }]
+                    };
+                    
+                    getODFlowData(ODLinks, ODstations, stationNames);
+                    setODOption(ODOption, ODstations, ODLinks);
+                    ODChart.setOption(ODOption);
 
                     //响应控件事件
                     layui.use('form', function(){
@@ -490,8 +661,11 @@ layui.use('laydate', function(){
                                         downlineFlow.push(split.down);
                                     }
 
-                                    setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
+                                    setBarOption(barOption, uplineFlow, downlineFlow, splitNames, data.value);
                                     splitChart.setOption(barOption);
+
+                                    splitRank = [];
+                                    getSplitRank(splitRank, data.value);
                                 }
                             });
                         }); 
@@ -637,7 +811,7 @@ layui.use('laydate', function(){
     
             //生成6-21点的客流数据
             function getHourFlowData(hourFlow, stations) {
-                var hourFlow = [];
+                var hourFlowList = [];
                 for (let i = 6; i <= 21; i++) {
                     var hour = {};
                     hour.staList = [];
@@ -664,9 +838,9 @@ layui.use('laydate', function(){
         
                         hour.staList.push(sta);
                     });
-                    hourFlow.push(hour);
+                    hourFlowList.push(hour);
                 }
-                return hourFlow;
+                return hourFlowList;
             }
             
             //配置图表属性
@@ -891,6 +1065,144 @@ layui.use('laydate', function(){
             setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
             splitChart.setOption(barOption);
 
+            var ODChart = echarts.init(document.getElementById('od_graph'));
+            var ODFlow;
+            $.ajax({
+                type: 'POST',
+                url: '/od_flow',
+                async: false,
+                data: value,
+                dataType: 'json',
+                success: function (result) {
+                    ODFlow = result;
+                    console.log(ODFlow);
+                }
+            });
+
+            function compare(name)
+            {
+                return function(a,b){
+                    var sta1 = a[name];
+                    var sta2 = b[name];
+                    var line1 = parseInt(ODFlow[sta1][0].split('号')[0]);
+                    var line2 =parseInt(ODFlow[sta2][0].split('号')[0]);
+                    
+                    return line1-line2;
+                }
+            }
+
+            var staColor = {
+                '1号线': '#73DDFF',
+                '2号线': '#73ACFF',
+                '3号线': '#FDD56A',
+                '4号线': '#FDB36A',
+                '5号线': '#FD866A',
+                '10号线': '#9E87FF',
+                '11号线': '#58D5FF',
+                '12号线': '#E271DE'
+            }
+
+            var ODLinks = [];
+            var ODstations = [];
+            var stationNames = Object.keys(ODFlow);
+
+            function GetODFlowData(ODLinks, ODstations, stationNames) {
+                for (let i = 0; i < (stationNames.length / 2); i++){
+                    let source = stationNames[i];
+
+                    let targetDict = ODFlow[source][1];
+                    let targetList = Object.keys(targetDict);
+                    for (let j = 0; j < (targetList.length / 2); j++) {
+                        let target = targetList[j];
+                        if (targetDict[target][1] != 0) {
+                            ODLinks.push({
+                                'source': source,
+                                'target': target,
+                                'value': targetDict[target][1]
+                            });
+                        }
+                    }
+
+                    ODstations.push({
+                        name: source,
+                        symbolSize: 6,
+                        itemStyle: {
+                            color: staColor[ODFlow[source][0]]
+                        },
+                        category: ODFlow[source][0]
+                    });
+                }
+                ODstations = ODstations.sort(compare('name'));
+            }
+
+            function SetODOption(ODOption, ODstations, ODLinks) {
+                ODOption.series.data = ODstations;
+                ODOption.series.links = ODLinks;
+                return ODOption;
+            }
+
+            var ODOption = {
+                title: {
+                    text: '地铁站点OD关系图',
+                    left:"center",
+                    textStyle:{
+                        color:"#000"
+                    }
+                },
+                legend: [{ data: lineNames, orient: 'vertical', right: '2%' }],
+                tooltip: {trigger:'item'},
+                animationDurationUpdate: 1500,
+                animationEasingUpdate: 'quinticInOut',
+                series: [{
+                    name: "relation",
+                    type: 'graph',
+                    layout: 'circular',
+                    circular: {
+                        rotateLabel: true
+                    },
+                    data: ODstations,
+                    links: ODLinks,
+                    roam: true,
+                    label: {
+                        show: false,
+                        position: 'right',
+                        formatter: '{b}',
+                        interval: 0
+                    },
+                    categories:categories,
+                    emphasis: {
+                        lineStyle: {
+                            width: "3"
+                        }
+                    },
+                    focusNodeAdjacency: true,
+                    lineStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: '#4e8ebf'
+                            },
+                            {
+                                offset: 0.45,
+                                color: '#9ac8e0'
+                            },
+                            {
+                                offset: 0.65,
+                                color: '#ba3036'
+                            },
+                            {
+                                offset: 1,
+                                color: '#c84641'
+                            }
+                        ]),
+                        curveness: 0.3
+                    }
+                }]
+            };
+            
+            GetODFlowData(ODLinks, ODstations, stationNames);
+            SetODOption(ODOption, ODstations, ODLinks);
+            ODChart.setOption(ODOption);
+
             layui.use('form', function(){
                 var form = layui.form;
                 
@@ -931,6 +1243,7 @@ layui.use('laydate', function(){
                     });
                     
                 }); 
+                
                 
                 form.on('select', function(data){
                     console.log(data.value); //得到被选中的值
