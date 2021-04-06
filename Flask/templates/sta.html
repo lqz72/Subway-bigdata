@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/css/sta.css">
+	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
+</head>
+<style>
+    .layui-laydate, .layui-laydate-hint {
+        box-shadow: none !important;
+        border: none !important;
+    }
+</style>
+<body>
+    <div class="w">
+        <!-- 左侧导航栏 -->
+        <div class="nav">
+            <p>&nbsp;&nbsp;轨道交通智慧系统</p>
+            <ul>
+                <li><a href="/history">&nbsp;&nbsp;历史轨道数据储库</a></li>
+                <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
+                <li><a href="/client">&nbsp;&nbsp;乘客特征分析系统</a></li>
+                <li><a href="/station">&nbsp;&nbsp;运营规划辅助系统</a></li>
+                <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
+            </ul>
+        </div>
+        <!-- 右侧内容区域 -->
+        <div class="content">
+            <!-- 用户信息 -->
+            <div class="user">
+                <div class="loc">轨道交通智慧系统>运营规划辅助系统</div>
+                <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
+                <span class="name">超级管理员</span>
+            </div>
+
+            <!-- 搜索框 -->
+            <div class="searchsta">
+                搜索区域
+            </div>
+
+            <!-- 时间控件 -->
+            <div class="time" id='timectrlpre'>
+            
+            </div>
+            
+            
+
+
+
+ 
+        </div>
+    </div>
+    <script src="{{ url_for('static',filename ='layui/layui.js') }}"></script>
+    <script src="../static/js/predict.js"></script>
+</body>
+</html>

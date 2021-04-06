@@ -26,7 +26,7 @@ station_name='Sta1'
 #------------模板渲染------------
 @app.route('/')
 def root():                             
-    return redirect(url_for('index'))
+    return redirect(url_for('history'))
 
 @app.route('/login')
 def login():
@@ -47,6 +47,10 @@ def client():
 @app.route('/selfcenter')  
 def selfcenter():
     return render_template('selfcenter.html')
+
+@app.route('/station')  
+def station():
+    return render_template('sta.html')
 
 @app.route('/userinf')
 def userinf():

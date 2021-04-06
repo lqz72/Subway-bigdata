@@ -1,0 +1,86 @@
+.weather {
+    float: left;
+    width: 626px;
+    height: 280px;
+    background-color: #ffffff;
+}
+.thismonthpre {
+    float: left;
+    width: 910px;
+    height: 300px;
+    margin: 10px 20px 0 20px;
+    background-color: #ffffff;
+}
+.thisweekpre {
+    float: left;
+    width: 390px;
+    height: 300px;
+    margin: 10px -10px 0 20px;
+    background-color: #ffffff;
+}
+.line-percentpre {
+    float: left;
+    width: 390px;
+    height: 300px;
+    margin: 10px 10px 0 20px;
+    background-color: #fff;
+}
+.exacthourpre {
+    float: left;
+    width: 510px;
+    height: 300px;
+    background-color: #fff;
+    margin-top: 10px;
+}
+
+ /* 客流评分及预警措施  */
+.markpre {
+    float: left;
+    position: relative;
+    width: 910px;
+    height: 300px;
+    margin: 10px 20px 0 20px;
+    background-color: #ffffff;
+}
+.markpre h4 {
+    font-size: 18px;
+    height: 20px;
+    line-height: 20px;
+    padding-left: 5px;
+}
+.markpre .graph {
+    float: left;
+    width: 300px;
+    height: 280px;
+}
+.markpre  .words {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    width: 300px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 18px;
+    z-index: 99999;
+    width: 300px;
+    text-align: center;
+}
+.markpre .description {
+    float: left;
+    width: 310px;
+    height: 280px;
+}
+.markpre .graph2 {
+    float: left;
+    width: 300px;
+    height: 280px;
+}
+
+
+.graphpre {
+    float: left;
+    width: 910px;
+    height: 700px;
+    margin: 10px 20px 0 20px;
+    background-color: #ffffff;
+}

@@ -14,48 +14,49 @@
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/lodash.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
-</head>
-<style>
-    .layui-laydate, .layui-laydate-hint {
-        box-shadow: none !important;
-        border: none !important;
-    }
-    .layui-input-block {
-        position:absolute;
-        z-index: 9999999;
-        margin-left: 0;
-    }
-    .m-radio {
-        position: absolute;
-        left: 475px;
-        top: 60px;
-    }
-    .twograph {
-        position: relative;
-        overflow: hidden;
-        padding-top: 0;
-    }
-    #line_graph {
-        width: 100%;
-        height: 100%;
-    }
-    .layui-form-item {
+    <style>
+        .layui-laydate, .layui-laydate-hint {
+    box-shadow: none !important;
+    border: none !important;
+}
+.layui-input-block {
+    position:absolute;
+    z-index: 9999999;
+    margin-left: 0;
+}
+.m-radio {
+    position: absolute;
+    left: 475px;
+    top: 60px;
+}
+.twograph {
+    position: relative;
+    overflow: hidden;
+    padding-top: 0;
+}
+#line_graph {
+    width: 100%;
+    height: 100%;
+}
+.layui-form-item {
     margin-bottom: 0px;
-    }
-    .cutline {
-        position: relative;
-    }
-    .cmb {
-        position: absolute;
-        width: 87px;
-        left: 810px;
-        top: 40px;
-    }
-    #split_bar {
-        width: 100%;
-        height: 100%;
-    }
-</style>
+}
+.cutline {
+    position: relative;
+}
+.cmb {
+    position: absolute;
+    width: 87px;
+    left: 810px;
+    top: 40px;
+}
+#split_bar {
+    width: 100%;
+    height: 100%;
+}
+
+    </style>
+</head>
 <body>
     <div class="w">
         <!-- 左侧导航栏 -->
@@ -64,7 +65,8 @@
             <ul>
                 <li><a href="/history">&nbsp;&nbsp;历史轨道数据储库</a></li>
                 <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
-                <li><a href="/client">&nbsp;&nbsp;运营规划辅助系统</a></li>
+                <li><a href="/client">&nbsp;&nbsp;乘客特征分析系统</a></li>
+                <li><a href="/station">&nbsp;&nbsp;运营规划辅助系统</a></li>
                 <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
             </ul>
         </div>
@@ -79,11 +81,7 @@
 
             <!-- 时间控件 -->
             <div class="time" id='timectrl'>
-                <!-- <p>日期选择</p>
-                <div id='date'>
-                    <input type="text" value='' placeholder="2020-01-01" id='inputdate' />
-                </div> -->
-                
+            
             </div>
             
 

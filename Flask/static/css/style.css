@@ -42,10 +42,14 @@
     font-family: 'iconfont';
 }
 .nav ul li:nth-child(3) a::before {
-    content: '\e624';
+    content: '\e65b';
     font-family: 'iconfont';
 }
 .nav ul li:nth-child(4) a::before {
+    content: '\e624';
+    font-family: 'iconfont';
+}
+.nav ul li:nth-child(5) a::before {
     content: '\e606';
     font-family: 'iconfont';
 }
@@ -109,7 +113,6 @@
     font-size: 14px;
 }
 
-/* 历史数据 */
 .content .time {
     float: left;
     width: 274px;
@@ -514,9 +517,9 @@
 }
 .content .outshow2 {
     float: left;
-    margin-top: 10px;
+    margin: 10px 20px 0 20px;
     height: 500px;
-    width: 550px;
+    width: 910px;
     background-color: #fff;
 }
 
@@ -532,6 +535,13 @@
     margin-top: 10px;
 }
 
+.road {
+    float: left;
+    margin-top: 10px;
+    height: 500px;
+    width: 550px;
+    background-color: #fff;
+}
 
 #outshow2 {
     overflow: scroll;
@@ -579,17 +589,17 @@
     border-bottom: 2px solid #E9E9E9;
 }
 #outshow2 table tr td:nth-child(1){
-    width: 150px;
+    width: 250px;
     padding-left: 10px;
 }
 #outshow2 table tr td:nth-child(2){
-    width: 150px;
+    width: 250px;
 }
 #outshow2 table tr td:nth-child(3){
-    width: 150px;
+    width: 250px;
 }
 #outshow2 table tr td:nth-child(4){
-    width: 150px;
+    width: 250px;
 }
 
 

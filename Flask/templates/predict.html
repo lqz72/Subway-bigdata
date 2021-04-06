@@ -7,11 +7,17 @@
     <title>Document</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
-    <script type="text/javascript" src="{{ url_for('static',filename ='js/date.js') }}"></script>
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../static/css/predict.css">
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
 </head>
+<style>
+    .layui-laydate, .layui-laydate-hint {
+        box-shadow: none !important;
+        border: none !important;
+    }
+</style>
 <body>
     <div class="w">
         <!-- 左侧导航栏 -->
@@ -20,7 +26,8 @@
             <ul>
                 <li><a href="/history">&nbsp;&nbsp;历史轨道数据储库</a></li>
                 <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
-                <li><a href="/client">&nbsp;&nbsp;运营规划辅助系统</a></li>
+                <li><a href="/client">&nbsp;&nbsp;乘客特征分析系统</a></li>
+                <li><a href="/station">&nbsp;&nbsp;运营规划辅助系统</a></li>
                 <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
             </ul>
         </div>
@@ -34,24 +41,82 @@
             </div>
 
             <!-- 时间控件 -->
-            <div class="time">
-                <p>日期选择</p>
-                <div id='date'>
-                    <input type="text" value='' placeholder="2020-01-01" id='inputdate' />
-                </div>
-                <script type="text/javascript">
-                    var d = new DateJs({
-                        inputEl: '#inputdate',
-                        el: '#date'
-                    })
-                    console.log(d)
-                </script>
-                
+            <div class="time" id='timectrlpre'>
+            
             </div>
-            <div class="left"></div>
+            
+            <!-- 天气控件等 -->
+            <div class="weather">
+                天气控件等
+            </div>
+
+            <!-- 本月客流 -->
+            <div class="thismonthpre">
+                本月客流
+            </div>
+
+            <!-- 本周客流 -->
+            <div class="thisweekpre">
+                本周客流
+            </div>
+
+            <!-- 当天总客流 -->
+            <div class="thisdayall">
+                <p>今日客流总量</p>
+                <p id = "day_flow">1213</p>
+            </div>
+            <!-- 当天其他信息 -->
+            <div id = "thisday_info" class="thisdayinfo">
+                <p>今日天气情况：<span id = "weather">晴朗</span></p>
+                <p>是否节假日：<span id = "is_hoilday">否</span></p>
+                <p>客流量对比</p>
+                <ul>
+                    <li>较昨日：<span class='font-red'>+20%</span></li> 
+                    <li>较月平均：<span class='font-red'>+20%</span></li> 
+                    <li>较年平均：<span class='font-red'>-20%</span></li>
+                    <li>早高峰客流：<span> <em class='font-red'>231</em> 人次</span></li>
+                    <li>晚高峰客流：<span> <em class='font-red'>315</em> 人次</span></li>
+                </ul>
+            </div>
+
+            <!-- 线路流量占比 -->
+            <div class="line-percentpre">
+                线路流量占比
+            </div>
+
+            <!-- 今日具体时刻客流 -->
+            <div class="exacthourpre">
+                今日具体时刻客流
+            </div>
+
+            <!-- 客流评分及预警措施 -->
+            <div class="markpre">
+                <h4>客流评分及预警措施</h4>
+                <div class="graph" id="markpre">
+                    
+                </div>
+                <div class="words">
+                    评分
+                </div>
+                <div class="description">
+                    描述
+                </div>
+                <div class="graph2">
+                    图表
+                </div>
+            </div>
+
+            <!-- 进站出站 -->
+            <div class="graphpre">
+                进站出站 地铁图
+            </div>
+
+
+
  
         </div>
     </div>
-    
+    <script src="{{ url_for('static',filename ='layui/layui.js') }}"></script>
+    <script src="../static/js/predict.js"></script>
 </body>
 </html>

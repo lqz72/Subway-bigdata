@@ -34,8 +34,8 @@ layui.use('laydate', function(){
         ,ready: function(date){//初始化
             n_date = '2020-01-01';
             //console.log(date); //得到初始的日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
-            $(
-                function(){
+            // $(
+            //     function(){
                     value = '2020-01-01';
                     var month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
                     // console.log(value);
@@ -72,7 +72,6 @@ layui.use('laydate', function(){
                         url: '/thisday_info',
                         dataType: 'json',
                         success: function (result) {
-                            // console.log(result);
                             weather_info.innerHTML = result.weather;
                             is_hoilday.innerHTML = result.is_hoilday;
                             day_flow.innerHTML = result.day_flow;
@@ -672,8 +671,8 @@ layui.use('laydate', function(){
                     });
                     
                     
-                }
-            )
+            //     }
+            // )
 
         }
         ,change: function(value, date){ //改变日期后
