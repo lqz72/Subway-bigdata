@@ -208,7 +208,8 @@ class DataApi(object):
 
         flow_data = flow_data.groupby(by=['day', 'sta'], as_index=False)['flow'].count()
         return flow_data
-        
+    
+    @staticmethod
     def get_date_series(flow_df):
         '''
         获得对应日期的总体客流量 返回一个series
@@ -364,7 +365,7 @@ class DataApi(object):
 
         user_df = df[df['user_id'].isin([user_id])].drop('user_id', axis = 1)
         user_df = user_df.sort_values(by='in_time', ascending=True)
-        print(user_df)
+    
         in_sta_name, out_sta_name = user_df['in_sta_name'].values, user_df['out_sta_name'].values
         in_time = [i.strftime('%m-%d %H:%M') for i in user_df['in_time']]
         out_time = [i.strftime('%m-%d %H:%M') for i in user_df['out_time']]
@@ -450,7 +451,7 @@ class DataApi(object):
 
     def get_line_split_flow(self, date, line):
         '''
-        获取线路断面客流 格式:{split:flow,}
+        获取线路断面客流 格式:{split:{up:flow, down:flow},}
         '''
         sp = ShortestPath()
         #获取断面字典
@@ -522,19 +523,8 @@ class DataApi(object):
 
 if __name__ == '__main__':
     api = DataApi()
-    a = api.get_od_flow('2020-07-01')
-    print(a)
-    # station_dict = SQLOS.get_station_dict()
+    a = api.get_date_series(api.flow_df)
+    print(a.head(10))
 
-    # links = []
-    # i = 0
-    # for source in station_dict:
-    #     for target in station_dict:
-    #         if source == target:
-    #             continue
-    #         links.append({'source': source, 'target': target})
-            
-    # with open('./PredictModel/relation.json', 'w', encoding='utf-8') as f:
-    #     json.dump(links, f)
 
     
