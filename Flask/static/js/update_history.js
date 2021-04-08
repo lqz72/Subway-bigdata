@@ -842,7 +842,7 @@ layui.use('laydate', function(){
             }
     
             //图例的数据数组 数组中的每一项代表一个系列的name
-            var legend = [{ data: lineNames, top: "5%" }];
+            var legend = [{ data: lineNames, orient: 'vertical', top: '20%', right: '2%'  }];
     
             //获取类目名称数组 用于和 legend 对应以及格式化 tooltip 的内容
             var categories = lineNames.map(lineName => { return { name: lineName } });
