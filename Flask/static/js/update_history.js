@@ -146,12 +146,7 @@ layui.use('laydate', function(){
             var graphChart = echarts.init(document.getElementById('line_graph'));
     
             //获取线路名称列表
-            var lineNames = [];
-            for (let index = 0; index < stations.length - 1; index++) {
-                if (lineNames.indexOf(stations[index].category) == -1) {
-                    lineNames.push(stations[index].category);
-                }
-            }
+            var lineNames = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线'];
     
             //图例的数据数组 数组中的每一项代表一个系列的name
             var legend = [{ data: lineNames, orient: 'vertical', top: '20%', right: '2%'  }];
@@ -177,30 +172,30 @@ layui.use('laydate', function(){
                     var hourAlertList = [];
                     stations.forEach(function (station) {
                         var staName = station.name;
-        
                         var sta = JSON.parse(JSON.stringify(station));
-                        
-                        sta.itemStyle.color = station.itemStyle.color;
-                        sta.symbolSize = [10, 10];
-                        sta.value.push(0);
-                        if (hourFlow[staName]) {
-                            sta.value[2] = hourFlow[staName][`${i}`];
-                            if (sta.value[2]) {
-                                let size = Math.log(hourFlow[staName][`${i}`]) * 5 + 10;
-                                sta.symbolSize = [size, size];
-                                if (sta.value[2] >= 20) {
-                                    sta.symbolSize = [10, 10];
-                                    hourAlertList.push({
-                                        name: sta.name,
-                                        value: sta.value,
-                                        itemStyle: {
-                                            color: station.itemStyle.color 
-                                        }
-                                    });
+
+                        if (lineNames.indexOf(sta.name) == -1) {
+                            sta.itemStyle.color = station.itemStyle.color;
+                            sta.symbolSize = [10, 10];
+                            sta.value.push(0);
+                            if (hourFlow[staName]) {
+                                sta.value[2] = hourFlow[staName][`${i}`];
+                                if (sta.value[2]) {
+                                    let size = Math.log(hourFlow[staName][`${i}`]) * 5 + 10;
+                                    sta.symbolSize = [size, size];
+                                    if (sta.value[2] >= 20) {
+                                        sta.symbolSize = [10, 10];
+                                        hourAlertList.push({
+                                            name: sta.name,
+                                            value: sta.value,
+                                            itemStyle: {
+                                                color: station.itemStyle.color 
+                                            }
+                                        });
+                                    }
                                 }
-                                
-                            }
-                        }          
+                            }      
+                        } 
                         hour.staList.push(sta);
                     });
                     hourFlowList.push(hour);
@@ -263,6 +258,7 @@ layui.use('laydate', function(){
                 title: {
                     text: '早晚高峰客流'
                 },
+                color: ['#EE1822', '#0000FF', '#FFFF00', '#00FF00', '#FF00FF', '#00FFFF', '#800080', '#F39C12'], 
                 backgroundColor: '#fff',
                 coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
                 xAxis: {
@@ -288,7 +284,6 @@ layui.use('laydate', function(){
                         if (param.value)
                             value = param.value[2];
                         let label = param.name + ": " + value + "";
-                        console.log(label);
                         return label;
                     }
                 },
@@ -537,12 +532,12 @@ layui.use('laydate', function(){
                 '2号线': '#73ACFF',
                 '3号线': '#FDD56A',
                 '4号线': '#FDB36A',
-                '5号线': '#FD866A',
-                '10号线': '#9E87FF',
-                '11号线': '#58D5FF',
-                '12号线': '#E271DE'
+                '5号线': '#9E87FF',
+                '10号线': '#F8456B',
+                '11号线': '#4AEAB0',
+                '12号线': '#E271DE',
             }
-
+            
             var ODLinks = [];
             var ODstations = [];
             var stationNames = Object.keys(ODFlow);
@@ -590,6 +585,7 @@ layui.use('laydate', function(){
                         color:"#000"
                     }
                 },
+                color: ['#73ACFF', '#73DDFF', '#E271DE', '#F8456B', '#FDB36A', '#4AEAB0', '#9E87FF', '#FDD56A'],
                 legend: [{ data: lineNames, orient: 'vertical', right: '2%' }],
                 tooltip: {trigger:'item'},
                 animationDurationUpdate: 1500,
@@ -842,7 +838,7 @@ layui.use('laydate', function(){
             }
     
             //图例的数据数组 数组中的每一项代表一个系列的name
-            var legend = [{ data: lineNames, orient: 'vertical', top: '20%', right: '2%'  }];
+            var legend = [{ data: lineNames, top: "5%" }];
     
             //获取类目名称数组 用于和 legend 对应以及格式化 tooltip 的内容
             var categories = lineNames.map(lineName => { return { name: lineName } });
@@ -865,31 +861,30 @@ layui.use('laydate', function(){
                     var hourAlertList = [];
                     stations.forEach(function (station) {
                         var staName = station.name;
-        
                         var sta = JSON.parse(JSON.stringify(station));
 
-                        sta.symbolSize = [10, 10];
-                        sta.value.push(0);
-                        if (hourFlow[staName]) {
-                            sta.value[2] = hourFlow[staName][`${i}`];
-                            if (sta.value[2]) {
-                                let size = Math.log(hourFlow[staName][`${i}`]) * 5 + 10;
-                                sta.symbolSize = [size, size];
-                                if (sta.value[2] >= 20) {
-                                    sta.symbolSize = [10, 10];
-                                    hourAlertList.push({
-                                        name: sta.name,
-                                        value: sta.value,
-                                        itemStyle: {
-                                            color: station.itemStyle.color 
-                                        }
-                                    });
+                        if (lineNames.indexOf(sta.name) == -1) {
+                            sta.itemStyle.color = station.itemStyle.color;
+                            sta.symbolSize = [10, 10];
+                            sta.value.push(0);
+                            if (hourFlow[staName]) {
+                                sta.value[2] = hourFlow[staName][`${i}`];
+                                if (sta.value[2]) {
+                                    let size = Math.log(hourFlow[staName][`${i}`]) * 5 + 10;
+                                    sta.symbolSize = [size, size];
+                                    if (sta.value[2] >= 20) {
+                                        sta.symbolSize = [10, 10];
+                                        hourAlertList.push({
+                                            name: sta.name,
+                                            value: sta.value,
+                                            itemStyle: {
+                                                color: station.itemStyle.color 
+                                            }
+                                        });
+                                    }
                                 }
-                                
-                            }
-                        }
-                        sta.itemStyle.color = station.itemStyle.color;
-                            
+                            }      
+                        } 
                         hour.staList.push(sta);
                     });
                     hourFlowList.push(hour);
@@ -1193,17 +1188,17 @@ layui.use('laydate', function(){
                 '2号线': '#73ACFF',
                 '3号线': '#FDD56A',
                 '4号线': '#FDB36A',
-                '5号线': '#FD866A',
-                '10号线': '#9E87FF',
-                '11号线': '#58D5FF',
-                '12号线': '#E271DE'
+                '5号线': '#9E87FF',
+                '10号线': '#F8456B',
+                '11号线': '#4AEAB0',
+                '12号线': '#E271DE',
             }
-
+            
             var ODLinks = [];
             var ODstations = [];
             var stationNames = Object.keys(ODFlow);
 
-            function GetODFlowData(ODLinks, ODstations, stationNames) {
+            function getODFlowData(ODLinks, ODstations, stationNames) {
                 for (let i = 0; i < (stationNames.length / 2); i++){
                     let source = stationNames[i];
 
@@ -1232,7 +1227,7 @@ layui.use('laydate', function(){
                 ODstations = ODstations.sort(compare('name'));
             }
 
-            function SetODOption(ODOption, ODstations, ODLinks) {
+            function setODOption(ODOption, ODstations, ODLinks) {
                 ODOption.series.data = ODstations;
                 ODOption.series.links = ODLinks;
                 return ODOption;
@@ -1246,6 +1241,7 @@ layui.use('laydate', function(){
                         color:"#000"
                     }
                 },
+                color: ['#73ACFF', '#73DDFF', '#E271DE', '#F8456B', '#FDB36A', '#4AEAB0', '#9E87FF', '#FDD56A'],
                 legend: [{ data: lineNames, orient: 'vertical', right: '2%' }],
                 tooltip: {trigger:'item'},
                 animationDurationUpdate: 1500,
