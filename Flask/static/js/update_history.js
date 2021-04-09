@@ -258,7 +258,7 @@ layui.use('laydate', function(){
                 title: {
                     text: '早晚高峰客流'
                 },
-                color: ['#EE1822', '#0000FF', '#FFFF00', '#00FF00', '#FF00FF', '#00FFFF', '#800080', '#F39C12'], 
+                color: ['#0000FF', '#EE1822', '#F39C12', '#FF00FF', '#800080', '#00FF00', '#00FFFF', '#FFFF00'], 
                 backgroundColor: '#fff',
                 coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
                 xAxis: {
@@ -585,7 +585,7 @@ layui.use('laydate', function(){
                         color:"#000"
                     }
                 },
-                color: ['#73ACFF', '#73DDFF', '#E271DE', '#F8456B', '#FDB36A', '#4AEAB0', '#9E87FF', '#FDD56A'],
+                color: ['#73DDFF','#73ACFF','#FDD56A','#FDB36A', '#9E87FF', '#F8456B', '#4AEAB0', '#E271DE'],
                 legend: [{ data: lineNames, orient: 'vertical', right: '2%' }],
                 tooltip: {trigger:'item'},
                 animationDurationUpdate: 1500,
@@ -830,16 +830,11 @@ layui.use('laydate', function(){
             var graphChart = echarts.init(document.getElementById('line_graph'));
     
             //获取线路名称列表
-            var lineNames = [];
-            for (let index = 0; index < stations.length - 1; index++) {
-                if (lineNames.indexOf(stations[index].category) == -1) {
-                    lineNames.push(stations[index].category);
-                }
-            }
+            var lineNames = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线'];
     
             //图例的数据数组 数组中的每一项代表一个系列的name
-            var legend = [{ data: lineNames, top: "5%" }];
-    
+            var legend = [{ data: lineNames, orient: 'vertical', top: '20%', right: '2%'  }];
+
             //获取类目名称数组 用于和 legend 对应以及格式化 tooltip 的内容
             var categories = lineNames.map(lineName => { return { name: lineName } });
             
@@ -850,7 +845,7 @@ layui.use('laydate', function(){
                 }
                 return timelist;
             }
-    
+            
             var alertStations = [];
             //生成6-21点的客流数据
             function getHourFlowData(hourFlow, stations) {
@@ -918,7 +913,6 @@ layui.use('laydate', function(){
                                 coordinateSystem: "cartesian2d",
                                 symbolSize: function(val) {
                                     return val[2]*1.2;
-                                    
                                 },
                                 data: alertStations[i],
                                 showEffectOn: "render",
@@ -927,10 +921,8 @@ layui.use('laydate', function(){
                                     period: 4,
                                     scale: 4,
                                     brushType: "stroke" 
-                                    
                                 },
-                                hoverAnimation: true
-                                
+                                hoverAnimation: true            
                             }
                         ]
                     },
@@ -950,6 +942,7 @@ layui.use('laydate', function(){
                 title: {
                     text: '早晚高峰客流'
                 },
+                color: ['#0000FF', '#EE1822', '#F39C12', '#FF00FF', '#800080', '#00FF00', '#00FFFF', '#FFFF00'], 
                 backgroundColor: '#fff',
                 coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
                 xAxis: {
@@ -975,7 +968,6 @@ layui.use('laydate', function(){
                         if (param.value)
                             value = param.value[2];
                         let label = param.name + ": " + value + "";
-                        console.log(label);
                         return label;
                     }
                 },
@@ -1241,7 +1233,7 @@ layui.use('laydate', function(){
                         color:"#000"
                     }
                 },
-                color: ['#73ACFF', '#73DDFF', '#E271DE', '#F8456B', '#FDB36A', '#4AEAB0', '#9E87FF', '#FDD56A'],
+                color: ['#73DDFF','#73ACFF','#FDD56A','#FDB36A', '#9E87FF', '#F8456B', '#4AEAB0', '#E271DE'],
                 legend: [{ data: lineNames, orient: 'vertical', right: '2%' }],
                 tooltip: {trigger:'item'},
                 animationDurationUpdate: 1500,
