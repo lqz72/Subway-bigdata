@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
     <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../static/css/sta.css">
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
@@ -42,15 +43,147 @@
 
             <!-- 搜索框 -->
             <div class="searchsta">
-                搜索区域
+                <input type="text" class="sousuo" placeholder="请输入您要搜索的站点...">
+                <button></button>
             </div>
 
+            <div class="stainfo">
+                <div class="staname">
+                    Sta101
+                </div>
+                <div class="locinfo">
+                    <div class="graph">
+                        站点位置
+                        <div class="instance">
+                            <img src="../static/images/loc.png" alt="">
+                        </div>
+                    </div>
+                    <p>所属区域：4115</p>
+                    <p>所属线路：3号线</p>
+                    <p>所属功能区域：居住区</p>
+                </div>
+                <div class="datainfo">
+                    <p>客流量对比</p>
+                    <ul>
+                        <li>较昨日：<span class='font-red'>+23.6%</span></li> 
+                        <li>较月平均：<span class='font-red'>+12.1%</span></li> 
+                        <li>较年平均：<span class='font-red'>+10.3%</span></li>
+                        <li>早高峰客流：<span> <em class='font-red'>231</em> 人次</span></li>
+                        <li>晚高峰客流：<span> <em class='font-red'>315</em> 人次</span></li>
+                    </ul>
+                </div>
+                <div class="cloud">
+                    <p>人群词云图</p>
+                    <div class="yun">
+
+                    </div>
+                </div>
+            </div>
             <!-- 时间控件 -->
             <div class="time" id='timectrlpre'>
             
             </div>
+
+            <div class="stamonth">
+                本月
+            </div>
             
+            <div class="stahour">
+                当日小时客流
+            </div>
             
+            <div class="ranknear">
+                <p>客流来源排行</p>
+                <table>
+                    <tr>
+                        <th>排名</th>
+                        <th>站点名</th>
+                        <th>所在线路</th>
+                        <th>客流量</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Sta93</td>
+                        <td>3号线</td>
+                        <td>121</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Sta16</td>
+                        <td>3号线</td>
+                        <td>111</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Sta14</td>
+                        <td>2号线</td>
+                        <td>98</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Sta42</td>
+                        <td>3号线</td>
+                        <td>71</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Sta53</td>
+                        <td>6号线</td>
+                        <td>67</td>
+                    </tr>
+                </table>
+                <p>客流去处排行</p>
+                <table>
+                    <tr>
+                        <th>排名</th>
+                        <th>站点名</th>
+                        <th>所在线路</th>
+                        <th>客流量</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Sta73</td>
+                        <td>3号线</td>
+                        <td>156</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Sta53</td>
+                        <td>6号线</td>
+                        <td>120</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Sta44</td>
+                        <td>2号线</td>
+                        <td>101</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Sta47</td>
+                        <td>3号线</td>
+                        <td>99</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Sta49</td>
+                        <td>3号线</td>
+                        <td>98</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="itemadvice">
+                各种设施建设数量
+            </div>
+
+            <div class="agestructure">
+                年龄结构
+            </div>
+
+            <div class="seats">
+                座位摆放
+            </div>
 
 
 
