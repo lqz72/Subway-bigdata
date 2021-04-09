@@ -3,23 +3,23 @@ layui.use('laydate', function(){
     
     //执行一个laydate实例
     laydate.render({
-        elem: '#timectrlpre'
+        elem: '#timectrlsta'
         ,position: 'static'
-        ,value: '2020-07-17'
+        ,value: '2020-01-01'
         ,showBottom: false
-        ,min: '2020-07-17'
-        ,max: '2020-10-16'
+        ,min: '2019-12-22'
+        ,max: '2020-07-15'
         ,ready:function(date){//初始化
-            var markgraph = echarts.init(document.querySelector("#markpre"));            
-            markgraph.setOption(option_markpre);
+            var markgraph = echarts.init(document.querySelector("#marksta"));
+            markgraph.setOption(option_marksta);
 
         }
-        ,change:function(value, date){
+        ,change:function(value, date){//修改日历
 
         }
     });
 });
-var option_markpre = {
+var option_marksta = {
     series: [{
         type: 'gauge',
         axisLine: {

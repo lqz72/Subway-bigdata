@@ -211,6 +211,50 @@ button {
 .ranknear table tr td:nth-child(4){
     width: 280px;
 }
+
+
+/* 客流评分及预警措施  */
+.marksta {
+    float: left;
+    position: relative;
+    width: 910px;
+    height: 300px;
+    margin: 10px 20px 0 20px;
+    background-color: #ffffff;
+}
+.marksta h4 {
+    font-size: 18px;
+    height: 20px;
+    line-height: 20px;
+    padding-left: 5px;
+}
+.marksta .graph {
+    float: left;
+    width: 300px;
+    height: 280px;
+}
+.marksta  .words {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    width: 300px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 18px;
+    z-index: 99999;
+    width: 300px;
+    text-align: center;
+}
+.marksta .description {
+    float: left;
+    width: 310px;
+    height: 280px;
+}
+.marksta .graph2 {
+    float: left;
+    width: 300px;
+    height: 280px;
+}
 .itemadvice {
     float: left;
     margin: 10px 20px 0 20px;
