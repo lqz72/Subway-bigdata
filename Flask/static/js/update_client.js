@@ -10,7 +10,9 @@ $(function(){
     //点击搜索后
     var btn_search = document.getElementById('btn_search');
     var user_id = document.getElementById('user_search');
-    btn_search.onclick = function(){
+    var userRecord;
+    btn_search.onclick = function () {
+        
         $.ajax({
             url: '/user_info',
             type: 'POST',
@@ -44,6 +46,7 @@ $(function(){
             data: user_id.value,
             success: function(data)
             {
+                userRecord = data.reverse();
                 test = {title:'用户记录'};
                 test['list'] = data.reverse();
                 test['length'] = data.length;
@@ -53,6 +56,9 @@ $(function(){
 
                 var html2 = template('historylist', test);
                 document.getElementById('outshow2').innerHTML = html2;
+
+                linesOption.series[1].data = getLinesData(userRecord, stations);
+                linesChart.setOption(linesOption);
             }
         });
     }
@@ -110,12 +116,15 @@ $(function(){
             user_flow_line.setOption(result);
         }
     });
+    
     $.ajax({
         type:'post',
-        url:'/user_record',
+        url: '/user_record',
+        async: false,
         data: init_id,
         success: function(data)
         {
+            userRecord = data.reverse();
             test = {title:'用户记录'};
             test['list'] = data.reverse();
             test['length'] = data.length;
@@ -124,7 +133,148 @@ $(function(){
 
             var html2 = template('historylist', test);
             document.getElementById('outshow2').innerHTML = html2;
+            
+            linesOption.series[1].data = getLinesData(userRecord, stations);
+            linesChart.setOption(linesOption);
         }
     });
+
+    function getJsonData(url){
+        var jsData;
+        $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "json", 
+                async: false,
+                success: function(data) {
+                    jsData = data;
+                }
+            })
+        return jsData;
+    }
+
+    var stations = getJsonData('/sta/json');
+    var links = getJsonData('/link/json');
+
+    //初始化图表
+    var linesChart = echarts.init(document.getElementById('road'));
+
+    //获取线路名称列表
+    var lineNames = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线'];
+
+    //图例的数据数组 数组中的每一项代表一个系列的name
+    var legend = [{ data: lineNames, orient: 'vertical', top: '20%', right: '2%'  }];
+
+    //获取类目名称数组 用于和 legend 对应以及格式化 tooltip 的内容
+    var categories = lineNames.map(lineName => { return { name: lineName } });
+    
+    var linesOption = {
+        title: {
+            text: '早晚高峰客流'
+        },
+        backgroundColor: '#fff',
+        coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
+        xAxis: {
+            show: false,
+            min: 50,
+            max: 2300,
+            axisPointer: {
+                show: true
+            },
+        },
+        yAxis: {
+            show: false,
+            min: 0,
+            max: 2000,
+            axisPointer: {
+                show: true
+            },
+        },
+        tooltip: {
+            trigger: 'item',
+        },
+        legend: legend,
+        series: [
+            // 用关系图实现地铁地图
+            {
+                type: "graph",
+                zlevel: 5,
+                draggable: false,
+                coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
+                categories :categories,
+                edgeSymbolSize: [0, 8], //边两端的标记大小，可以是一个数组分别指定两端，也可以是单个统一指定
+                edgeLabel: {
+                  normal: {
+                    textStyle: {
+                      fontSize: 60
+                    }
+                  }
+                },
+                symbol: "rect",
+                symbolOffset: ["15%", 0],
+                data: stations,
+                links: links,
+                label: {
+                    normal: {
+                        show: false,
+                    }
+                },
+                lineStyle: {
+                    normal: {
+                        opacity: 0.6, //线条透明度
+                        curveness: 0, //站点间连线曲度，0表示直线
+                        width: 5, //线条宽度
+                    }
+                }
+            },
+            {
+				type: 'lines',
+                zlevel: 5,
+                draggable: false,
+                coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
+				effect: {
+					show: true,
+					period: 4, //箭头指向速度，值越小速度越快
+					trailLength: 0.02, //特效尾迹长度[0,1]值越大，尾迹越长重
+					symbol: 'arrow', //箭头图标
+					symbolSize: 5, //图标大小
+				},
+				lineStyle: {
+					normal: {
+						width: 1, //尾迹线条宽度
+						opacity: 1, //尾迹线条透明度
+						curveness: .3 //尾迹线条曲直度
+					}
+				},
+                data:[],
+			}
+        ],
+    }
+
+    function getLinesData(userRecord, stations) {
+        var coordsList = [];
+        var len = userRecord.length;
+        for (let i = 0; i < len; i++){
+            var source = userRecord[i][0];
+            var target = userRecord[i][2];
+            var data = { coords: [0, 0], lineStyle: {color: ""}};
+            for (let j = 0; j < stations.length; j++){
+                if (stations[j].category == 1)
+                    continue;
+                if (source == stations[j].name) {
+                    data.coords[0] = stations[j].value;
+                    data.lineStyle.color = stations[j].itemStyle.borderColor;
+                }
+                else if (target == stations[j].name) {
+                    data.coords[1] = stations[j].value;
+                }
+            }  
+            coordsList.push(data);
+        }
+        return coordsList;
+    }
+    
+    linesOption.series[1].data = getLinesData(userRecord, stations);
+    linesChart.setOption(linesOption);
 }
 )
