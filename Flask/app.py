@@ -221,6 +221,14 @@ def del_user():
     
     return str(res)
 
+@app.route('/weather_info', methods=['POST', 'GET'])
+def weather_info():
+    """获取近7天的天气信息
+    """
+    curr_date = request.get_data().decode('utf-8')
+    curr_weather = api.get_recent_weather(curr_date)
+    return jsonify(curr_weather)
+
 #------------控制图表的展示------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])
 def day_flow():

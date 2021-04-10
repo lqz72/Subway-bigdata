@@ -521,6 +521,30 @@ class DataApi(object):
             print(e, in_sta, out_sta)
         return od_dict
 
+    def get_recent_weather(self, date):
+        """获取近7天的完整天气信息
+        """
+        weather_info = SQLOS.get_df_data('weather_info')
+
+        end_time = datetime.datetime.strptime(date, "%Y-%m-%d")  
+        one_day = datetime.timedelta(days=1)
+        date_list = [date,]
+        for i in range(6):      
+            end_time += one_day
+            date_list.append(end_time.strftime("%Y-%m-%d"))
+        
+        recent_weather = weather_info[weather_info.date.isin(date_list)]
+        weather_list = []
+        for row in recent_weather.itertuples(index=False):
+            weather_list.append({
+                'date': getattr(row, 'date'),
+                'weather': getattr(row, 'weather').split('/')[0],
+                'temp': getattr(row, 'temp'),
+                'wind': getattr(row, 'wind').split('/')[0]
+            })
+
+        return weather_list
+        
 if __name__ == '__main__':
     api = DataApi()
     a = api.get_date_series(api.flow_df)
