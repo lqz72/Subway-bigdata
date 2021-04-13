@@ -262,6 +262,9 @@ button {
     height: 200px;
     background-color: #ffffff;
 }
+.itemadvice img {
+    width: 100%;
+}
 .agestructure {
     float: left;
     margin: 10px 10px 0 20px;

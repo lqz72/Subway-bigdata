@@ -1,159 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>test1</title>
-  <script src="../static/js/jquery.min.js"></script>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../static/layui/css/layui.css">
+  <title>Document</title>
 </head>
 <style>
-    * {
-    margin: 0;
-    padding: 0;
-    }
-    
-    li {
-    list-style: none;
-    }
-    .shenyong{
-    float: left;
-    height:32px;
-    line-height: 32px;
-    margin-right: 5px;
-    }
-    #select {
-    width: 100px;
-    height:32px;
-    line-height: 32px;
-    background:rgba(255,255,255,1);
-    border-radius:4px;
-    border:1px solid #C0C4CC;
-    font-size: 12px;
-    float: left;
-    
-    }
-    
-    .select-head {
-    overflow: hidden;
-    width: 100%;
-    height: 24px;
-    box-sizing: border-box;
-    padding-left: 5px;
-    line-height: 24px;
-    position: relative;
-    line-height: 24px;
-    }
-    
-    .select-head .select-head-cont {
-    float: left;
-    }
-    
-    .select-head .select-icon {
-    float: right;
-    margin-right: 10px;
-    margin-top:5px;
-    }
-    
-    
-    
-    .option {
-    line-height: 32px;
-    background:rgba(255,255,255,1);
-    border-radius:4px;
-    border:1px solid #C0C4CC;
-    margin-top: 10px;
-    display: none;
-    }
-    
-    .option .option-item {
-    height:26px;
-    line-height: 26px;
-    font-size:12px;
-    
-    }
-    
-    .option-item:hover {
-    background:rgba(58,137,132,1) !important;
-    color: #fff !important;
-    }
+#slideTest1 {
+  margin-top: 200px;
+  margin-left: 200px;
+  width: 200px;
+}
 </style>
 <body>
+  <div id='slideTest1'>
+    
+  </div>
   
-    
-    <div>
-    <div class="shenyong">申佣状态</div>
-    <ul id="select">
-    <li>
-    <div class="select-head">
-    <span class="select-head-cont"></span>
-    <span class="glyphicon glyphicon-triangle-bottom select-icon"></span>
-    </div>
-    <ul class="option">
-    <li class="option-item" >全部</li>
-    <li class="option-item">未申佣</li>
-    <li class="option-item">部分申佣</li>
-    <li class="option-item">全部申佣</li>
-    </ul>
-    </li>
-    </ul>
-    
-    </div>
-    
-    <script type="text/javascript">
-    $(function() {
-    var selectHeadCont = document.getElementsByClassName('select-head-cont');
-    var optionItem = document.getElementsByClassName('option-item');
-    
-    /*默认是第一个选项*/
-    selectHeadCont[0].innerHTML = optionItem[0].innerHTML;
-    optionItem[0].setAttribute('style', 'background: rgba(58,137,132,1); color:#fff');
-    
-    /*点击选项后出现在下拉框*/
-    var len = optionItem.length;
-    for(var i = 0; i < len; i++) {
-    optionItem[i].index = i;
-    optionItem[i].addEventListener('click', function() {
-    selectHeadCont[0].innerHTML = optionItem[this.index].innerHTML;
-    // 初始化所有optionItem背景样式
-    for(var k = 0; k < len; k++) {
-    optionItem[k].setAttribute('style', 'background: #fff; color:#333333');
+    <script src="../static/layui/layui.js"></script>
+    <script>
+      layui.use('slider', function(){
+  var slider = layui.slider;
+  
+  //渲染
+  slider.render({
+    elem: '#slideTest1'  //绑定元素
+    ,theme: '#3196ff'
+    ,max:42
+    ,min:-5
+    ,value:20
+    // ,input:true
+    ,setTips: function(value){ //自定义提示文本
+      return value + '℃';
+      }
+    ,change: function(value){
+      console.log(value) //动态获取滑块数值
+      //do something
     }
-    
-    // 给选中的optionItem添加背景样式
-    optionItem[this.index].setAttribute('style', 'background: rgba(58,137,132,1) color:#fff');
-    $('.option').css('display', 'none');
-    }, false);
-    }
-    
-    // 阻止冒泡事件发生
-    function stopPropagation(e) {
-    if(e.stopPropagation)
-    e.stopPropagation(); //停止冒泡 非ie
-    else
-    e.cancelBubble = true; //停止冒泡 ie
-    }
-    // 点击select-head时，select出现
-    $('.select-head').on('click', function(e) {
-    $('.option').css('display', 'block');
-    stopPropagation(e);
-    })
-    
-    // 点击其他地方时，select会收起来
-    $(document).on('click', function(event) {
-    $('.option').css('display', 'none');
-    })
-    })
-    </script>
-  <!-- <select name="这是一个测试" id="test">
-    <option value="1">选项1</option>
-    <option value="3">选项2</option>
-    <option value="5" selected='selected'>选项3</option>
-    <option value="5">选项4</option>
-  </select> -->
-
-  <script>
-    $('#test').change(function(){
-        console.log(this.value);
-    });
-  </script>
+  });
+});
+      </script>
 </body>
 </html>

@@ -1,18 +1,18 @@
 $(function(){
     // 点击详细信息
     var btn1 = document.querySelector('#btn_show');
-        btn1.addEventListener('click',
-        function()
-        {
-            location.href = '/userinf';
-        })
+    btn1.addEventListener('click',
+    function()
+    {
+        location.href = '/userinf';
+    })
 
     //点击搜索后
     var btn_search = document.getElementById('btn_search');
     var user_id = document.getElementById('user_search');
     var userRecord;
     btn_search.onclick = function () {
-        
+        //更改三条基本信息
         $.ajax({
             url: '/user_info',
             type: 'POST',
@@ -28,13 +28,15 @@ $(function(){
             }
         });
 
+        //更改右侧出行信息图表
         var user_flow_line = echarts.init(document.getElementById('monthout'));
         $.ajax({
             type: 'POST',
             url: '/history/user_flow/line',
             data: user_id.value,
             dataType: 'json',
-            success: function (result) {        
+            success: function (result) {    
+                console.log(result);    
                 user_flow_line.setOption(result);
             }
         });
@@ -50,7 +52,6 @@ $(function(){
                 test = {title:'用户记录'};
                 test['list'] = data.reverse();
                 test['length'] = data.length;
-                console.log(test);
                 var html = template('historyshow', test);
                 document.getElementById('outshow1').innerHTML = html;
 
@@ -95,7 +96,6 @@ $(function(){
         data: init_id,
         dataType: 'json',
         success: function(result){
-            // console.log(result);
             var id = document.getElementById('id');
             var age = document.getElementById('age');
             var trips_num = document.getElementById('trips_num');
@@ -124,9 +124,10 @@ $(function(){
         data: init_id,
         success: function(data)
         {
+            orgin_data = data;
             userRecord = data.reverse();
             test = {title:'用户记录'};
-            test['list'] = data.reverse();
+            test['list'] = data;
             test['length'] = data.length;
             var html = template('historyshow', test);
             document.getElementById('outshow1').innerHTML = html;
@@ -170,7 +171,7 @@ $(function(){
     
     var linesOption = {
         title: {
-            text: '早晚高峰客流'
+            text: '用户出行轨迹'
         },
         backgroundColor: '#fff',
         coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）

@@ -341,7 +341,8 @@ layui.use('laydate', function(){
                 }
             });
             
-            var uplineFlow = downlineFlow = [];
+            var uplineFlow  = [];
+            var downlineFlow = [];
             var splitNames = Object.keys(splitFlow);
             for (let index = 0; index < splitNames.length; index++){
                 var split = splitFlow[splitNames[index]];
@@ -819,7 +820,7 @@ layui.use('laydate', function(){
                         success: function(data) {
                             jsData = data;
                         }
-                    })
+                })
                 return jsData;
             }
     

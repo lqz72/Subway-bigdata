@@ -17,6 +17,17 @@
         box-shadow: none !important;
         border: none !important;
     }
+    .layui-form-item {
+        width: 250px;
+        /* top:60px; */
+    }
+    .layui-form-label {
+        width: 100px;
+        /* top:60px; */
+    }
+    .layui-form {
+        margin-top: -10px;
+    }
 </style>
 <body>
     <div class="w">
@@ -47,7 +58,115 @@
             
             <!-- 天气控件等 -->
             <div class="weather">
-                天气控件等
+                <div class="todayweatherpre">
+                    <div class="w-img" id="today_weather">
+                        &#xe625;
+                    </div>
+                    <div class="description">
+                        <p id="today">2020-01-01</p>
+                        <p id="today_wea_txt">多云</p>
+                        <strong class="temp" id="today_temp">18℃</strong>
+                        <p id = "today_wind">风向：无持续风向1-2级</p>
+                        <p>节假日：否</p>
+                    </div>
+                </div>
+                <div class="ctrl">
+                    <h3>影响因素控件</h3>
+                    <div class="layui-form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">预测算法</label>
+                            <div class="layui-input-block">
+                              <select name="interest" lay-filter="model">
+                                <!-- <option value="0">请选择</option> -->
+                                <option value="1" selected>Xgboost</option>
+                                <option value="2">Arima</option>
+                                <option value="3">指数平滑</option>
+                              </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">天气状况</label>
+                            <div class="layui-input-block">
+                              <select name="interest" lay-filter="wea">
+                                <option value="0">请选择</option>
+                                <option value="1">多云</option>
+                                <option value="2">晴</option>
+                                <option value="3">阴</option>
+                                <option value="4">阵雨</option>
+                                <option value="5">小雨</option>
+                                <option value="6">中雨</option>
+                                <option value="7">大雨</option>
+                                <option value="8">暴雨</option>
+                              </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p id="T"></p>
+                    <em>温度</em>
+                    <button class="layui-btn layui-btn-warm confirm" id="apply">应用</button>
+                    
+                </div>
+                <div class="nextdayspre">
+                    <ul>
+                        <li>
+                            <p>明天</p>
+                            <div class="image" id = "d1_icon">
+                                &#xe646;
+                            </div>
+                            <div class="tempe" id = "d1_temp">
+                                18℃
+                            </div>
+                        </li>
+                        <li>
+                            <p>后天</p>
+                            <div class="image" id = "d2_icon">
+                                &#xe646;
+                            </div>
+                            <div class="tempe" id = "d2_temp">
+                                18℃
+                            </div>
+                        </li>
+                        <li>
+                            <p id="d3_date">4日</p>
+                            <div class="image" id = "d3_icon">
+                                &#xe646;
+                            </div>
+                            <div class="tempe" id = "d3_temp">
+                                18℃
+                            </div>
+                        </li>
+                        <li>
+                            <p id="d4_date">5日</p>
+                            <div class="image" id = "d4_icon">
+                                &#xe646;
+                            </div>
+                            <div class="tempe" id = "d4_temp">
+                                18℃
+                            </div>
+                        </li>
+                        <li>
+                            <p id="d5_date">6日</p>
+                            <div class="image" id = "d5_icon">
+                                &#xe646;
+                            </div>
+                            <div class="tempe" id = "d5_temp">
+                                18℃
+                            </div>
+                        </li>
+                        <li>
+                            <p id="d6_date">7日</p>
+                            <div class="image" id = "d6_icon">
+                                &#xe646;
+                            </div>
+                            <div class="tempe" id = "d6_temp">
+                                18℃
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <!-- 本月客流 -->
@@ -71,9 +190,9 @@
                 <p>是否节假日：<span id = "is_hoilday">否</span></p>
                 <p>客流量对比</p>
                 <ul>
-                    <li>较昨日：<span class='font-red'>+20%</span></li> 
-                    <li>较月平均：<span class='font-red'>+20%</span></li> 
-                    <li>较年平均：<span class='font-red'>-20%</span></li>
+                    <li>较昨日：<span class='font-red'>+21.1%</span></li> 
+                    <li>较月平均：<span class='font-red'>+10.3%</span></li> 
+                    <li>较年平均：<span class='font-red'>-1.6%</span></li>
                     <li>早高峰客流：<span> <em class='font-red'>231</em> 人次</span></li>
                     <li>晚高峰客流：<span> <em class='font-red'>315</em> 人次</span></li>
                 </ul>

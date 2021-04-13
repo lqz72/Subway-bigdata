@@ -226,6 +226,7 @@ def weather_info():
     """获取近7天的天气信息
     """
     curr_date = request.get_data().decode('utf-8')
+    print(curr_date);
     curr_weather = api.get_recent_weather(curr_date)
     return jsonify(curr_weather)
 

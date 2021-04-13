@@ -1,9 +1,130 @@
+/* 天气控件 */
 .weather {
     float: left;
     width: 626px;
     height: 280px;
     background-color: #ffffff;
 }
+.weather .todayweatherpre {
+    float: left;
+    width: 313px;
+    height: 175px;
+    background-color: #ffffff;
+    border-bottom: 2px solid #e2e0e0;
+}
+.weather .todayweatherpre .w-img {
+    float: left;
+    width: 140px;
+    height: 173px;
+    /* border: solid 1px pink; */
+    background-color: #fff;
+    font-family: 'iconfont';
+    text-align: center;
+    line-height: 168px;
+    font-size: 80px;
+    color: #a566f3;
+}
+.weather .todayweatherpre>.description {
+    float: left;
+    width: 173px;
+    height: 173px;
+    /* border: solid 1px black; */
+    background-color: #fff;
+}
+.weather .todayweatherpre>.description p {
+    height: 28px;
+    line-height: 28px;
+    font-size: 16px;
+    font-family: fantasy;
+    /* color: #e1c5b2; */
+}
+.weather .todayweatherpre>.description p:first-child {
+    margin-bottom: 5px;
+    margin-top: 7px;
+    font-size: 17px;
+}
+.weather .todayweatherpre>.description strong {
+    display: block;
+    height: 45px;
+    width: 100%;
+    line-height: 45px;
+    font-size: 25px;
+    text-align: center;
+    color: #a566f3;
+    border-top: 1px solid #e2e0e0;
+    border-bottom: 1px solid #e2e0e0;
+}
+.weather .ctrl {
+    float: left;
+    position: relative;
+    width: 313px;
+    height: 175px;
+    /* margin-bottom: 10px; */
+    background-color: #ffffff;
+    border-bottom: 2px solid #e2e0e0;
+}
+.weather .ctrl h3 {
+    margin-left: 30px;
+    margin-top: 7px;
+    margin-bottom: 20px;
+    line-height: 30px;
+    height: 30px;
+    font-size: 18px;
+}
+
+.weather .ctrl p {
+    margin-left: 70px;
+    margin-top: 23px;
+    width: 200px;
+}
+.weather .ctrl em {
+    position: absolute;
+    left: 30px;
+    bottom: 13px;
+    z-index: 99999;
+}
+.weather .ctrl .confirm {
+    position: absolute;
+    left: 200px;
+    width: 50px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    padding: 0;
+    top: 7px;
+    z-index: 99999;
+}
+.weather .nextdayspre {
+    float: left;
+    width: 626px;
+    height: 105px;
+    background-color: #ffffff;
+}
+.weather .nextdayspre ul li {
+    float: left;
+    width: 104px;
+    height: 105px;
+    /* border: 1px solid pink; */
+}
+.weather .nextdayspre ul li p {
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+}
+.weather .nextdayspre ul li .image {
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    font-size: 45px;
+    width: 100%;
+    font-family: 'iconfont';
+    font-weight: 100;
+}
+.weather .nextdayspre ul li .tempe {
+    height: 25px;
+    text-align: center;
+}
+
 .thismonthpre {
     float: left;
     width: 910px;
