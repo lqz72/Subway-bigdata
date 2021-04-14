@@ -6,19 +6,22 @@ from sys import path
 import os
 import json
 import time
+import random
 import warnings
 warnings.filterwarnings('ignore')
 path.append('..')
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0])
-path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0] + 'PredictModel\\')
+path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0] + 'SubwayModel\\')
 
 import numpy as np
 from DataAnalysis import DataApi
+from PredictResult import PredictApi
 from MakeChart import ChartApi
 from MysqlOS import SQLOS
 
 app=Flask(__name__)
 api=DataApi()
+pred_api=PredictApi()
 
 abs_path = os.path.abspath(os.path.dirname(__file__))
 station_name='Sta1'
@@ -252,14 +255,14 @@ def curr_week_flow():
 @app.route('/history/age/pie', methods = ['POST', 'GET'])
 def age_pie():
     age, percent = api.age, api.percent
-    age_pie = ChartApi.age_pie(age, percent)
-    return age_pie.dump_options_with_quotes()
+    pie = ChartApi.age_pie(age, percent)
+    return pie.dump_options_with_quotes()
 
 @app.route('/history/age/bar', methods = ['POST', 'GET'])
 def age_bar():
     age, percent = api.age, api.percent
-    age_bar = ChartApi.age_bar(age, percent)
-    return age_bar.dump_options_with_quotes()
+    bar = ChartApi.age_bar(age, percent)
+    return bar.dump_options_with_quotes()
 
 @app.route('/history/user_flow/line', methods = ['POST', 'GET'])
 def user_flow_line():
@@ -281,6 +284,61 @@ def line_pie():
 
     return pie.dump_options_with_quotes()
 
+@app.route('/pred/month/line', methods=['POST', 'GET'])
+def pred_month_line():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+    curr_date = param_dict['c_date']
+
+    month = int(curr_date.split('-')[1])
+    month_dict = pred_api.get_curr_month_flow(month)
+    line = ChartApi.pred_month_line(month_dict, int(curr_date.split('-')[1]))
+
+    return line.dump_options_with_quotes()
+
+@app.route('/pred/week/line', methods=['POST', 'GET'])
+def pred_week_line():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+    curr_date = param_dict['c_date']
+
+    week_dict = pred_api.get_curr_week_flow(curr_date)
+    line = ChartApi.pred_week_line(week_dict)
+    
+    return line.dump_options_with_quotes()
+    
+@app.route('/pred/line/pie', methods=['POST', 'GET'])
+def pred_line_pie():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+    curr_date = param_dict['c_date']
+
+    line, percent = pred_api.get_line_flow_percent(curr_date, api.sta_dict)
+    pie = ChartApi.line_pie(line, percent)
+
+    return pie.dump_options_with_quotes()
+
+@app.route('/pred/hour/line', methods=['POST', 'GET'])
+def pred_hour_line():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+    curr_date = param_dict['c_date']
+    
+    hour_list = [str(i) for i in range(6, 22, 1)]
+    hour_flow = [str(random.randint(50,100)) for i in range(6, 22, 1)]
+    line = ChartApi.hour_line(hour_list, hour_flow)
+
+    return line.dump_options_with_quotes()
+
+@app.route('/pred/eval/radar', methods=['POST', 'GET'])
+def pred_eval_radar():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+    curr_date = param_dict['c_date']
+
+    radar = ChartApi.eval_radar()
+
+    return radar.dump_options_with_quotes()
 
 if __name__ == '__main__':
     app.run(debug=True)

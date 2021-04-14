@@ -49,6 +49,62 @@ function change_data()
         }
     });
 
+    /*------------------pyecharts 图表------------------*/
+    var linePie = echarts.init(document.getElementById('line_pie'));
+    $.ajax({
+        url: '/pred/line/pie',
+        type: 'POST',
+        data: s_data,
+        dataType: 'json',
+        success: function (option) {
+            linePie.setOption(option);
+        }
+    })
+
+    var monthLine = echarts.init(document.getElementById('month_line'));
+    $.ajax({
+        url: '/pred/month/line',
+        type: 'POST',
+        data: s_data,
+        dataType: 'json',
+        success: function (option) {
+            monthLine.setOption(option);
+        }
+    })
+
+    var weekLine = echarts.init(document.getElementById('week_line'));
+    $.ajax({
+        url: '/pred/week/line',
+        type: 'POST',
+        data: s_data,
+        dataType: 'json',
+        success: function (option) {
+            weekLine.setOption(option);
+        }
+    })
+
+    var hourLine = echarts.init(document.getElementById('hour_line'));
+    $.ajax({
+        url: '/pred/hour/line',
+        type: 'POST',
+        data: s_data,
+        dataType: 'json',
+        success: function (option) {
+            hourLine.setOption(option);
+        }
+    })
+
+    var evalRadar = echarts.init(document.getElementById('eval_radar'));
+    $.ajax({
+        url: '/pred/eval/radar',
+        type: 'POST',
+        data: s_data,
+        dataType: 'json',
+        success: function (option) {
+            evalRadar.setOption(option);
+        }
+    })
+    /*------------------------------------------------*/
 
 }
 
