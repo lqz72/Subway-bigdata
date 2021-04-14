@@ -4,43 +4,112 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../static/layui/css/layui.css">
   <title>Document</title>
+  <script src="../static/js/echarts.min.js"></script>
+  <script src="../static/js/echarts-wordcloud.min.js"></script>
 </head>
 <style>
-#slideTest1 {
-  margin-top: 200px;
-  margin-left: 200px;
-  width: 200px;
-}
+  .test {
+    margin-top: 100px;
+    margin-left: 200px;
+    width: 200px;
+    height: 200px;
+    background-color: pink;
+  }
 </style>
 <body>
-  <div id='slideTest1'>
-    
-  </div>
-  
-    <script src="../static/layui/layui.js"></script>
-    <script>
-      layui.use('slider', function(){
-  var slider = layui.slider;
-  
-  //渲染
-  slider.render({
-    elem: '#slideTest1'  //绑定元素
-    ,theme: '#3196ff'
-    ,max:42
-    ,min:-5
-    ,value:20
-    // ,input:true
-    ,setTips: function(value){ //自定义提示文本
-      return value + '℃';
+  <style>
+      /* html, body, #main {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+      } */
+      #main {
+        width: 200px;
+        height: 200px;
+        margin-left: 200px;
+        margin-top: 100px;
       }
-    ,change: function(value){
-      console.log(value) //动态获取滑块数值
-      //do something
-    }
-  });
-});
-      </script>
+  </style>
+  <div id='main'></div>
+  <script>
+      var chart = echarts.init(document.getElementById('main'));
+
+      var option = {
+          tooltip: {},
+          series: [ {
+              type: 'wordCloud',
+              gridSize: 2,
+              sizeRange: [6, 30],
+              // sizeRange: [12, 50],
+              rotationRange: [-90, 90],
+              shape: 'pentagon',
+              width: 200,
+              height: 200,
+              drawOutOfBound: true,
+              textStyle: {
+                  color: function () {
+                      return 'rgb(' + [
+                          Math.round(Math.random() * 160),
+                          Math.round(Math.random() * 160),
+                          Math.round(Math.random() * 160)
+                      ].join(',') + ')';
+                  }
+              },
+              emphasis: {
+                  textStyle: {
+                      shadowBlur: 10,
+                      shadowColor: '#333'
+                  }
+              },
+              data: [
+                  {
+                      name: '通勤乘客',
+                      value: 10000,
+                      textStyle: {
+                          color: 'black'
+                      },
+                      emphasis: {
+                          textStyle: {
+                              color: 'red'
+                          }
+                      }
+                  },
+                  {
+                    name:"剁手党",
+                    value: 9100
+                  },
+                  {
+                    name:"购物达人",
+                    value: 3200
+                  },
+                  {
+                    name:"驴友",
+                    value: 8100
+                  },
+                  {
+                    name:"学生党",
+                    value: 6000
+                  },
+                  {
+                    name:"远距通勤者",
+                    value: 5100
+                  },
+                  {
+                    name:"夜行人",
+                    value: 3100
+                  },
+                  {
+                    name:"行动不便者",
+                    value: 1200
+                  }
+              ]
+          } ]
+      };
+
+      chart.setOption(option);
+
+      // window.onresize = chart.resize;
+  </script>
 </body>
 </html>

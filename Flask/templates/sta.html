@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="../static/css/sta.css">
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
+    <script src="../static/js/echarts-wordcloud.min.js"></script>
 </head>
 <style>
     .layui-laydate, .layui-laydate-hint {
@@ -74,7 +75,7 @@
                 </div>
                 <div class="cloud">
                     <p>人群词云图</p>
-                    <div class="yun">
+                    <div class="yun" id = "wordclouds">
 
                     </div>
                 </div>
