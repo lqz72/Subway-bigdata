@@ -891,7 +891,8 @@ textarea:focus {
  .black-light-bg { background: #3e3e3e }
  .black-bg { background: #2e2e2e }
  .gray-bg { background: #f8f8f8; }
- .theme-bg { background: #f8b864; }
+ .theme-bg { background: #6ebacc; }
+ /* .theme-bg { background: #f8b864; } */
  .theme-bg2 { background: #6ebacc; }
  .transparent-bg { background: transparent; }
 

@@ -1816,7 +1816,7 @@ h3.leave-comment-text {
 /* scrollup */
 
 #scrollUp {
-    background: #f8b864 none repeat scroll 0 0;
+    background: #6ebacc none repeat scroll 0 0;
     bottom: 85px;
     color: #ffffff;
     cursor: pointer;
@@ -1873,8 +1873,8 @@ h3.leave-comment-text {
 	transform: scale(1.06);
 }
 .my_limit {
-    width: 370px;
-    height: 269px;
+    width: 270px;
+    height: 199px;
 }
 
 
