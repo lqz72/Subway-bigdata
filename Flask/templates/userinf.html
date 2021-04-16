@@ -23,6 +23,11 @@
     body {
         font-size: 16px;
     }
+    .aaddd {
+        border: 2px solid #A3D0C3!important;
+        border-left: none!important;
+        background-color: #A3D0C3!important;
+    }
 </style>
 <body>
     <div class="w">
@@ -32,7 +37,8 @@
             <ul>
                 <li><a href="/history">&nbsp;&nbsp;历史轨道数据储库</a></li>
                 <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
-                <li><a href="/client">&nbsp;&nbsp;运营规划辅助系统</a></li>
+                <li><a href="/client">&nbsp;&nbsp;乘客特征分析系统</a></li>
+                <li><a href="/station">&nbsp;&nbsp;运营规划辅助系统</a></li>
                 <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
             </ul>
         </div>
@@ -40,7 +46,7 @@
         <div class="content">
             <!-- 用户信息 -->
             <div class="user">
-                <div class="loc">轨道交通智慧系统>运营规划辅助系统>用户信息库</div>
+                <div class="loc">轨道交通智慧系统>乘客特征分析系统>用户信息库</div>
                 <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
                 <span class="name">超级管理员</span>
             </div>
@@ -48,7 +54,7 @@
             <!-- 搜索框 -->
             <div class="search">
                 <input type="text">
-                <button class='bt'></button>
+                <button class='bt aaddd'></button>
             </div>
             
             <!-- 用户列表 -->
@@ -56,7 +62,6 @@
                 <table id='userlist'>
                    
                 </table>
-                <!-- <div id='userlist'></div> -->
                 <div class="pageselector" id='pageselector'></div>
             </div>
 

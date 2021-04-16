@@ -9,8 +9,9 @@ layui.use('laydate', function(){
         ,min: '2019-12-22'
         ,max: '2020-07-15'
         ,ready:function(date){//初始化
-            var markgraph = echarts.init(document.querySelector("#marksta"));
+            var markgraph = echarts.init(document.querySelector("#markpre"));
             markgraph.setOption(option_marksta);
+            
 
         }
         ,change:function(value, date){//修改日历

@@ -5,8 +5,79 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="../static/js/echarts.min.js"></script>
+
 </head>
+<style>
+    #main {
+        width: 400px;
+        height: 800px;
+        margin-top: 200px;
+        margin-left: 300px;
+    }
+</style>
 <body>
-    <iframe allowtransparency="true" frameborder="0" width="875" height="98" scrolling="no" src="//tianqi.2345.com/plugin/widget/index.htm?s=1&z=1&t=1&v=0&d=5&bd=0&k=000000&f=&ltf=009944&htf=cc0000&q=1&e=0&a=0&c=57516&w=875&h=98&align=center"></iframe>
+    <div id="main">
+            nnnnn
+    </div>
+    
+     <script>
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        option = {
+            series: [{
+                type: 'gauge',
+                axisLine: {
+                    lineStyle: {
+                        width: 30,
+                        color: [
+                            [0.3, '#67e0e3'],
+                            [0.7, '#37a2da'],
+                            [1, '#fd666d']
+                        ]
+                    }
+                },
+                pointer: {
+                    itemStyle: {
+                        color: 'auto'
+                    }
+                },
+                axisTick: {
+                    distance: -30,
+                    length: 8,
+                    lineStyle: {
+                        color: '#fff',
+                        width: 2
+                    }
+                },
+                splitLine: {
+                    distance: -30,
+                    length: 30,
+                    lineStyle: {
+                        color: '#fff',
+                        width: 4
+                    }
+                },
+                axisLabel: {
+                    color: 'auto',
+                    distance: 40,
+                    fontSize: 20
+                },
+                detail: {
+                    valueAnimation: true,
+                    formatter: '{value} km/h',
+                    color: 'auto'
+                },
+                data: [{
+                    value: 70
+                }]
+            }]
+        };
+
+        option && myChart.setOption(option);
+
+    </script>
 </body>
 </html>

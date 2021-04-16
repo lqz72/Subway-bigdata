@@ -234,7 +234,7 @@ var option_markpre = {
             fontSize: 25
         },
         data: [{
-            value: 70
+            value: 85
         }]
     }]
 };
