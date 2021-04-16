@@ -4,6 +4,7 @@ from pyecharts.charts import Radar
 from pyecharts.charts import Pie
 from pyecharts.charts import Line, Timeline
 from pyecharts.charts import Bar
+from pyecharts.charts import Grid
 from DataAnalysis import DataApi
 from PredictResult import PredictApi
 
@@ -23,45 +24,52 @@ class ChartApi(object):
             Bar()
             .add_xaxis(xaxis_data=age)
             .add_yaxis(
-                series_name="年龄结构占比",
+                series_name="",
                 y_axis=percent,
                 yaxis_index=0,
                 label_opts=opts.LabelOpts(is_show=False)
             )
 
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="用户年龄结构柱状图"),
+                title_opts=opts.TitleOpts(title="用户年龄结构柱状图", pos_left="center"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis", axis_pointer_type="cross"),
                 yaxis_opts=opts.AxisOpts(
                     name="百分比%",
                     type_="value",
                     axislabel_opts=opts.LabelOpts(formatter="{value}"),
+                    splitline_opts=opts.SplitLineOpts(is_show=False)
                 ),
             )
             # .renderer('./test.html')
         )
-        return bar
+        grid = Grid()
+        grid.add(chart=bar, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+        return grid
 
     def age_pie(age, percent) -> Pie:
         '''
         绘制年龄结构分布图
         返回一个饼状图
         '''
-        c = (
+        pie = (
             Pie()
             .add(
                 "",
                 [list(i) for i in zip(age, percent)],
-                center=["40%", "50%"],
+                center=["50%", "55%"],
             )
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="用户年龄结构分布"),
+                title_opts=opts.TitleOpts(title="用户年龄结构分布", pos_left="center"),
                 legend_opts=opts.LegendOpts(type_="scroll", pos_left="80%", orient="vertical"),
             )
             # .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}%"))
 
         )
-        return c
+        grid = Grid()
+        grid.add(chart=pie, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+        return grid
 
     def month_line(month_dict) -> Line:
         '''
@@ -92,7 +100,8 @@ class ChartApi(object):
                 )
             )
             tl.add(line, "{0}年{1}月".format(i[0:4], int(i[-2:])))
-        return tl
+
+        return t1
 
     def week_line(week_dict) -> Line:
         '''
@@ -136,13 +145,13 @@ class ChartApi(object):
             Line()
             .add_xaxis(xaxis_data = day)
             .add_yaxis(
-                series_name= "客流",
+                series_name= "",
                 y_axis=flow,
                 label_opts=opts.LabelOpts(is_show=False)
             )
             .set_colors(['#32c5e9'])
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="本周客流波动"),
+                title_opts=opts.TitleOpts(title="本周客流波动", pos_left="center"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 yaxis_opts=opts.AxisOpts(
                     name = "客流量/人次",
@@ -153,22 +162,25 @@ class ChartApi(object):
             )
         )
 
-        return line
+        grid = Grid()
+        grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+        return grid 
 
     def day_line(month, day_dict) -> Line:
-        day = day_dict.keys()
+        day = list(day_dict.keys())
         flow = [str(j) for j in day_dict.values()]
         line = (
             Line()
             .add_xaxis(xaxis_data = day)
             .add_yaxis(
-                series_name= "{}月客流".format(int(month[-2:])),
+                series_name= "",
                 y_axis=flow,
                 label_opts=opts.LabelOpts(is_show=False),
             )
             .set_colors(['#fb7293'])
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="本月客流波动"),
+                title_opts=opts.TitleOpts(title="本月客流波动", pos_left="center"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 yaxis_opts=opts.AxisOpts(
                     name = "客流量/人次",
@@ -178,7 +190,10 @@ class ChartApi(object):
                 xaxis_opts=opts.AxisOpts(name = "日期", type_="category", boundary_gap=False),
             )
         )
-        return line
+        grid = Grid()
+        grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+        return grid
 
     def station_bar(station, in_dict, out_dict) ->Bar:
         '''
@@ -244,12 +259,12 @@ class ChartApi(object):
             Line()
             .add_xaxis(xaxis_data = month)
             .add_yaxis(
-                series_name= "出行次数",
+                series_name= "",
                 y_axis=flow,  
                 label_opts=opts.LabelOpts(is_show=False)
             )
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="各月出行次数分布"),
+                title_opts=opts.TitleOpts(title="各月出行次数分布", pos_left="cenetr"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 yaxis_opts=opts.AxisOpts(
                     name = "出行数/次",
@@ -260,7 +275,10 @@ class ChartApi(object):
             )
         )
 
-        return line
+        grid = Grid()
+        grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+        return grid
 
     def line_pie(line, percent) -> Pie:
         '''
@@ -271,7 +289,7 @@ class ChartApi(object):
             .add(
                 series_name="流量占比",
                 data_pair=[list(i) for i in zip(line, percent)],
-                radius= [40, 120],
+                radius= [40, 110],
                 rosetype="area",
             )
             .set_colors(['#37a2da','#32c5e9','#9fe6b8','#ffdb5c','#ff9f7f','#fb7293','#e7bcf3','#8378ea'])
@@ -283,7 +301,10 @@ class ChartApi(object):
             .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}%"))
 
         )
-        return pie
+        grid = Grid()
+        grid.add(chart=pie, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+        return grid
     
     def pred_month_line(month_dict, month) -> Line:
         '''
@@ -296,14 +317,14 @@ class ChartApi(object):
             Line()
             .add_xaxis(xaxis_data = day)
             .add_yaxis(
-                series_name= "{}月客流".format(month),
+                series_name= "",
                 y_axis=flow,
                 # is_smooth=True,
                 label_opts=opts.LabelOpts(is_show=False)
             )
             .set_colors(['#58D5FF'])
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="本月整体客流波动"),
+                title_opts=opts.TitleOpts(title="{}月整体客流波动".format(month), pos_left="center"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 yaxis_opts=opts.AxisOpts(
                     name = "客流量/人次",
@@ -314,7 +335,10 @@ class ChartApi(object):
             )
             # .render('./test.html')
         )
-        return line
+        grid = Grid()
+        grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+        return grid
 
     def pred_week_line(week_dict) -> Line:
             '''
@@ -328,13 +352,13 @@ class ChartApi(object):
                 Line()
                 .add_xaxis(xaxis_data = weekday)
                 .add_yaxis(
-                    series_name= "客流",
+                    series_name= "",
                     y_axis=flow,
                     label_opts=opts.LabelOpts(is_show=False),
                     is_smooth=True
                 )
                 .set_global_opts(
-                    title_opts=opts.TitleOpts(title="本周客流分布"),
+                    title_opts=opts.TitleOpts(title="本周客流分布", pos_left="center"),
                     tooltip_opts=opts.TooltipOpts(trigger="axis"),
                     yaxis_opts=opts.AxisOpts(
                         name = "客流量/人次",
@@ -345,14 +369,17 @@ class ChartApi(object):
                 )
                 # .render('./test.html')
             )
-            return line
+            grid = Grid()
+            grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+            return grid
 
     def hour_line(hour_list, hour_flow) -> Line:
-        c = (
+        line = (
             Line()
             .add_xaxis(xaxis_data = hour_list)
             .add_yaxis(
-                series_name = "客流量",
+                series_name = "",
                 y_axis = hour_flow,
                 markpoint_opts=opts.MarkPointOpts(data=[
                     opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color ='#E271DE')),
@@ -363,7 +390,7 @@ class ChartApi(object):
             )
             .set_colors(['#F8456B'])
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="当天小时客流分布"),
+                title_opts=opts.TitleOpts(title="当天小时客流分布", pos_left="center"),
                 yaxis_opts=opts.AxisOpts(
                     name = "客流量 /人次",
                     type_="value",
@@ -377,8 +404,10 @@ class ChartApi(object):
             )
             # .render("line_markpoint.html")
         )
+        grid = Grid()
+        grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
 
-        return c
+        return grid
 
     def eval_radar() -> Radar:
         data = [{"value": [0.8, 0.6, 0.9, 0.5, 0.7, 0.5], "name": "交通拥堵系数"}]
@@ -411,6 +440,77 @@ class ChartApi(object):
         )
 
         return radar
+
+    def sta_age_pie(age, percent) -> Pie:
+        '''
+        绘制年龄结构分布图
+        返回一个饼状图
+        '''
+        pie = (
+            Pie()
+            .add(
+                "",
+                [list(i) for i in zip(age, percent)],
+                center=["50%", "60%"],
+                radius = ['35%', '60%']
+            )
+            .set_colors(['#FD866A','#FDB36A', '#73ACFF', '#73DDFF', '#9E87FF'])
+            .set_global_opts(
+                title_opts=opts.TitleOpts(title="用户年龄结构分布", pos_left="center"),
+                legend_opts=opts.LegendOpts(pos_right="0%", pos_top="5%",orient="vertical",
+                    item_width=12, item_height=12, legend_icon="circle"),
+                tooltip_opts=opts.TooltipOpts(formatter="{b} : {c}%")
+            )
+            .set_series_opts(label_opts=opts.LabelOpts(is_show=False))
+
+        )
+        grid = Grid()
+        grid.add(chart=pie, grid_opts=opts.GridOpts(pos_bottom="5%"))
+
+        return grid
+    
+    def sta_schedule_line(hour_list, volunteer, worker) -> Line:
+        line = (
+            Line()
+            .add_xaxis(xaxis_data = hour_list)
+            .add_yaxis(
+                series_name = "志愿者",
+                y_axis = volunteer,
+                markpoint_opts=opts.MarkPointOpts(data=[
+                    opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color ='#F8456B')),
+                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color ='#F8456B'))
+                ]),
+                label_opts=opts.LabelOpts(is_show=False)
+            )
+            .add_yaxis(
+                series_name = "工作人员",
+                y_axis = worker,
+                markpoint_opts=opts.MarkPointOpts(data=[
+                    opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color ='#E271DE')),
+                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color ='#E271DE'))
+                ]),
+                label_opts=opts.LabelOpts(is_show=False)
+            )
+            .set_colors(['#F8456B', '#E271DE'])
+            .set_global_opts(
+                title_opts=opts.TitleOpts(title="地铁人员调度比例", pos_left="center", pos_top="0%"),
+                yaxis_opts=opts.AxisOpts(
+                    name = "百分比 %",
+                    type_="value",
+                    splitline_opts=opts.SplitLineOpts(
+                        is_show=True,
+                        linestyle_opts=opts.LineStyleOpts(opacity=1)
+                    ),
+                ),
+                xaxis_opts=opts.AxisOpts(name = "/时", type_="category", boundary_gap=False),
+                legend_opts=opts.LegendOpts(pos_top="10%")
+            )
+            # .render("line_markpoint.html")
+        )
+        grid = Grid()
+        grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+        return grid
 
 if __name__ == '__main__':
     chartapi = ChartApi

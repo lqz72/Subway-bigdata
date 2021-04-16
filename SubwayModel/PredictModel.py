@@ -39,7 +39,7 @@ class MLPredictor(object):
     def __init__(self):
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
 
-        self.feature_data = SQLOS.get_df_data('feature2020')
+        self.feature_day = SQLOS.get_df_data('feature_day')
 
         self.scaler = StandardScaler()  # 标准化缩放器
 
@@ -91,7 +91,7 @@ class MLPredictor(object):
         --------
         Dataframe: 特征集
         """
-        feature_df = self.feature_data.copy()
+        feature_df = self.feature_day.copy()
         feature_df[['weekday', 'month', 'is_hoilday', 'y']] = \
             feature_df[['weekday', 'month', 'is_hoilday', 'y']].astype('int')
         feature_df['MA'] = feature_df['MA'].astype('float')
@@ -112,13 +112,13 @@ class MLPredictor(object):
         --------
         Dataframe: 特征集
         """
-        feature_df = self.feature_data.copy()
+        feature_df = self.feature_day.copy()
 
         #处理不符合规范的数据
         if (series.shape[0] < 198):
             nan_list = []
             day_list = [i.strftime('%Y-%m-%d') for i in series.index]
-            print(feature_df['day'].values[0:197])
+
             for day in feature_df['day'].values[0:198]:
                 if day not in day_list:
                     nan_list.append(day)
@@ -547,15 +547,16 @@ def plotHoltWinters(series, plot_intervals=False, plot_anomalies=False):
 
 
 if __name__ == '__main__':
+    pass
     # bp = MLPredictor()
     # df = bp.get_day_feature()
-    # bp.forecast_day_flow(df, 'test')
+    # ddf = bp.forecast_day_flow(df, 'test')
     # feature_df = Predictor.get_sta_feature('Sta101')
     
     # Predictor.forecast(feature_df, 'Sta101')
     
-    flow_df=get_data_set()
-    series = pd.Series(flow_df['y'].values)
+    # flow_df=get_data_set()
+    # series = pd.Series(flow_df['y'].values)
     #寻找最优的参数
     # data = series[:-30] # 留置一些数据用于测试
     # 初始化模型参数alpha、beta、gamma
@@ -566,6 +567,6 @@ if __name__ == '__main__':
     # alpha_final, beta_final, gamma_final = opt.x
     # print(alpha_final, beta_final, gamma_final)
     #0.22334736563502622 0.03323882022600311 0.4090198141980643
-    model = HoltWinters(series, 7, 0.22334736563502622, 0.03323882022600311, 0.4090198141980643, 90)
-    model.triple_exponential_smoothing()  
-    plotHoltWinters(series)
+    # model = HoltWinters(series, 7, 0.22334736563502622, 0.03323882022600311, 0.4090198141980643, 90)
+    # model.triple_exponential_smoothing()  
+    # plotHoltWinters(series)

@@ -7,6 +7,8 @@ import configparser
 import os
 import time
 
+ABS_PATH = os.path.abspath(os.path.dirname(__file__))
+
 class SQLOS(object):
     '''
     数据库交互 提供数据读写接口
@@ -16,28 +18,35 @@ class SQLOS(object):
         因此数据库的读取采取MySQLdb进行连接 pandas.read_sql转化为dataframe
         将dataframe导入数据库需要使用pandas.io.sql.to_sql 所以需要采取sqlalchemy引擎
     '''
+    
     def __init__(self):
         pass
+
+    def get_mysql_config():
+        """获取数据库配置
+        """
+        cf= configparser.ConfigParser()
+        cf.read(ABS_PATH + '/mysql.conf', encoding='utf-8')
+
+        config = {
+            'host': cf.get('Default', 'DB_HOST'),
+            'port': cf.getint('Default', 'DB_PORT'),
+            'user': cf.get('Default', 'DB_USER'),
+            'passwd': cf.get('Default', 'DB_PASSWD'),
+            'db': cf.get('Default', 'DB_NAME'),
+            'charset': 'utf8mb4',
+        }
+
+        return config
     
     def connect_to_db():
-        abs_path = os.path.abspath(os.path.dirname(__file__))
-
-        cf= configparser.ConfigParser()
-        cf.read(abs_path + '/mysql.conf', encoding='utf-8')
-
         #远程数据库连接
         # conn = MySQLdb.connect(host='118.178.88.14', port=3306, user='lqz',
         # passwd='863JTcyPGezGEXmm', db='lqz', charset='utf8mb4')
 
         #本地数据库连接
-        conn = MySQLdb.connect(
-            host=cf.get('Default', 'DB_HOST'),
-            port=cf.getint('Default', 'DB_PORT'),
-            user=cf.get('Default', 'DB_USER'),
-            passwd=cf.get('Default', 'DB_PASSWD'),
-            db=cf.get('Default', 'DB_NAME'),
-            charset='utf8mb4',
-        )
+        config = SQLOS.get_mysql_config()
+        conn = MySQLdb.connect(**config)
    
         return conn
     
@@ -47,21 +56,24 @@ class SQLOS(object):
         '''
         conn = SQLOS.connect_to_db()
         cursor = conn.cursor()
+        path =  ABS_PATH + '/txt_data/' 
+        txt_path = eval(repr(path).replace(r'\\', '/'))
 
-        abs_path = 'd:/Python/code/Subway-bigdata/PredictModel/txt_data/'
         file_path = {
-            # 'feature2020':  abs_path + 'feature2020.txt',
-            # 'weather2020': abs_path + 'weather2020.txt',
-            # 'hoilday2020': abs_path + 'hoilday2020.txt',
-            # 'station': abs_path + 'station.txt',
-            # 'users': abs_path + 'users.txt',
-            # 'flow': abs_path + 'flow.txt',
-            # 'trips': abs_path +'trips.txt', 
-            # 'weather_info': abs_path + 'weather_info.txt',
+            # 'weather2020': txt_path + 'weather2020.txt',
+            # 'hoilday2020': txt_path + 'hoilday2020.txt',
+            # 'station': txt_path + 'station.txt',
+            # 'users': txt_path + 'users.txt',
+            # 'flow': txt_path + 'flow.txt',
+            # 'trips': txt_path +'trips.txt', 
+            # 'weather_info': txt_path + 'weather_info.txt',
+            # 'feature_day':  txt_path + 'feature_day.txt',
+            # 'pred_day': txt_path + '/predict/pred_day.txt',
         }
 
         try:
             for name, path in file_path.items():
+                print(path)
                 print('正在载入%s中的数据' % name)
                 start = time.time()
 
@@ -87,7 +99,7 @@ class SQLOS(object):
         '''
         conn = SQLOS.connect_to_db()
 
-        if table_name in ['feature', 'hoilday', 'weather']:
+        if table_name in ['hoilday', 'weather']:
             table_name += '2020'
 
         try:
@@ -112,14 +124,12 @@ class SQLOS(object):
         '''
         将dataframe写入mysql对应的表中
         '''
-        abs_path = os.path.abspath(os.path.dirname(__file__))
-        cf= configparser.ConfigParser()
-        cf.read(abs_path + '/mysql.conf', encoding='utf-8')
-        host=cf.get('Default', 'DB_HOST')
-        port=cf.getint('Default', 'DB_PORT')
-        user=cf.get('Default', 'DB_USER')
-        passwd=cf.get('Default', 'DB_PASSWD')
-        db=cf.get('Default', 'DB_NAME')
+        config = SQLOS.get_mysql_config()
+        host=config['host']
+        port=config['port']
+        user=config['user']
+        passwd=config['passwd']
+        db=config['db']
 
         conn = create_engine('mysql+pymysql://{user}:{passwd}@{host}:{port}/{db}?charset=utf8mb4'.format(
             user=user, passwd=passwd, host=host, port=port, db=db))
@@ -227,8 +237,8 @@ class SQLOS(object):
         out_df.out_time = pd.to_datetime(out_df.out_time)
         out_df.set_index('out_time', inplace=True)
   
-        in_df.drop(['id', 'user_id'], axis=1, inplace=True)
-        out_df.drop(['id', 'user_id'], axis=1, inplace=True)
+        in_df.drop(['id'], axis=1, inplace=True)
+        out_df.drop(['id'], axis=1, inplace=True)
         
         return in_df, out_df
 
@@ -355,5 +365,11 @@ class SQLOS(object):
             print('error', e)
             return 0
 
-    
+    def get_pred_day():
+        predict_df = SQLOS.get_df_data('pred_day')
+
+        predict_df.day = pd.to_datetime(predict_df.day)
+        predict_df.set_index('day', inplace=True)
+
+        return predict_df
 

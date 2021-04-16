@@ -144,14 +144,14 @@ button {
 .stamonth {
     float: left;
     margin: 10px 10px 0 20px;
-    width: 300px;
+    width: 330px;
     height: 300px;
     background-color: #ffffff;
 }
 .stahour {
     float: left;
     margin-top: 10px;
-    width: 600px;
+    width: 570px;
     height: 300px;
     background-color: #ffffff;
 }
@@ -275,14 +275,14 @@ button {
 .agestructure {
     float: left;
     margin: 10px 10px 0 20px;
-    width: 300px;
+    width: 330px;
     height: 300px;
     background-color: #ffffff;
 }
 .seats {
     float: left;
     margin-top: 10px;
-    width: 600px;
+    width: 570px;
     height: 300px;
     background-color: #ffffff;
 }

@@ -12,19 +12,17 @@ class PredictApi(object):
     def __init__(self):
         self.ml_predictor = MLPredictor()
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
-        self.predict_df =  SQLOS.get_df_data('predict').set_index('day')
+        self.pred_day_df =  SQLOS.get_pred_day()
 
     def get_month_flow(self):
-        '''
+        """
         单月整体的客流波动分析
         返回一个字典 包含每个月份客流量的数据 格式 {'year-month':{'day':flow,},}
-        '''
-        predict_results = SQLOS.get_df_data('predict')
+        """
+        predict_results = self.pred_day_df
 
-        date_flow = predict_results[['day', 'y']]
-        date_flow.day = pd.to_datetime(date_flow.day)
-        date_flow.set_index('day', inplace =True)
-        
+        date_flow = predict_results[['y']]
+
         # 获取所有行程中出现的年月
         month_list = DataApi.get_month_list(date_flow.index)
 
@@ -38,15 +36,13 @@ class PredictApi(object):
         return month_dict
 
     def get_week_flow(self):
-        '''
+        """
         获取不同月份每周客流量 
         返回一个字典 格式{'month':{'weekday':num,},}
-        '''
-        predict_results = SQLOS.get_df_data('predict')
+        """
+        predict_results = self.pred_day_df
 
-        date_flow = predict_results[['day', 'weekday', 'month', 'y']]
-        date_flow.day = pd.to_datetime(date_flow.day)
-        date_flow.set_index('day', inplace =True)
+        date_flow = predict_results[['weekday', 'month', 'y']]
 
         # 获取所有行程中出现的年月
         month_list = DataApi.get_month_list(date_flow.index)
@@ -64,10 +60,10 @@ class PredictApi(object):
         return week_dict
 
     def get_sta_flow(self,sta_name):
-        '''
+        """
         单站的点出/入站客流分析
         返回两个字典 格式{'month':{'day':num,},}
-        '''
+        """
         in_series, out_series = DataApi.get_sta_series(sta_name)
 
         in_feature_df =  self.ml_predictor.get_sta_feature(in_series)
@@ -98,25 +94,25 @@ class PredictApi(object):
         return in_dict, out_dict
 
     def get_curr_month_flow(self, month):
-        '''
+        """
         获取当月客流变化
         返回一个字典 格式: {day:flow,}
-        '''
-        predict_df = self.predict_df.copy()
-        
+        """
+        predict_df = self.pred_day_df.copy()
+
         month_flow = predict_df[predict_df['month'] == month]['y']
 
-        day = [i.strftime("%d") for i in month_flow.index]
+        day = [i.strftime("%d").lstrip('0') for i in month_flow.index]
         flow = month_flow.values
 
         return dict(zip(day, flow))
 
     def get_curr_week_flow(self, date):
-        '''
+        """
         获取当前周的客流变化 
         返回一个字典 格式: {day:flow,}
-        '''
-        predict_df = self.predict_df.copy()
+        """
+        predict_df = self.pred_day_df.copy()
         date_flow = predict_df['y']
 
         date = datetime.datetime.strptime(date, '%Y-%m-%d')
@@ -129,39 +125,41 @@ class PredictApi(object):
             sunday += one_day
         # 返回当前的星期一和星期天的日期
         monday, sunday = monday.strftime('%Y-%m-%d'), sunday.strftime('%Y-%m-%d') 
-
         curr_week_flow = date_flow[monday:sunday]
        
-        day = [j.strftime("%d") for j in curr_week_flow.index]
+        day = [j.strftime("%d").lstrip('0') for j in curr_week_flow.index]
         flow = curr_week_flow.values
         
         return dict(zip(day, flow))
 
     def get_line_flow_percent(self, date, sta_dict):
-        '''
+        """
         获取线路流量占比
         返回一个字典 {line:percent,}
-        '''
+        """
         line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
         line_dict = dict.fromkeys(line_list, 0)
-        try:
-            for sta in sta_dict:
-                sta_df = pd.read_csv(self.abs_path + '/predict/station/%s.csv' % sta, encoding='gb18030')
-                sta_df.day = pd.to_datetime(sta_df.day)
-                line_dict[sta_dict[sta]] +=  sta_df[sta_df['day'] == date].y.values[0]
 
-            all_flow = sum(list(line_dict.values()))
-            for each in line_dict:
-                line_dict[each] = round(line_dict[each] / all_flow * 100, 1)
-                
-        except Exception as e:
-            print(e)
-            print(sta_df)
+        df = SQLOS.get_df_data('pred_sta_day')
+        df.day = pd.to_datetime(df.day)
+        df = df[df['day'].isin([date])]
+
+        for sta in sta_dict:
+            sta_df = df[df['sta'].isin([sta])]
+            line_dict[sta_dict[sta]] += sta_df['y'].values[0]
+
+        all_flow = sum(list(line_dict.values()))
+        for each in line_dict:
+            line_dict[each] = round(line_dict[each] / all_flow * 100, 1)
 
         return line_dict.keys(), line_dict.values()
 
     @staticmethod
     def get_station_pred_flow():
+        '''
+        勿动
+        对所有站点进行拟合 并输出结果到csv文件中 
+        '''
         p_api = PredictApi()
         api = DataApi()
         try:
@@ -185,8 +183,36 @@ class PredictApi(object):
 
 
 if __name__ == '__main__':
-    api = DataApi()
-    p_api = PredictApi()
-    p_api.get_line_flow_percent('2020-07-17', api.sta_dict)
-    
-                
+    for i in range(6, 22, 1):
+        df = pd.read_csv(os.path.abspath(os.path.dirname(__file__)) + '/feature/feature_per_hour/%d.csv' % i, encoding='gb18030')
+        times = list(df.time.unique())
+        j = 0
+        for time in times:
+            ddf = df[df['time'] == time]
+   
+            ddf = ddf.sort_values(by=['sta'], key=lambda x: x.str.lstrip('Sta').astype('int'))
+            if j == 0:
+                my_df = ddf
+            else:
+                my_df = my_df.append(ddf)
+            j += 1
+        my_df.to_csv(os.path.abspath(os.path.dirname(__file__)) + '/feature/%d.csv' % i, encoding='gb18030', index = 0)
+
+    # api = DataApi()
+    # p_api = PredictApi()
+    # print(p_api.get_line_flow_percent(('2020-07-20'), SQLOS.get_station_dict()))
+    # sta_dict = SQLOS.get_station_dict()
+    # i = 0
+    # for sta in sta_dict:
+        
+    #     sta_df = pd.read_csv(p_api.abs_path + '/predict/station/%s.csv' % sta, encoding='gb18030')
+    #     sta_df['sta'] = sta
+    #     if i == 0:
+    #         df = sta_df
+    #     else:
+    #         df = df.append(sta_df)
+            
+    #     i += 1
+    # df.index =range(df.shape[0])
+    # print(df)
+    # df.to_csv(p_api.abs_path + '/predict/sta.csv', index = 0, encoding = 'gb18030')

@@ -280,10 +280,11 @@ layui.use('laydate', function(){
                 tooltip: {
                     trigger: 'item',
                     formatter: function (param) {
-                        let value = 0;
-                        if (param.value)
-                            value = param.value[2];
-                        let label = param.name + ": " + value + "";
+                        let label = "";
+                        if (param.value) {
+                            label = `站点名称: ${param.name} <br> 站点客流: ${param.value[2]}人`;
+                        }
+
                         return label;
                     }
                 },
@@ -351,7 +352,10 @@ layui.use('laydate', function(){
             }
                             
             function setBarOption(option, y1, y2, x, line) {
-                option.title.subtext = line + '号线';
+                if (line)
+                    option.title.subtext = line + '号线';
+                else
+                    option.title.subtext = '1号线';
                 option.xAxis[0].data = x;
                 option.xAxis[1].data = x;
                 option.series[0].data = y1;
@@ -586,6 +590,7 @@ layui.use('laydate', function(){
                         color:"#000"
                     }
                 },
+                grid:[{bottom: "10%"}],
                 color: ['#73DDFF','#73ACFF','#FDD56A','#FDB36A', '#9E87FF', '#F8456B', '#4AEAB0', '#E271DE'],
                 legend: [{ data: lineNames, orient: 'vertical', right: '2%' }],
                 tooltip: {trigger:'item'},
@@ -696,7 +701,8 @@ layui.use('laydate', function(){
                         success: function (result) {
                             splitFlow = result;
 
-                            uplineFlow = downlineFlow = [];
+                            uplineFlow = [];
+                            downlineFlow = [];
                             splitNames = Object.keys(splitFlow);
                             for (let index = 0; index < splitNames.length; index++){
                                 var split = splitFlow[splitNames[index]];

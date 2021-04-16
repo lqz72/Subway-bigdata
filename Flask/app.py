@@ -229,9 +229,34 @@ def weather_info():
     """获取近7天的天气信息
     """
     curr_date = request.get_data().decode('utf-8')
-    print(curr_date);
     curr_weather = api.get_recent_weather(curr_date)
+
     return jsonify(curr_weather)
+
+@app.route('/sta/curr_week_flow', methods=['POST', 'GET'])
+def sta_curr_week_flow():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    station = param_dict['sta']
+    date = param_dict['date']
+
+    flow_dict = api.get_sta_curr_week_flow(date, station)
+
+    return jsonify(flow_dict)
+
+@app.route('/sta/curr_day_flow', methods=['POST', 'GET'])
+def sta_curr_day_flow():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    station = param_dict['sta']
+    date = param_dict['date']
+
+    flow_dict = api.get_sta_curr_day_flow(date, station)
+
+    return jsonify(flow_dict)
+
 
 #------------控制图表的展示------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])
@@ -255,14 +280,14 @@ def curr_week_flow():
 @app.route('/history/age/pie', methods = ['POST', 'GET'])
 def age_pie():
     age, percent = api.age, api.percent
-    pie = ChartApi.age_pie(age, percent)
-    return pie.dump_options_with_quotes()
+    age_pie = ChartApi.age_pie(age, percent)
+    return age_pie.dump_options_with_quotes()
 
 @app.route('/history/age/bar', methods = ['POST', 'GET'])
 def age_bar():
     age, percent = api.age, api.percent
-    bar = ChartApi.age_bar(age, percent)
-    return bar.dump_options_with_quotes()
+    age_bar = ChartApi.age_bar(age, percent)
+    return age_bar.dump_options_with_quotes()
 
 @app.route('/history/user_flow/line', methods = ['POST', 'GET'])
 def user_flow_line():
@@ -290,7 +315,7 @@ def pred_month_line():
     param_dict = json.loads(param_str)
     curr_date = param_dict['c_date']
 
-    month = int(curr_date.split('-')[1])
+    month = curr_date.split('-')[1].lstrip('0')
     month_dict = pred_api.get_curr_month_flow(month)
     line = ChartApi.pred_month_line(month_dict, int(curr_date.split('-')[1]))
 
@@ -339,6 +364,35 @@ def pred_eval_radar():
     radar = ChartApi.eval_radar()
 
     return radar.dump_options_with_quotes()
+
+@app.route('/sta/age/pie', methods = ['POST', 'GET'])
+def sta_age_pie():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    station = param_dict['sta']
+    date = param_dict['date']
+
+    age, percent = api.get_sta_age_structure(date, station)
+    age_pie = ChartApi.sta_age_pie(age, percent)
+
+    return age_pie.dump_options_with_quotes()
+
+@app.route('/sta/schedule/line', methods = ['POST', 'GET'])
+def sta_schedule_line():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    station = param_dict['sta']
+    date = param_dict['date']
+
+    hour_list = [str(i) for i in range(6,22,3)]
+    volunteer = [str(random.randint(-20, 40)) for i in range(6, 22,3)]
+    worker = [str(random.randint(-20, 20)) for i in range(6, 22,3)]
+
+    line = ChartApi.sta_schedule_line(hour_list, volunteer, worker)
+
+    return line.dump_options_with_quotes()
 
 if __name__ == '__main__':
     app.run(debug=True)

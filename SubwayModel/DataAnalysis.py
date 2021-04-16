@@ -25,6 +25,7 @@ class DataApi(object):
         self.month_dict = DataApi.get_month_flow(self.flow_df)
         self.date_flow = DataApi.get_date_series(self.flow_df)
         self.in_df, self.out_df = SQLOS.get_in_out_df()
+        self.user_df = SQLOS.get_user_df()
     
     def get_age_structure():
         '''
@@ -305,11 +306,12 @@ class DataApi(object):
 
         age = 2021 - int(df['birth_year'].values[0])
         area = df['area'].values[0]
+        category = df['category'].values[0]
 
         trips_df = self.trips_df
         trips_num = trips_df[trips_df['user_id'] == user_id].shape[0]
 
-        return {'id':user_id, 'age':int(age), 'area':area, 'trips_num':int(trips_num)} 
+        return {'id':user_id, 'age':int(age), 'area':area, 'trips_num':int(trips_num), 'category':category} 
 
     def get_users_by_index(self, index):
         '''
@@ -387,8 +389,7 @@ class DataApi(object):
         sta_hour_dict = {}
         hour_list = [str(i) for i in range(6,22)]
         sta_dict = self.sta_dict
-    
-        sta_hour_dict = {}
+
         for sta, sta_df in df.groupby(by=['in_sta_name']):
             sta_df['in_time'] = sta_df['in_time'].dt.hour.astype('str')
             grouped = sta_df.groupby(by='in_time')['flow'].sum()
@@ -416,6 +417,7 @@ class DataApi(object):
         sta_hour_dict = {}
         hour_list = [str(i) for i in range(6,22)]
         sta_dict = self.sta_dict
+
         for sta in sta_dict:
             hour_dict = dict.fromkeys(hour_list, 0)
             sta_df = df[df['out_sta_name'] == sta]
@@ -545,8 +547,120 @@ class DataApi(object):
 
         return weather_list
         
+    def get_sta_curr_week_flow(self, date, station):
+        '''
+        获取站点当前周的客流变化 
+        返回一个字典 格式: {weekday:[in_flow,out_flow],}
+        '''
+        weekday = datetime.datetime.strptime(date, '%Y-%m-%d')
+        one_day = datetime.timedelta(days=1)
+
+        while weekday.weekday() != 0:
+            weekday -= one_day
+
+        # 返回当前的星期一日期
+        weekday_date = weekday.strftime('%Y-%m-%d')
+
+        in_series, out_series = DataApi.get_sta_series(
+            station,
+            self.in_df.drop('user_id', axis = 1),
+            self.out_df.drop('user_id', axis = 1)
+        )
+
+        weekday_list = ['1', '2', '3', '4', '5', '6', '7']
+        curr_week_dict = dict.fromkeys(weekday_list, 0)
+        in_series_date  = [i.strftime('%Y-%m-%d') for i in in_series.index]
+        out_series_date = [i.strftime('%Y-%m-%d') for i in out_series.index]
+
+        for i in range(7):
+            curr_week_dict[weekday_list[i]] = [0, 0]
+            if weekday_date in in_series_date:
+                curr_week_dict[weekday_list[i]][0] = str(in_series.loc[weekday_date])
+            else:
+                curr_week_dict[weekday_list[i]][0] = "0"
+
+            if weekday_date in out_series_date:
+                curr_week_dict[weekday_list[i]][1] = str(out_series.loc[weekday_date])
+            else:
+                curr_week_dict[weekday_list[i]][1] = "0"
+            i += 1
+            weekday += one_day
+            weekday_date = weekday.strftime('%Y-%m-%d')
+
+        return curr_week_dict
+
+    def get_sta_curr_day_flow(self, date, station):
+        '''
+        获取本站点6-21点的进出站客流量 
+        传入一个一个有效日期
+        返回值为一个字典 格式:{hour:[in_flow,out_flow],}
+        '''
+        def _get_data(_type):
+            if _type == 'in':
+                df = self.in_df.copy().drop('user_id', axis = 1)
+            else:
+                df = self.out_df.copy().drop('user_id', axis = 1)
+
+            df = df[df['%s_sta_name'%_type].isin([station])]
+            df = df.loc[date]
+            df['flow'] = 1
+            
+            rs = df.resample('H')['flow'].sum()
+
+            hours = [i.strftime('%H').lstrip('0') for i in rs.index]
+            flow  = rs.values
+            return dict(zip(hours, flow))
+
+        in_dict, out_dict = _get_data('in'), _get_data('out')
+   
+        hour_list = [str(i) for i in range(6,22)]
+        hour_dict = dict.fromkeys(hour_list, "0")
+
+        for hour in hour_dict:
+            hour_dict[hour] = [str(in_dict.get(hour, 0)), str(out_dict.get(hour, 0))]
+     
+        return hour_dict
+    
+    def get_sta_age_structure(self, date, station):
+        '''
+        获取出入本站的乘客年龄结构分布
+        '''
+        in_df, out_df = self.in_df.loc[date], self.out_df.loc[date]
+        user_df = self.user_df.copy().set_index('user_id')
+       
+        sta_in_df = in_df[in_df['in_sta_name'].isin([station])]
+        sta_out_df = out_df[out_df['out_sta_name'].isin([station])]
+
+        sta_df = sta_in_df.append(sta_out_df)
+
+        user_list = sta_df['user_id'].unique()
+
+        label = ["0-20岁", "21-30岁", "31-40岁", "41—50岁", "大于50岁"]
+        percent = []
+        age_dict = dict.fromkeys(label, 0)
+        for user in user_list:
+            age = 2021 - int(user_df.loc[user].birth_year)
+            if (0 < age) & (age <= 20):
+                age_dict["0-20岁"] += 1
+            elif (20 < age) & (age <= 30):
+                age_dict["21-30岁"] += 1
+            elif (30 < age) & (age <= 40):
+                age_dict["31-40岁"] += 1
+            elif (40 < age) & (age <= 50):
+                age_dict["41—50岁"] += 1
+            else:
+                age_dict["大于50岁"] += 1
+
+        all_num = sum(list(age_dict.values()))
+        for val in age_dict.values():
+            percent.append(round(val * 100 / all_num, 2))
+
+        return label, percent
+        
 if __name__ == '__main__':
-    pass
+    api = DataApi()
+    print(api.get_sta_age_structure('2020-07-01', 'Sta101'))
+
     
 
 
