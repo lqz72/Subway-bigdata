@@ -257,6 +257,27 @@ def sta_curr_day_flow():
 
     return jsonify(flow_dict)
 
+@app.route('/pred/in_hour_flow', methods=['POST', 'GET'])
+def pred_in_hour_flow():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    date = param_dict['c_date']
+
+    flow_dict = pred_api.get_sta_hour_flow(date, 'in')
+
+    return jsonify(flow_dict)
+
+@app.route('/pred/out_hour_flow', methods=['POST', 'GET'])
+def pred_out_hour_flow():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    date = param_dict['c_date']
+
+    flow_dict = pred_api.get_sta_hour_flow(date, 'out')
+
+    return jsonify(flow_dict)
 
 #------------控制图表的展示------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])
@@ -350,8 +371,9 @@ def pred_hour_line():
     curr_date = param_dict['c_date']
     
     hour_list = [str(i) for i in range(6, 22, 1)]
-    hour_flow = [str(random.randint(50,100)) for i in range(6, 22, 1)]
-    line = ChartApi.hour_line(hour_list, hour_flow)
+    in_flow = pred_api.get_hour_flow(curr_date, 'in')
+    
+    line = ChartApi.hour_line(hour_list, in_flow)
 
     return line.dump_options_with_quotes()
 

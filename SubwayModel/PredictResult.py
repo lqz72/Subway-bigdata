@@ -10,9 +10,56 @@ class PredictApi(object):
     提供预测数据分析接口
     '''
     def __init__(self):
-        self.ml_predictor = MLPredictor()
+        # self.ml_predictor = MLPredictor()
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
-        self.pred_day_df =  SQLOS.get_pred_day()
+        self.pred_day_df = SQLOS.get_pred_day()
+        self.pred_in_hour_df = SQLOS.get_pred_hour('in')
+        self.pred_out_hour_df = SQLOS.get_pred_hour('out')
+
+    @staticmethod
+    def get_station_pred_flow():
+        '''
+        勿动
+        对所有站点进行拟合 并输出结果到csv文件中 
+        '''
+        p_api = PredictApi()
+        api = DataApi()
+        try:
+            for sta in api.sta_dict.keys():
+                if os.path.exists(api.abs_path + '/model/%s.pkl' % sta):
+                    continue
+                in_series, out_series = DataApi.get_sta_series(sta, api.in_df, api.out_df)
+                if in_series.shape[0] == 0:
+                    print('0')
+                    continue
+
+                feature_df = p_api.ml_predictor.get_sta_feature(in_series)
+                df = p_api.ml_predictor.forecast_day_flow(feature_df, sta)
+                df.to_csv(api.abs_path + '/predict/station/%s.csv' % sta, encoding='gb18030')
+            
+                print(sta)
+            print('success!')
+        except Exception as e:
+            print(in_series)
+            print(e)
+
+    @staticmethod
+    def get_sta_hour_feature():
+        in_df, out_df = SQLOS.get_in_out_df()
+        in_df = in_df.loc['2020-05-01':].drop('user_id', axis =1)
+        out_df = out_df.loc['2020-05-01':].drop('user_id', axis=1)
+        
+        in_df.reset_index(level = 'in_time', inplace =True)
+        out_df.reset_index(level = 'out_time', inplace =True)
+        in_df['y'] = 1
+        out_df['y'] = 1
+        in_df['day'] = in_df.in_time.dt.normalize()
+        out_df['day'] = out_df.out_time.dt.normalize()
+        
+        # in_grouped = in_df.groupby(by=['in_sta_name', 'day'], as_index=False)[['y']].sum()
+        # out_grouped = out_df.groupby(by=['out_sta_name', 'day'], as_index=False)[['y']].sum()
+        in_df.to_csv('./in.csv', encoding='gb18030', index=0)
+        out_df.to_csv('./out.csv', encoding='gb18030', index=0)
 
     def get_month_flow(self):
         """
@@ -154,49 +201,96 @@ class PredictApi(object):
 
         return line_dict.keys(), line_dict.values()
 
-    @staticmethod
-    def get_station_pred_flow():
+    def get_hour_flow(self, date, type_ = 'out'):
         '''
-        勿动
-        对所有站点进行拟合 并输出结果到csv文件中 
+        获取本日各小时进出站客流
+        传入一个一个有效日期 以及进出站标识
+        返回一个字典 格式:{hour:'flow'}
         '''
-        p_api = PredictApi()
-        api = DataApi()
-        try:
-            for sta in api.sta_dict.keys():
-                if os.path.exists(api.abs_path + '/model/%s.pkl' % sta):
-                    continue
-                in_series, out_series = DataApi.get_sta_series(sta, api.in_df, api.out_df)
-                if in_series.shape[0] == 0:
-                    print('0')
-                    continue
+        pred_df = self.pred_in_hour_df[date] if type_ == 'in' else self.pred_out_hour_df[date]
+        
+        gb = pred_df.groupby('hour')['y'].sum()
+        
+        hour_flow = [str(i) for i in gb.values]
 
-                feature_df = p_api.ml_predictor.get_sta_feature(in_series)
-                df = p_api.ml_predictor.forecast_day_flow(feature_df, sta)
-                df.to_csv(api.abs_path + '/predict/station/%s.csv' % sta, encoding='gb18030')
+        return hour_flow
+
+    def get_sta_hour_flow(self, date, type_ = 'out'):
+        '''
+        获取各个站点6-21点的进站客流量 
+        传入一个一个有效日期 以及进出站标识
+        返回值为一个字典 格式:{station:{hour:flow,},}
+        '''
+        pred_df = self.pred_in_hour_df[date] if type_== 'in' else self.pred_in_hour_df[date]
+        sta_list = SQLOS.get_station_dict().keys()
+
+        sta_dict = dict.fromkeys(sta_list, 0)
+        for sta in sta_list:
+            sta_df = pred_df[pred_df['sta'].isin([sta])]
             
-                print(sta)
-            print('success!')
-        except Exception as e:
-            print(in_series)
-            print(e)
+            hour_list = [i for i in range(6,22)]
+            hour_dict = dict.fromkeys(hour_list)
+            for hour in hour_list:
+                hour_dict[hour] = int(sta_df[sta_df.hour.isin([hour])].y.values[0])
+            sta_dict[sta] = hour_dict
+ 
+        return sta_dict
 
 
 if __name__ == '__main__':
-    for i in range(6, 22, 1):
-        df = pd.read_csv(os.path.abspath(os.path.dirname(__file__)) + '/feature/feature_per_hour/%d.csv' % i, encoding='gb18030')
-        times = list(df.time.unique())
-        j = 0
-        for time in times:
-            ddf = df[df['time'] == time]
-   
-            ddf = ddf.sort_values(by=['sta'], key=lambda x: x.str.lstrip('Sta').astype('int'))
-            if j == 0:
-                my_df = ddf
-            else:
-                my_df = my_df.append(ddf)
-            j += 1
-        my_df.to_csv(os.path.abspath(os.path.dirname(__file__)) + '/feature/%d.csv' % i, encoding='gb18030', index = 0)
+    p_api = PredictApi()
+    print(p_api.get_hour_flow('2020-07-17'))
+    # p_api.get_sta_hour_flow('2020-07-17')
+    # PredictApi.get_sta_hour_feature()
+
+    # for i in range(6, 22):
+    #     df = pd.read_csv(os.path.abspath(os.path.dirname(__file__)) + '/feature/feature_out_hour/%d.csv' % i, encoding='gb18030')
+    #     # df = df[df['time'] >= '2020-05-01'] 
+    #     if i == 6:
+    #         ddf = df
+    #     else:
+    #         ddf = ddf.append(df)
+    # ddf.to_csv('./feature_out_hour.csv', encoding = 'gb18030', index = 0)
+
+    # sta_list  = SQLOS.get_station_dict().keys()
+    # for i in range(6, 22, 1):
+    #     df = pd.read_csv(os.path.abspath(os.path.dirname(__file__)) + '/feature/feature_out_hour/%d.csv' % i, encoding='gb18030')
+    #     df.time = pd.to_datetime(df.time)
+    #     df = df.sort_values('time')
+    #     times = list(df.time.unique())
+
+    #     j = 0
+    #     for time in times:
+    #         ddf = df[df['time'] == time]
+    #         real_sta_list = ddf.sta.tolist()
+ 
+    #         nan_list  = []
+    #         for sta in sta_list:
+    #             if sta not in real_sta_list:
+    #                 nan_list.append(sta)
+    #         df_len = len(nan_list)
+    #         nan_df = pd.DataFrame({'time': [time] * df_len, 'y': [0] * df_len, 'sta': nan_list})
+            
+    #         nan_df['time'] = pd.to_datetime(nan_df['time'])
+    #         nan_df['hour'] = nan_df.time.dt.hour
+    #         nan_df['weekday'] = nan_df.time.dt.weekday + 1
+    #         nan_df['month'] = nan_df.time.dt.month
+    #         nan_df['is_hoilday'] = ddf['is_hoilday'].values[0]
+    #         nan_df['weather'] = ddf['weather'].values[0]
+    #         nan_df['mean_temp'] = ddf['mean_temp'].values[0]
+
+    #         ddf = ddf.append(nan_df)
+    #         ddf = ddf.sort_values(by=['sta'], key=lambda x: x.str.lstrip('Sta').astype('int'))
+
+        
+    #         if j == 0:
+    #             my_df = ddf
+    #         else:
+    #             my_df = my_df.append(ddf)
+    #         j += 1
+
+    #     my_df.to_csv(os.path.abspath(os.path.dirname(__file__)) + '/feature/%d.csv' % i, encoding='gb18030', index=0)
+    #     print(i)
 
     # api = DataApi()
     # p_api = PredictApi()

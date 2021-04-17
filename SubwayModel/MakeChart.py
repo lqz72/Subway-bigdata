@@ -454,7 +454,7 @@ class ChartApi(object):
                 center=["50%", "60%"],
                 radius = ['35%', '60%']
             )
-            .set_colors(['#FD866A','#FDB36A', '#73ACFF', '#73DDFF', '#9E87FF'])
+            .set_colors( ['#58D5FF', '#73ACFF', '#FDD56A', '#FDB36A', '#FD866A'])
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="用户年龄结构分布", pos_left="center"),
                 legend_opts=opts.LegendOpts(pos_right="0%", pos_top="5%",orient="vertical",

@@ -106,6 +106,23 @@ function change_data()
     })
     /*------------------------------------------------*/
 
+    /*------------------echarts-----------------------*/
+    //初始化图表
+    var graphChart = echarts.init(document.getElementById('graph'));
+    $.ajax({
+        type: "POST",
+        data: s_data,
+        url: 'pred/out_hour_flow',
+        dataType: 'json',
+        async: false,
+        success: function (result) {
+            var hourFlow = result;
+            console.log(result);
+            var hourFlowData = getHourFlowData(hourFlow, stations);
+            graphOption = setGraphOptions(graphOption, hourFlowData);
+            graphChart.setOption(graphOption);
+        }
+    });
 }
 
 //用户选择控件
@@ -238,3 +255,203 @@ var option_markpre = {
         }]
     }]
 };
+
+
+var stations = getJsonData('/sta/json');
+var links = getJsonData('/link/json');
+    
+//获取线路名称列表
+var lineNames = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线'];
+
+//图例的数据数组 数组中的每一项代表一个系列的name
+var legend = [{ data: lineNames, orient: 'vertical', top: '20%', right: '2%'  }];
+
+//获取类目名称数组 用于和 legend 对应以及格式化 tooltip 的内容
+var categories = lineNames.map(lineName => { return { name: lineName } });
+
+var alertStations = [];
+
+var graphOption = {
+    timeline: {
+        axisType: 'category',
+        show: true,
+        autoPlay: false,
+        playInterval: 1000,
+        data: timelist()
+    },
+    title: {
+        text: '早晚高峰客流'
+    },
+    color: ['#0000FF', '#EE1822', '#F39C12', '#FF00FF', '#800080', '#00FF00', '#00FFFF', '#FFFF00'], 
+    backgroundColor: '#fff',
+    coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
+    xAxis: {
+        show: false,
+        min: 50,
+        max: 2300,
+        axisPointer: {
+            show: true
+        },
+    },
+    yAxis: {
+        show: false,
+        min: 0,
+        max: 2000,
+        axisPointer: {
+            show: true
+        },
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: function (param) {
+            let label = "";
+            if (param.value) {
+                label = `站点名称: ${param.name} <br> 站点客流: ${param.value[2]}人`;
+            }
+
+            return label;
+        }
+    },
+    legend: legend,
+    series: [
+        // 用关系图实现地铁地图
+        {
+            type: "graph",
+            zlevel: 5,
+            draggable: false,
+            coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
+            categories :categories,
+            edgeSymbolSize: [0, 8], //边两端的标记大小，可以是一个数组分别指定两端，也可以是单个统一指定
+            edgeLabel: {
+              normal: {
+                textStyle: {
+                  fontSize: 60
+                }
+              }
+            },
+            symbol: "rect",
+            symbolOffset: ["15%", 0],
+            links: links,
+            label: {
+                normal: {
+                    show: false,
+                }
+            },
+            lineStyle: {
+                normal: {
+                    opacity: 0.6, //线条透明度
+                    curveness: 0, //站点间连线曲度，0表示直线
+                    width: 5, //线条宽度
+                }
+            }
+        },
+    ],
+    options: []
+}
+
+function getJsonData(url){
+    var jsData;
+    $.ajax({
+            url: url,
+            type: "GET",
+            dataType: "json", 
+            async: false,
+            success: function(data) {
+                jsData = data;
+            }
+        })
+    return jsData;
+}
+
+function timelist() {
+    var timelist = [];
+    for(let i = 6; i <= 21; i++){
+        timelist.push(`${i}:00`);
+    }
+    return timelist;
+}
+
+//配置图表属性
+function setGraphOptions(option, hourFlowData, type = "出站") {
+    option.options = [];
+    for (let i = 0; i <= 15; i++){ 
+        option.options.push({
+            title: {
+                text: '轨道交通' + type + '客流分布 ' + timelist()[i],
+                textStyle: {
+                    color: 'black',
+                    fontSize: 20
+                },
+                x: 'center',
+                top: 10
+            },
+            series: [{
+                    data: hourFlowData[i].staList,
+                },
+                {
+                    type: "effectScatter",
+                    scaling: 1.5,
+                    // color: '#F8456B',
+                    //该系列使用的坐标系
+                    coordinateSystem: "cartesian2d",
+                    symbolSize: function(val) {
+                        return val[2]*1.2;
+                    },
+                    data: alertStations[i],
+                    showEffectOn: "render",
+                    effectType: "ripple",
+                    rippleEffect: {
+                        period: 4,
+                        scale: 4,
+                        brushType: "stroke" 
+                    },
+                    hoverAnimation: true            
+                }
+            ]
+        },
+        
+        )    
+    }
+    return option;
+}
+
+//生成6-21点的客流数据
+function getHourFlowData(hourFlow, stations) {
+    var hourFlowList = [];
+    for (let i = 6; i <= 21; i++) {
+        var hour = {};
+        hour.staList = [];
+        var hourAlertList = [];
+        stations.forEach(function (station) {
+            var staName = station.name;
+            var sta = JSON.parse(JSON.stringify(station));
+
+            if (lineNames.indexOf(sta.name) == -1) {
+                sta.itemStyle.color = station.itemStyle.color;
+                sta.symbolSize = [10, 10];
+                sta.value.push(0);
+                if (hourFlow[staName]) {
+                    sta.value[2] = hourFlow[staName][`${i}`];
+                    if (sta.value[2]) {
+                        let size = Math.log(hourFlow[staName][`${i}`]) * 5 + 10;
+                        sta.symbolSize = [size, size];
+                        if (sta.value[2] >= 20) {
+                            sta.symbolSize = [10, 10];
+                            hourAlertList.push({
+                                name: sta.name,
+                                value: sta.value,
+                                itemStyle: {
+                                    color: station.itemStyle.color 
+                                }
+                            });
+                        }
+                    }
+                }      
+            } 
+            hour.staList.push(sta);
+        });
+        hourFlowList.push(hour);
+        alertStations.push(hourAlertList);
+    }
+    return hourFlowList;
+}

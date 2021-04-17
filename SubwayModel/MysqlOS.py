@@ -68,7 +68,11 @@ class SQLOS(object):
             # 'trips': txt_path +'trips.txt', 
             # 'weather_info': txt_path + 'weather_info.txt',
             # 'feature_day':  txt_path + 'feature_day.txt',
+            # 'feature_in_hour': txt_path + '/feature/feature_in_hour.txt',
+            # 'feature_out_hour': txt_path + '/feature/feature_out_hour.txt',
             # 'pred_day': txt_path + '/predict/pred_day.txt',
+            # 'pred_in_hour': txt_path + '/predict/pred_in_hour.txt',
+            # 'pred_out_hour': txt_path + '/predict/pred_out_hour.txt',
         }
 
         try:
@@ -373,3 +377,12 @@ class SQLOS(object):
 
         return predict_df
 
+    def get_pred_hour(type_):
+
+        predict_df = SQLOS.get_df_data('pred_%s_hour' % type_)
+        predict_df.time = pd.to_datetime(predict_df.time)
+        predict_df['hour'] = predict_df.time.dt.hour
+
+        predict_df.set_index('time', inplace=True)
+
+        return predict_df

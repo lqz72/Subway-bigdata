@@ -39,7 +39,10 @@ class MLPredictor(object):
     def __init__(self):
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
 
-        self.feature_day = SQLOS.get_df_data('feature_day')
+        # self.feature_day = SQLOS.get_df_data('feature_day')
+
+        self.feature_in_hour = SQLOS.get_df_data('feature_in_hour')
+        self.feature_out_hour = SQLOS.get_df_data('feature_out_hour')
 
         self.scaler = StandardScaler()  # 标准化缩放器
 
@@ -92,8 +95,8 @@ class MLPredictor(object):
         Dataframe: 特征集
         """
         feature_df = self.feature_day.copy()
-        feature_df[['weekday', 'month', 'is_hoilday', 'y']] = \
-            feature_df[['weekday', 'month', 'is_hoilday', 'y']].astype('int')
+        feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']] = \
+            feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']].astype('int')
         feature_df['MA'] = feature_df['MA'].astype('float')
 
         feature_df.day = pd.to_datetime(feature_df.day)
@@ -139,9 +142,45 @@ class MLPredictor(object):
 
         feature_df.dropna(inplace=True)
 
-        feature_df[['weekday', 'month', 'is_hoilday', 'y']] = \
-            feature_df[['weekday', 'month', 'is_hoilday', 'y']].astype('int')
+        feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']] = \
+            feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']].astype('int')
         feature_df['MA'] = feature_df['MA'].astype('float')
+
+        feature_df = self.feature_coding(feature_df)
+
+        return feature_df
+
+    def get_sta_hour_feature(self, station, hour, type_ = 'in'):
+        """获取单个站点的入站/出站客流特征集
+        Parameters
+        ----------
+        station: 站点名称
+        hour: 时间/时
+        type_: 类型: 进站或出站
+
+        Returns
+        --------
+        Dataframe: 特征集
+        """
+        feature_df = self.feature_in_hour.copy() if type_ == 'in' else self.feature_out_hour.copy()
+        
+        
+        sta_df = feature_df[feature_df['sta'].isin([station])].drop('sta', axis=1)
+        
+        feature_df = sta_df[sta_df['hour'].isin([hour])].drop('hour', axis=1)
+
+        feature_df.time = pd.to_datetime(feature_df.time)
+        feature_df.set_index('time', inplace=True)
+
+        # def moving_avg(x):
+        #     return round(sum(x.values[:-1]) / (x.shape[0] - 1), 1)
+        # feature_df['MA'] = feature_df.y.rolling(4).apply(moving_avg)
+
+        feature_df.dropna(inplace=True)
+
+        feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']] = \
+            feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']].astype('int')
+        # feature_df['MA'] = feature_df['MA'].astype('float')
 
         feature_df = self.feature_coding(feature_df)
 
@@ -314,10 +353,10 @@ class MLPredictor(object):
         reg.fit(X_train, y_train)
         prediction = reg.predict(X_test)
 
-        plot_importance(reg)
+        # plot_importance(reg)
 
-        self.plot_model_results(reg, X_train=X_train, X_test=X_test, y_train=y_train
-            , y_test=y_test, plot_intervals=True)
+        # self.plot_model_results(reg, X_train=X_train, X_test=X_test, y_train=y_train
+        #     , y_test=y_test, plot_intervals=True)
 
         mae = mean_absolute_error(prediction, y_test)
         mape = mean_absolute_percentage_error(prediction, y_test)
@@ -334,7 +373,7 @@ class MLPredictor(object):
         Parameters
         ----------
         feature_df: dataframe格式的特征集
-        file_nmae: 模型名称
+        file_name: 模型名称
 
         Returtns
         --------
@@ -375,6 +414,47 @@ class MLPredictor(object):
         
         return predict_df
 
+    def forecast_hour_flow(self, feature_df, file_name):
+        """以每天的某小时作为时间刻度进行预测 
+
+        Parameters
+        ----------
+        feature_df: dataframe格式的特征集
+        file_name: 模型名称
+
+        Returtns
+        --------
+        DataFrame index = 'day' columns = ['weekday', 'month', 'y'] 
+        """
+        #获取模型路径
+        model_path = self.abs_path + '/model/' +  file_name + '.pkl'
+
+        #如果模型不存在 获取训练数据拟合模型
+        if os.path.exists(model_path) is False:
+            #训练集只是特征集的子集 所以直接取切片即可
+            train_df = feature_df['2020-05-01':'2020-07-16']
+
+            reg = self.fit_model(train_df, 0.9, model_path)
+
+        #调取训练模型
+        model = joblib.load(model_path)
+
+        #取7月17日之后的特征集
+        feature_df = feature_df['2020-07-17':]
+
+        predict_list = []
+        for i in range(7):
+            df = feature_df[i:i + 1]
+            X, y = df.drop(['y'], axis=1), df.y
+          
+            prediction = model.predict(X)[0]
+            feature_df.y[i:i + 1] = int(prediction)
+            predict_list.append(prediction)
+
+        predict_df = feature_df.iloc[:]
+        predict_df = predict_df[['weekday', 'month', 'y']]
+
+        return predict_df
 
 class HoltWinters(object):
      
@@ -471,85 +551,180 @@ class HoltWinters(object):
             self.Trend.append(trend)
 
             self.Season.append(seasonals[i%self.slen])
+
+    @staticmethod   
+    def get_data_set():
+        """获取数据集 时间序列单位:天
+
+        Returns
+        --------
+        Dataframe: 数据集 
+        columns = ['day', 'weekday', 'month', 'y', 'is_hoilday', 'weather', 'mean_temp', 'MA']
+        """
+        flow_df = SQLOS.get_flow_df()
+        flow_df['y'] = 1
+        flow_df = flow_df.groupby(by = ['day', 'weekday', 'month'], as_index = False)['y'].count()
+
+        #选取2020/1/1之后的数据
+        flow_df = flow_df[flow_df['day'] >= '2020-01-01']
+        flow_df.index = range(flow_df.shape[0])
+        flow_df.drop('day', axis=1, inplace=True)
+        flow_df.drop('weekday',axis=1, inplace=True)
+        flow_df.drop('month',axis=1, inplace=True)
+        
+        return flow_df    
+
+    @staticmethod
+    def timeseriesCVscore(params, series, loss_function=mean_squared_error, slen=7):
+        errors = []
+        values = series.values
+        alpha, beta, gamma = params
+
+        # 设定交叉验证折数
+        tscv = TimeSeriesSplit(n_splits=3) 
+
+        for train, test in tscv.split(values):
+            model = HoltWinters(series=values[train], slen=slen,  alpha=alpha, beta=beta, gamma=gamma, n_preds=len(test))
+            model.triple_exponential_smoothing()
             
-def get_data_set():
-    """获取数据集 时间序列单位:天
+            predictions = model.result[-len(test):]
+            actual = values[test]
+            
+            error = loss_function(predictions, actual)
+            errors.append(error)
 
-    Returns
-    --------
-    Dataframe: 数据集 
-    columns = ['day', 'weekday', 'month', 'y', 'is_hoilday', 'weather', 'mean_temp', 'MA']
-    """
-    flow_df = SQLOS.get_flow_df()
-    flow_df['y'] = 1
-    flow_df = flow_df.groupby(by = ['day', 'weekday', 'month'], as_index = False)['y'].count()
-
-    #选取2020/1/1之后的数据
-    flow_df = flow_df[flow_df['day'] >= '2020-01-01']
-    flow_df.index = range(flow_df.shape[0])
-    flow_df.drop('day', axis=1, inplace=True)
-    flow_df.drop('weekday',axis=1, inplace=True)
-    flow_df.drop('month',axis=1, inplace=True)
+        return np.mean(np.array(errors))
     
-    return flow_df    
+    @staticmethod
+    def plotHoltWinters(series, plot_intervals=False, plot_anomalies=False):
+        """
+            series - 时序数据集
+            plot_intervals - 显示置信区间 
+            plot_anomalies - 显示异常值 
 
-def timeseriesCVscore(params, series, loss_function=mean_squared_error, slen=7):
-    errors = []
-    values = series.values
-    alpha, beta, gamma = params
+        """
+        plt.figure(figsize=(20, 10))
+        plt.plot(model.result, label = "Model")
+        plt.plot(series.values, label = "Actual")
+        error = mean_absolute_percentage_error(series.values, model.result[:len(series)])
+        plt.title("Mean Absolute Percentage Error: {0:.2f}%".format(error))
 
-    # 设定交叉验证折数
-    tscv = TimeSeriesSplit(n_splits=3) 
+        if plot_anomalies:
+            anomalies = np.array([np.NaN]*len(series))
+            anomalies[series.values<model.LowerBond[:len(series)]] = series.values[series.values<model.LowerBond[:len(series)]]
+            anomalies[series.values>model.UpperBond[:len(series)]] = series.values[series.values>model.UpperBond[:len(series)]]
 
-    for train, test in tscv.split(values):
-        model = HoltWinters(series=values[train], slen=slen,  alpha=alpha, beta=beta, gamma=gamma, n_preds=len(test))
-        model.triple_exponential_smoothing()
-        
-        predictions = model.result[-len(test):]
-        actual = values[test]
-        
-        error = loss_function(predictions, actual)
-        errors.append(error)
+            plt.plot(anomalies, "o", markersize=10, label = "Anomalies")
 
-    return np.mean(np.array(errors))
-        
-def plotHoltWinters(series, plot_intervals=False, plot_anomalies=False):
-    """
-        series - 时序数据集
-        plot_intervals - 显示置信区间 
-        plot_anomalies - 显示异常值 
+        if plot_intervals:
+            plt.plot(model.UpperBond, "r--", alpha=0.5, label = "Up/Low confidence")
+            plt.plot(model.LowerBond, "r--", alpha=0.5)
+            plt.fill_between(x=range(0,len(model.result)), y1=model.UpperBond,y2=model.LowerBond, alpha=0.2, color = "grey")    
 
-    """
-    plt.figure(figsize=(20, 10))
-    plt.plot(model.result, label = "Model")
-    plt.plot(series.values, label = "Actual")
-    error = mean_absolute_percentage_error(series.values, model.result[:len(series)])
-    plt.title("Mean Absolute Percentage Error: {0:.2f}%".format(error))
+        plt.vlines(len(series), ymin=min(model.LowerBond), ymax=max(model.UpperBond), linestyles='dashed')
+        plt.axvspan(len(series)-30, len(model.result), alpha=0.3, color='lightgrey')
+        plt.grid(True)
+        plt.axis('tight')
+        plt.legend(loc="best", fontsize=13)
+        plt.savefig('./pic.png')
 
-    if plot_anomalies:
-        anomalies = np.array([np.NaN]*len(series))
-        anomalies[series.values<model.LowerBond[:len(series)]] = series.values[series.values<model.LowerBond[:len(series)]]
-        anomalies[series.values>model.UpperBond[:len(series)]] = series.values[series.values>model.UpperBond[:len(series)]]
+class ArimaModel(object):
+    def __init__():
+        pass
 
-        plt.plot(anomalies, "o", markersize=10, label = "Anomalies")
+    def tsplot(self, y, lags=None, figsize=(12, 7), style='bmh'):
+        """
+            绘制时序及其ACF（自相关性函数）、PACF（偏自相关性函数），计算迪基-福勒检验
+            y - 时序
+            lags - ACF、PACF计算所用的时差
+        """
+        if not isinstance(y, pd.Series):
+            y = pd.Series(y)
 
-    if plot_intervals:
-        plt.plot(model.UpperBond, "r--", alpha=0.5, label = "Up/Low confidence")
-        plt.plot(model.LowerBond, "r--", alpha=0.5)
-        plt.fill_between(x=range(0,len(model.result)), y1=model.UpperBond,y2=model.LowerBond, alpha=0.2, color = "grey")    
+        with plt.style.context(style):    
+            fig = plt.figure(figsize=figsize)
+            layout = (2, 2)
+            ts_ax = plt.subplot2grid(layout, (0, 0), colspan=2)
+            acf_ax = plt.subplot2grid(layout, (1, 0))
+            pacf_ax = plt.subplot2grid(layout, (1, 1))
 
-    plt.vlines(len(series), ymin=min(model.LowerBond), ymax=max(model.UpperBond), linestyles='dashed')
-    plt.axvspan(len(series)-30, len(model.result), alpha=0.3, color='lightgrey')
-    plt.grid(True)
-    plt.axis('tight')
-    plt.legend(loc="best", fontsize=13)
-    plt.savefig('./pic.png')
+            y.plot(ax=ts_ax)
+            p_value = sm.tsa.stattools.adfuller(y)[1]
+            ts_ax.set_title('Time Series Analysis Plots\n Dickey-Fuller: p={0:.5f}'.format(p_value))
+            smt.graphics.plot_acf(y, lags=lags, ax=acf_ax)
+            smt.graphics.plot_pacf(y, lags=lags, ax=pacf_ax)
+            plt.tight_layout()
 
+    def optimizeSARIMA(self, parameters_list, d, D, s):
+        """
+        返回参数和相应的AIC的dataframe
+            parameters_list - (p, q, P, Q)元组列表
+            d - ARIMA模型的单整阶
+            D - 季节性单整阶
+            s - 季节长度
+        """
+        results = []
+        best_aic = float("inf")
+
+        for param in tqdm_notebook(parameters_list):
+
+            # 由于有些组合不能收敛，所以需要使用try-except
+
+            try:
+                model=sm.tsa.statespace.SARIMAX(series, order=(param[0], d, param[1]), 
+
+                                                seasonal_order=(param[3], D, param[3], s)).fit(disp=-1)
+            except:
+                continue
+
+            aic = model.aic
+
+            # 保存最佳模型、AIC、参数
+            if aic < best_aic:
+                best_model = model
+                best_aic = aic
+                best_param = param
+
+            results.append([param, model.aic])
+
+        result_table = pd.DataFrame(results)
+        result_table.columns = ['parameters', 'aic']
+
+        # 递增排序，AIC越低越好
+        result_table = result_table.sort_values(by='aic', ascending=True).reset_index(drop=True)
+
+        return result_table
 
 if __name__ == '__main__':
-    pass
-    # bp = MLPredictor()
-    # df = bp.get_day_feature()
+    bp = MLPredictor()
+    # j = 0
+
+    # for i in range(6, 22):
+    #     k = 0
+    #     for sta in SQLOS.get_station_dict().keys():
+
+    #         feature_df = bp.get_sta_hour_feature(sta, str(i), 'out')
+      
+    #         df = bp.forecast_hour_flow(feature_df, 'out_hour/%s_%d'%(sta, i))
+    #         df.reset_index(level='time', inplace=True)
+    #         df['sta'] = sta
+    #         if k == 0:
+    #             ddf = df
+    #         else:
+    #             ddf = ddf.append(df)
+
+    #         k += 1
+    #         print(k)
+    #     if j == 0:
+    #         dddf = ddf
+    #     else:
+    #         dddf = dddf.append(ddf)
+    #     j += 1
+    #     print(j)
+    
+    # dddf.to_csv('./test.csv', encoding = 'gb18030', index = 0)
+    
+    
     # ddf = bp.forecast_day_flow(df, 'test')
     # feature_df = Predictor.get_sta_feature('Sta101')
     
