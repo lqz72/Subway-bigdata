@@ -22,7 +22,7 @@ button {
     height: 60px;
     line-height: 40px;
     text-align: center;
-    margin: 0px 20px 0 270px;
+    padding: 0px 20px 0 270px;
     /* background-color: #ffffff; */
 }
 .searchsta .sousuo {
@@ -356,9 +356,7 @@ button {
 .markpre .description ul li:nth-child(1)::before {
     line-height: 50px;
 }
-.markpre .description ul li:nth-child(2)::before {
-    
-}
+
 .markpre .description ul li:nth-child(3)::before {
     color: #93251c;
     
