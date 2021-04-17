@@ -18,6 +18,7 @@ function change_data()
     var markgraph = echarts.init(document.querySelector("#markpre"));            
     markgraph.setOption(option_markpre);
 
+    inout_s();
     //更新天气数据
     $.ajax({
         url:"/weather_info",
@@ -126,6 +127,13 @@ function change_data()
     });
 }
 
+//进出站改变的代码写这儿
+function inout_s()
+{
+    s_data = JSON.stringify(data_b);
+    // console.log(s_data);
+}
+
 //用户选择控件
 var apply = document.querySelector("#apply");
 apply.addEventListener('click',function(){
@@ -179,6 +187,7 @@ layui.use('form', function(){
     form.on('radio', function(data){
         data_b['inout_s'] = data.value;
         // console.log(data_b);
+        inout_s();
     }); 
 });
 
