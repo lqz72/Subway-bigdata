@@ -3,6 +3,7 @@ data_b['alg'] = 1;
 data_b['choose_wea'] = 3;
 data_b['choose_temp'] = 33;
 data_b['c_date'] = "2020-07-17";
+data_b['inout_s'] = 1;
 
 var alg; //选择的算法
 var choose_wea; //选择的天气
@@ -171,6 +172,17 @@ layui.use('slider', function(){
       }
     });
   });
+
+layui.use('form', function(){
+    var form = layui.form;
+    //各种基于事件的操作，下面会有进一步介绍
+    form.on('radio', function(data){
+        data_b['inout_s'] = data.value;
+        // console.log(data_b);
+    }); 
+});
+
+
 //日历控件
 layui.use('laydate', function(){
     var laydate = layui.laydate;
