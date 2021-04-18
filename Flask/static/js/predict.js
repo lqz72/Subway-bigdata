@@ -4,6 +4,7 @@ data_b['choose_wea'] = 3;
 data_b['choose_temp'] = 33;
 data_b['c_date'] = "2020-07-17";
 data_b['inout_s'] = 1;
+data_b['flag'] = 0;
 
 var alg; //选择的算法
 var choose_wea; //选择的天气
@@ -108,13 +109,21 @@ function change_data()
     })
     /*------------------------------------------------*/
 
+}
+
+//进出站改变的代码写这儿
+function inout_s()
+{
+    s_data = JSON.stringify(data_b);
+    // console.log(s_data);
+
     /*------------------echarts-----------------------*/
     //初始化图表
     var graphChart = echarts.init(document.getElementById('graph'));
     $.ajax({
         type: "POST",
         data: s_data,
-        url: 'pred/out_hour_flow',
+        url: 'pred/hour_flow',
         dataType: 'json',
         async: false,
         success: function (result) {
@@ -125,21 +134,21 @@ function change_data()
             graphChart.setOption(graphOption);
         }
     });
-}
-
-//进出站改变的代码写这儿
-function inout_s()
-{
-    s_data = JSON.stringify(data_b);
-    // console.log(s_data);
+    /*------------------------------------------------*/
 }
 
 //用户选择控件
 var apply = document.querySelector("#apply");
 apply.addEventListener('click',function(){
     data_b['alg'] = alg;
+    if (choose_temp != data_b['choose_wea'] || choose_wea != data_b['choose_temp']) {
+        console.log(choose_wea, choose_temp)
+        console.log(data_b['choose_wea'],  data_b['choose_temp'])
+        data_b['flag'] = 1;
+    }
     data_b['choose_wea'] = choose_wea;
     data_b['choose_temp'] = choose_temp;
+    
     change_data();
 })
 //获取select值

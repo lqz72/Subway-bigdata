@@ -259,7 +259,7 @@ var week_line_opts =  {
         //     fontSize: 14
         // }
     },
-    grid: [{bottom: "10%", right: "5%"}],
+    grid: [{bottom: "10%"}],
     legend: {
         show: true,
         icon: 'circle',
@@ -606,27 +606,24 @@ var hour_line_opts = {
     ]
 };
 
-//爱心专座
 var aixin_bar_opts = {
     title: {
         text: '爱心专座比例调整',
         left: 'center'
     },
-    grid:[{bottom:"10%", left:"8%"}],
+    grid:[{bottom:"10%"}],
     tooltip: {
         trigger: 'axis'
     },
     calculable: true,
     xAxis: [
         {
-            name: "/时",
             type: 'category',
             data: ["6","7","8","9","10","11","12","13","14","15", "16", "17", "18", "19", "20", "21"]
         }
     ],
     yAxis: [
         {
-            name: "百分比 %",
             type: 'value',
         }
     ],
@@ -634,11 +631,11 @@ var aixin_bar_opts = {
         {
             name: '百分比 %',
             type: 'bar',
-            data: [2.0, 4.9, 7.0, 13.2, 15.6, 17.7, 13.6, 12.2, 12.6, 20.0, 6.4, 3.3],
+            data: [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 13.6, 12.2, 32.6, 20.0, 6.4, 3.3],
             markPoint: {
                 data: [
-                    {type: 'max', name: '最大值',symbolSize :40},
-                    {type: 'min', name: '最小值', symbolSize :40}
+                    {type: 'max', name: '最大值'},
+                    {type: 'min', name: '最小值'}
                 ]
             },
             markLine: {

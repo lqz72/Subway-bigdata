@@ -714,3 +714,7 @@
     border-bottom: #E9E9E9 1px solid;
     padding-left: 10px;
 }
+
+.addbgc {
+    background-color: rgb(201, 183, 150);
+}

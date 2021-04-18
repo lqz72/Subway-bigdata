@@ -286,7 +286,18 @@
     top: 3px;
 }
 
-.layui-input-block {
+/* .layui-input-block {
+    position:absolute;
+    z-index: 9999999;
+    margin-left: 0;
+}
+.layui-form-item {
+    margin-bottom: 0px;
+} */
+.bug1 {
+    margin-bottom: 0px;
+}
+.bug2 {
     position:absolute;
     z-index: 9999999;
     margin-left: 0;
@@ -305,9 +316,7 @@
     width: 100%;
     height: 100%;
 }
-.layui-form-item {
-    margin-bottom: 0px;
-}
+
 .change {
     margin-top: 10px!important;
 }

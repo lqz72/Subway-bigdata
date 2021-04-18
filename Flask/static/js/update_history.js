@@ -701,8 +701,7 @@ layui.use('laydate', function(){
                         success: function (result) {
                             splitFlow = result;
 
-                            uplineFlow = [];
-                            downlineFlow = [];
+                            uplineFlow = downlineFlow = [];
                             splitNames = Object.keys(splitFlow);
                             for (let index = 0; index < splitNames.length; index++){
                                 var split = splitFlow[splitNames[index]];
