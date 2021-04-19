@@ -375,6 +375,8 @@ class ChartApi(object):
             return grid
 
     def hour_line(hour_list, hour_flow) -> Line:
+        if len(hour_flow) == 0:
+            hour_flow = [0] * len(hour_list)
         line = (
             Line()
             .add_xaxis(xaxis_data = hour_list)

@@ -257,27 +257,28 @@ def sta_curr_day_flow():
 
     return jsonify(flow_dict)
 
-@app.route('/pred/in_hour_flow', methods=['POST', 'GET'])
-def pred_in_hour_flow():
-    param_str = request.get_data().decode('utf-8')
-    param_dict = json.loads(param_str)
-
-    date = param_dict['c_date']
-
-    flow_dict = pred_api.get_sta_hour_flow(date, 'in')
-
-    return jsonify(flow_dict)
-
-@app.route('/pred/out_hour_flow', methods=['POST', 'GET'])
+@app.route('/pred/hour_flow', methods=['POST', 'GET'])
 def pred_out_hour_flow():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
 
     date = param_dict['c_date']
-
-    flow_dict = pred_api.get_sta_hour_flow(date, 'out')
+    type_ = param_dict['inout_s']
+    flow_dict = pred_api.get_sta_hour_flow(date, type_)
 
     return jsonify(flow_dict)
+
+@app.route('/pred/day/info', methods=['POST', 'GET'])
+def pred_day_info():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    date = param_dict['c_date']
+    alg = int(param_dict.get('alg', 1))
+
+    day_info = pred_api.get_day_flow_info(date, alg)
+
+    return jsonify(day_info)
 
 #------------控制图表的展示------------
 @app.route('/history/day_flow/line', methods = ['POST', 'GET'])
@@ -336,8 +337,9 @@ def pred_month_line():
     param_dict = json.loads(param_str)
     curr_date = param_dict['c_date']
 
+    print(param_dict)
     month = curr_date.split('-')[1].lstrip('0')
-    month_dict = pred_api.get_curr_month_flow(month)
+    month_dict = pred_api.get_curr_month_flow(month, **param_dict)
     line = ChartApi.pred_month_line(month_dict, int(curr_date.split('-')[1]))
 
     return line.dump_options_with_quotes()
@@ -347,8 +349,9 @@ def pred_week_line():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
     curr_date = param_dict['c_date']
-
-    week_dict = pred_api.get_curr_week_flow(curr_date)
+    alg = int(param_dict['alg'])
+    
+    week_dict = pred_api.get_curr_week_flow(curr_date, alg)
     line = ChartApi.pred_week_line(week_dict)
     
     return line.dump_options_with_quotes()

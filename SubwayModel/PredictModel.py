@@ -1,24 +1,28 @@
 import os
 import warnings
-
 import joblib
+import datetime
 import numpy as np
 import pandas as pd
 import xgboost as xgb
 from matplotlib import pyplot as plt
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import (GridSearchCV, TimeSeriesSplit, cross_val_score)
+
+#机器学习
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.model_selection import (GridSearchCV, TimeSeriesSplit, cross_val_score)
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import median_absolute_error, mean_squared_error, mean_squared_log_error
+from sklearn.linear_model import LinearRegression
 from xgboost import XGBRegressor
 from xgboost import plot_importance
+
+# 统计学和计量经济学
+import statsmodels.formula.api as smf        
+import statsmodels.tsa.api as smt
+import statsmodels.api as sm
 from scipy.optimize import minimize
-import seaborn as sns  
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.model_selection import cross_val_score
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score, median_absolute_error, mean_absolute_error
-from sklearn.metrics import median_absolute_error, mean_squared_error, mean_squared_log_error
-from scipy.optimize import minimize  
+import scipy.stats as scs
+from itertools import product  
 
 warnings.filterwarnings('ignore')
 
@@ -33,23 +37,16 @@ def mean_absolute_percentage_error(y_true, y_pred):
         """
         return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
-class MLPredictor(object):
-    """机器学习预测模型
+class BaseModel(object):
+    """基类 提供公用数据
     """
     def __init__(self):
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
 
-        # self.feature_day = SQLOS.get_df_data('feature_day')
+        self.feature_day = SQLOS.get_df_data('feature_day')
 
-        self.feature_in_hour = SQLOS.get_df_data('feature_in_hour')
-        self.feature_out_hour = SQLOS.get_df_data('feature_out_hour')
-
-        self.scaler = StandardScaler()  # 标准化缩放器
-
-        self.tscv = TimeSeriesSplit(n_splits=5)  # 五折交叉验证
-
-        self.xgb_best_param = {'eta': 0.3, 'n_estimators': 100, 'gamma': 0.89, 'max_depth': 7, 'min_child_weight': 1, 'colsample_bytree': 1, 'colsample_bylevel': 1, 'subsample': 
-        1, 'reg_lambda': 50.0, 'reg_alpha': 5.0, 'seed': 33}
+        # self.feature_in_hour = SQLOS.get_df_data('feature_in_hour')
+        # self.feature_out_hour = SQLOS.get_df_data('feature_out_hour')
 
     def get_data_set(self):
         """获取数据集 时间序列单位:天
@@ -86,6 +83,36 @@ class MLPredictor(object):
         train_df.dropna(inplace=True)
                     
         return train_df
+
+    def get_day_feature_series(self):
+        """获取每日客流特征集
+        Returns
+        --------
+        Series: 特征集
+        """
+        df = self.feature_day.copy()
+        
+        df.drop(['weekday', 'month', 'is_hoilday', 'weather', \
+            'mean_temp', 'MA'], axis=1, inplace=True)
+        
+        df.y = df.y.astype('int')
+        df.day = pd.to_datetime(df.day)
+        df.index = range(df.shape[0])
+        df.set_index('day', inplace=True)
+
+        return df['y']['2020-04-01':'2020-07-16']
+
+class MLPredictor(BaseModel):
+    """机器学习预测模型
+    """
+    def __init__(self):
+        super().__init__()
+        self.scaler = StandardScaler()  # 标准化缩放器
+
+        self.tscv = TimeSeriesSplit(n_splits=5)  # 五折交叉验证
+
+        self.xgb_best_param = {'eta': 0.3, 'n_estimators': 100, 'gamma': 0.89, 'max_depth': 7, 'min_child_weight': 1, 'colsample_bytree': 1, 'colsample_bylevel': 1, 'subsample': 
+        1, 'reg_lambda': 50.0, 'reg_alpha': 5.0, 'seed': 33}
 
     def get_day_feature(self):
         """获取2020全年特征集 7月16日之后的MA3需填充
@@ -367,7 +394,7 @@ class MLPredictor(object):
         print('mae:', mae, 'mape:', mape, 'mse:', mse, 'r2_score:', r2)
         return reg
 
-    def forecast_day_flow(self, feature_df, file_name):
+    def forecast_day_flow(self, feature_df, file_name, n_steps = 168):
         """以每一天作为时间刻度进行预测 
 
         Parameters
@@ -398,7 +425,7 @@ class MLPredictor(object):
         moving_avg = 3
         predict_list = []
         #获取预测日期之前三天的客流量 取平均值
-        for i in range(168):
+        for i in range(n_steps):
             index = i + moving_avg
             feature_df.MA[index] = \
                 sum(feature_df.y.values[index - moving_avg:index]) / moving_avg
@@ -456,16 +483,50 @@ class MLPredictor(object):
 
         return predict_df
 
-class HoltWinters(object):
-     
-    def __init__(self, series, slen, alpha, beta, gamma, n_preds, scaling_factor=1.96):
-        self.series = series
-        self.slen = slen
-        self.alpha = alpha
-        self.beta = beta
-        self.gamma = gamma
-        self.n_preds = n_preds
-        self.scaling_factor = scaling_factor
+    def forecast_by_factor(self, **param):
+        """
+        根据预测因子重新进行拟合
+        处于速度和数据量的考量 仅更新单日预测
+
+        返回预测结果y
+        """
+        date = param['date']
+        weather = param['weather']
+        temp = param['temp']
+
+        feature_df = self.feature_day.copy()
+    
+        feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']] = \
+            feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']].astype('int')
+        feature_df['MA'] = feature_df['MA'].astype('float')
+
+        feature_df.day = pd.to_datetime(feature_df.day)
+        feature_df.set_index('day', inplace=True)
+
+        feature_df.loc[date, 'weather'] = weather
+        feature_df.loc[date, 'mean_temp'] = temp
+
+        feature_df = self.feature_coding(feature_df)
+
+        end = datetime.datetime.strptime(date, '%Y-%m-%d')
+        start = datetime.datetime.strptime('2020-07-16', '%Y-%m-%d')
+        steps = int((end - start) / pd.Timedelta(1, 'D'))
+
+        predict_df = self.forecast_day_flow(feature_df, '%s_%s' % (weather, temp), n_steps=steps)
+
+        return predict_df.loc[date].y
+       
+class HoltWinters(BaseModel):
+    """三指数平滑模型
+    """
+    def __init__(self):
+        super().__init__()
+        self.slen = 7
+        self.alpha = 0.22
+        self.beta = 0.03
+        self.gamma = 0.41
+        self.n_preds = 30
+        self.scaling_factor = 1.96
 
     def initial_trend(self):
         '''
@@ -552,28 +613,6 @@ class HoltWinters(object):
 
             self.Season.append(seasonals[i%self.slen])
 
-    @staticmethod   
-    def get_data_set():
-        """获取数据集 时间序列单位:天
-
-        Returns
-        --------
-        Dataframe: 数据集 
-        columns = ['day', 'weekday', 'month', 'y', 'is_hoilday', 'weather', 'mean_temp', 'MA']
-        """
-        flow_df = SQLOS.get_flow_df()
-        flow_df['y'] = 1
-        flow_df = flow_df.groupby(by = ['day', 'weekday', 'month'], as_index = False)['y'].count()
-
-        #选取2020/1/1之后的数据
-        flow_df = flow_df[flow_df['day'] >= '2020-01-01']
-        flow_df.index = range(flow_df.shape[0])
-        flow_df.drop('day', axis=1, inplace=True)
-        flow_df.drop('weekday',axis=1, inplace=True)
-        flow_df.drop('month',axis=1, inplace=True)
-        
-        return flow_df    
-
     @staticmethod
     def timeseriesCVscore(params, series, loss_function=mean_squared_error, slen=7):
         errors = []
@@ -628,10 +667,49 @@ class HoltWinters(object):
         plt.legend(loc="best", fontsize=13)
         plt.savefig('./pic.png')
 
-class ArimaModel(object):
-    def __init__():
-        pass
+    def search_best_params(self, series):
+        data = series[:-30] # 留置一些数据用于测试
 
+        # 初始化模型参数alpha、beta、gamma
+        x = [0, 0, 0]
+
+        # 最小化损失函数
+        opt = minimize(HoltWinters.timeseriesCVscore, x0=x, args=(data, mean_squared_log_error), method="TNC", \
+            bounds = ((0, 1), (0, 1), (0, 1)))
+
+        # 取最优值
+        alpha_final, beta_final, gamma_final = opt.x
+        print(alpha_final, beta_final, gamma_final)
+
+        return opt.x
+
+    def predict_to_csv(self):
+        self.series = self.get_day_feature_series()
+
+        self.triple_exponential_smoothing()
+
+        flow_list = model.result[len(model.series):]
+
+        pred_df = pd.DataFrame(flow_list, columns=['y'])
+        pred_df.y = pred_df.y.astype('int')
+
+        date_list = pd.date_range(start='20200717', freq='D', periods=30)
+
+        pred_df['day'] = date_list
+        pred_df['weekday'] = pred_df.day.dt.weekday + 1
+        pred_df['month'] = pred_df.day.dt.month
+
+        pred_df.to_csv('./pred_holtwinters_day.csv', encoding='gb18030', index = 0)
+        
+class ArimaModel(BaseModel):
+    """SARIMA模型 
+        仅用于预测一个月的客流
+    """
+    def __init__(self):
+        super().__init__()
+
+        self.param = {'p': 2, 'd': 1, 'q': 2, 'P': 0, 'Q': 1, 'D': 1, 's': 7}
+        
     def tsplot(self, y, lags=None, figsize=(12, 7), style='bmh'):
         """
             绘制时序及其ACF（自相关性函数）、PACF（偏自相关性函数），计算迪基-福勒检验
@@ -695,12 +773,94 @@ class ArimaModel(object):
 
         return result_table
 
+    def plotSARIMA(self, series, model, n_steps):
+        """
+            绘制模型预测值与实际数据对比图
+            series - 时序数据集
+            model - SARIMA模型
+            n_steps - 预测未来的步数
+        """
+        data = pd.DataFrame(series.values, columns = ['actual'], index = series.index)
+        data['arima_model'] = model.fittedvalues.values
+
+        # 平移s+d步，因为差分的缘故，前面的一些数据没有被模型观测到
+        data['arima_model'][:s+d] = np.NaN
+
+        forecast = model.predict(start = data.shape[0], end = data.shape[0]+n_steps)
+        forecast = data.arima_model.append(forecast)
+        
+    
+        #计算误差，同样平移s+d步
+        error = mean_absolute_percentage_error(data['actual'][s+d:], data['arima_model'][s+d:])
+
+        plt.figure(figsize=(15, 7))
+        plt.title("Mean Absolute Percentage Error: {0:.2f}%".format(error))
+        plt.plot(forecast, color='r', label="model")
+        plt.axvspan(data.index[-1], forecast.index[-1], alpha=0.5, color='lightgrey')
+        plt.plot(data.actual, label="actual")
+        plt.legend()
+        plt.grid(True)
+        plt.savefig('./arima.png')
+
+    def forecast_day_flow(self, n_steps=30):
+        """获取每日客流特征集
+        Parameters
+        ----------
+        n_steps: 预测步长 默认为30 即预测最近30天的客流
+
+        Returns
+        -------
+        Series: 特征集
+        """
+        series = self.get_day_feature_series()
+
+        pdq = self.param['p'], self.param['d'], self.param['q']
+        PDQS = self.param['P'], self.param['D'], self.param['Q'], self.param['s']
+
+        best_model = sm.tsa.statespace.SARIMAX(series, order=pdq, seasonal_order=PDQS).fit(disp=-1)
+        
+        data = pd.DataFrame(series.values, columns=['actual'], index=series.index)
+   
+        data['arima_model'] = best_model.fittedvalues.values
+
+        offest = self.param['s'] + self.param['d']
+        # 平移s+d步，因为差分的缘故，前面的一些数据没有被模型观测到
+        data['arima_model'][:offest] = np.NaN
+
+        forecast = best_model.predict(start = data.shape[0], end = data.shape[0]+n_steps-1)
+        
+        #计算误差，同样平移s+d步
+        error = mean_absolute_percentage_error(data['actual'][offest:], data['arima_model'][offest:])
+        print('mape error: ', error)
+
+        return forecast
+        
+    def predict_to_csv(self):
+        """将模型输出保存为csv格式 
+        """
+        pred_series = self.forecast_day_flow(30)
+
+        pred_df = pd.DataFrame(pred_series.values, index=pred_series.index, columns=['y'])
+
+        pred_df.y = pred_df.y.astype('int')
+        pred_df.reset_index(inplace=True)
+
+        pred_df.columns = ['day', 'y']
+        pred_df['weekday'] = pred_df.day.dt.weekday + 1
+        pred_df['month'] = pred_df.day.dt.month
+
+        pred_df.to_csv('./pred_arima_day.csv', encoding='gb18030', index = 0)
+        
+        return pred_df
+
 if __name__ == '__main__':
-    bp = MLPredictor()
+    pass
+    # ml = MLPredictor()
+    # ml.forecast_by_factor('2020-07-17', choose_wea = '阴', choose_temp = '22')
     # j = 0
 
     # for i in range(6, 22):
-    #     k = 0
+    #     k = 0WW
     #     for sta in SQLOS.get_station_dict().keys():
 
     #         feature_df = bp.get_sta_hour_feature(sta, str(i), 'out')

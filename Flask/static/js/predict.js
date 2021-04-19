@@ -1,10 +1,9 @@
 var data_b = {};
 data_b['alg'] = 1;
 data_b['choose_wea'] = 3;
-data_b['choose_temp'] = 33;
+data_b['choose_temp'] = 28;
 data_b['c_date'] = "2020-07-17";
 data_b['inout_s'] = 1;
-data_b['flag'] = 0;
 
 var alg; //选择的算法
 var choose_wea; //选择的天气
@@ -53,23 +52,13 @@ function change_data()
     });
 
     /*------------------pyecharts 图表------------------*/
-    var linePie = echarts.init(document.getElementById('line_pie'));
-    $.ajax({
-        url: '/pred/line/pie',
-        type: 'POST',
-        data: s_data,
-        dataType: 'json',
-        success: function (option) {
-            linePie.setOption(option);
-        }
-    })
-
     var monthLine = echarts.init(document.getElementById('month_line'));
     $.ajax({
         url: '/pred/month/line',
         type: 'POST',
         data: s_data,
         dataType: 'json',
+        async: false,
         success: function (option) {
             monthLine.setOption(option);
         }
@@ -83,6 +72,41 @@ function change_data()
         dataType: 'json',
         success: function (option) {
             weekLine.setOption(option);
+        }
+    })
+
+    $.ajax({
+        url: '/pred/day/info',
+        type: 'POST',
+        data: s_data,
+        dataType: 'json',
+        success: function (result) {
+            console.log(s_data);
+            var day_flow = document.getElementById('day_flow');
+            var cmp_day = document.getElementById('cmp_day');
+            var cmp_month = document.getElementById('cmp_month');
+            var cmp_year = document.getElementById('cmp_year');
+            var am_peak_flow = document.getElementById('am_peak_flow');
+            var pm_peak_flow = document.getElementById('pm_peak_flow');
+
+            console.log(result);
+            day_flow.innerHTML = result['day_flow'];
+            cmp_day.innerHTML = result['cmp_day'] + "%";
+            cmp_month.innerHTML = result['cmp_month'] + "%";
+            cmp_year.innerHTML = result['cmp_year'] + "%";
+            am_peak_flow.innerHTML = result['am_peak_flow'];
+            pm_peak_flow.innerHTML = result['pm_peak_flow'];
+        }
+    })
+
+    var linePie = echarts.init(document.getElementById('line_pie'));
+    $.ajax({
+        url: '/pred/line/pie',
+        type: 'POST',
+        data: s_data,
+        dataType: 'json',
+        success: function (option) {
+            linePie.setOption(option);
         }
     })
 
@@ -141,11 +165,10 @@ function inout_s()
 var apply = document.querySelector("#apply");
 apply.addEventListener('click',function(){
     data_b['alg'] = alg;
-    if (choose_temp != data_b['choose_wea'] || choose_wea != data_b['choose_temp']) {
-        console.log(choose_wea, choose_temp)
-        console.log(data_b['choose_wea'],  data_b['choose_temp'])
-        data_b['flag'] = 1;
-    }
+
+    console.log(choose_wea, choose_temp)
+    console.log(data_b['choose_wea'],  data_b['choose_temp'])
+
     data_b['choose_wea'] = choose_wea;
     data_b['choose_temp'] = choose_temp;
     

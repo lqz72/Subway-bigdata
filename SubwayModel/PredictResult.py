@@ -1,6 +1,6 @@
 import pandas as pd
 from DataAnalysis import DataApi
-from PredictModel import  MLPredictor
+from PredictModel import *
 from MysqlOS import SQLOS
 import datetime
 import os
@@ -10,11 +10,15 @@ class PredictApi(object):
     提供预测数据分析接口
     '''
     def __init__(self):
-        # self.ml_predictor = MLPredictor()
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
-        self.pred_day_df = SQLOS.get_pred_day()
+        self.ml_predictor = MLPredictor()
+        self.pred_sta_df = SQLOS.get_df_data('pred_sta_day')
+        self.pred_day_df = SQLOS.get_pred_day('xgboost')
         self.pred_in_hour_df = SQLOS.get_pred_hour('in')
         self.pred_out_hour_df = SQLOS.get_pred_hour('out')
+        self.pred_arima_day_df = SQLOS.get_pred_day('arima')
+        self.pre_holtwinters_day_df = SQLOS.get_pred_day('holtwinters')
+        self.weather_list = ["多云", "晴", "阴", "阵雨", "小雨", "中雨", "大雨", "暴雨"]
 
     @staticmethod
     def get_station_pred_flow():
@@ -140,13 +144,26 @@ class PredictApi(object):
 
         return in_dict, out_dict
 
-    def get_curr_month_flow(self, month):
+    def get_curr_month_flow(self, month, **param):
         """
         获取当月客流变化
         返回一个字典 格式: {day:flow,}
         """
-        predict_df = self.pred_day_df.copy()
+        alg = int(param.get('alg', 1))
+        date = param.get('c_date', '2020-07-17')
+        weather = self.weather_list[int(param.get('choose_wea', 2)) - 1]
+        temp = int(param.get('choose_temp', 28))
 
+        if alg == 1:
+            self.change_pred_result(self.pred_day_df, alg=alg, date=date, weather=weather, temp=temp)
+            
+            predict_df = self.pred_day_df.copy()
+
+        elif alg == 2:
+            predict_df = self.pred_arima_day_df.copy()
+        else:
+            predict_df = self.pre_holtwinters_day_df.copy()
+    
         month_flow = predict_df[predict_df['month'] == month]['y']
 
         day = [i.strftime("%d").lstrip('0') for i in month_flow.index]
@@ -154,12 +171,18 @@ class PredictApi(object):
 
         return dict(zip(day, flow))
 
-    def get_curr_week_flow(self, date):
+    def get_curr_week_flow(self, date, alg):
         """
         获取当前周的客流变化 
         返回一个字典 格式: {day:flow,}
         """
-        predict_df = self.pred_day_df.copy()
+        if alg == 1:
+            predict_df = self.pred_day_df.copy()
+        elif alg == 2:
+            predict_df = self.pred_arima_day_df.copy()
+        else:
+            predict_df = self.pre_holtwinters_day_df.copy()
+
         date_flow = predict_df['y']
 
         date = datetime.datetime.strptime(date, '%Y-%m-%d')
@@ -179,6 +202,57 @@ class PredictApi(object):
         
         return dict(zip(day, flow))
 
+    def get_day_flow_info(self, date, alg):
+        """
+        获取日客流信息
+        """
+        if alg == 1:
+            predict_df = self.pred_day_df.copy()
+        elif alg == 2:
+            predict_df = self.pred_arima_day_df.copy()
+        else:
+            predict_df = self.pre_holtwinters_day_df.copy()
+
+        std_date = pd.to_datetime(date)
+        one_day = datetime.timedelta(days=1)
+        pre_day = (std_date - one_day).strftime('%Y-%m-%d')
+        month = date[5:7].lstrip('0')
+
+        day_flow = int(predict_df.loc[date, 'y'])
+        pre_day_flow = int(predict_df.loc[pre_day, 'y'])
+        month_mean = int(predict_df[predict_df['month'] == month].y.mean())
+        year_mean = int(predict_df.y.mean())
+
+        cmp_day = round((day_flow - pre_day_flow) / pre_day_flow * 100, 1)
+        cmp_month = round((day_flow - month_mean) / month_mean * 100, 1)
+        cmp_year = round((day_flow - year_mean) / year_mean * 100, 1)
+
+        in_hour_flow = self.get_hour_flow(date, 'in')
+        out_hour_flow = self.get_hour_flow(date, 'out')
+        am_peak_flow = 0
+        pm_peak_flow = 0
+        am_peak_hour = [1, 2, 3]
+        pm_peak_hour = [11, 12, 13]
+
+        if len(in_hour_flow) > 0:
+            for i in am_peak_hour:
+                am_peak_flow += (int(in_hour_flow[i]) + int(out_hour_flow[i]))
+            for i in pm_peak_hour:
+                pm_peak_flow += (int(in_hour_flow[i]) + int(out_hour_flow[i]))
+        else:
+            am_peak_flow = int(day_flow * 0.206)
+            pm_peak_flow = int(day_flow * 0.234)
+
+        info_dict = {
+            'day_flow': day_flow,
+            'cmp_day': cmp_day,
+            'cmp_month': cmp_month,
+            'cmp_year': cmp_year,
+            'am_peak_flow': am_peak_flow,
+            'pm_peak_flow': pm_peak_flow
+        }
+        return info_dict
+
     def get_line_flow_percent(self, date, sta_dict):
         """
         获取线路流量占比
@@ -187,7 +261,7 @@ class PredictApi(object):
         line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
         line_dict = dict.fromkeys(line_list, 0)
 
-        df = SQLOS.get_df_data('pred_sta_day')
+        df = self.pred_sta_df
         df.day = pd.to_datetime(df.day)
         df = df[df['day'].isin([date])]
 
@@ -236,10 +310,41 @@ class PredictApi(object):
  
         return sta_dict
 
+    def change_pred_result(self, predict_df, **param):
+        """
+        判断影响因子是否修改 并重新预测
+        """
+        alg = param.get('alg')
+        date = param.get('date')
+        weather = param.get('weather')
+        temp = param.get('temp')
+
+        #判断预测因子是否发生修改
+        feature_df = self.ml_predictor.feature_day
+        day_df = feature_df[feature_df['day'].isin([date])]
+        default_weather = day_df.weather.values[0]
+        default_temp = day_df.mean_temp.values[0]
+
+        if (weather != default_weather or temp != int(default_temp)):
+            """
+            此时需要根据数据重新拟合 适用xgboost
+            处于速度和数据量的考量 仅更新单日预测
+            """
+            flow = self.ml_predictor.forecast_by_factor(date=date, weather=weather, temp=temp)
+            predict_df.loc[date, 'y'] = flow
+
+        self.pred_day_df = predict_df
 
 if __name__ == '__main__':
-    p_api = PredictApi()
-    print(p_api.get_hour_flow('2020-07-17'))
+    pred_api = PredictApi()
+    pred_api.get_curr_month_flow('6', c_date = '2020-07-17')
+    # ml = MLPredictor()
+    # rs = ml.forecast_by_factor('2020-07-17', choose_wea='阴', choose_temp='22')
+    # print(rs)
+    # pred_api = PredictApi()
+ 
+    # p_api = PredictApi()
+    # print(p_api.get_hour_flow('2020-07-17'))
     # p_api.get_sta_hour_flow('2020-07-17')
     # PredictApi.get_sta_hour_feature()
 

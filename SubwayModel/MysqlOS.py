@@ -73,6 +73,8 @@ class SQLOS(object):
             # 'pred_day': txt_path + '/predict/pred_day.txt',
             # 'pred_in_hour': txt_path + '/predict/pred_in_hour.txt',
             # 'pred_out_hour': txt_path + '/predict/pred_out_hour.txt',
+            # 'pred_arima_day': txt_path + '/predict/pred_arima_day.txt',
+            # 'pred_holtwinters_day': txt_path + '/predict/pred_holtwinters_day.txt'
         }
 
         try:
@@ -369,8 +371,13 @@ class SQLOS(object):
             print('error', e)
             return 0
 
-    def get_pred_day():
-        predict_df = SQLOS.get_df_data('pred_day')
+    def get_pred_day(alg = 'xgboost'):
+        if alg == 'xgboost':
+            predict_df = SQLOS.get_df_data('pred_day')
+        elif alg == 'arima':
+            predict_df = SQLOS.get_df_data('pred_arima_day')
+        else:
+            predict_df = SQLOS.get_df_data('pred_holtwinters_day')
 
         predict_df.day = pd.to_datetime(predict_df.day)
         predict_df.set_index('day', inplace=True)
@@ -386,3 +393,4 @@ class SQLOS(object):
         predict_df.set_index('time', inplace=True)
 
         return predict_df
+
