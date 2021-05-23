@@ -153,6 +153,10 @@ layui.use('laydate', function(){
 
             //获取类目名称数组 用于和 legend 对应以及格式化 tooltip 的内容
             var categories = lineNames.map(lineName => { return { name: lineName } });
+
+            graphChart.on('click', function (param) {
+                location.href = '/station/' + param.data.name
+            });
             
             function timelist() {
                 var timelist = [];
@@ -282,7 +286,7 @@ layui.use('laydate', function(){
                     formatter: function (param) {
                         let label = "";
                         if (param.value) {
-                            label = `站点名称: ${param.name} <br> 站点客流: ${param.value[2]}人次`;
+                            label = `站点名称: ${param.name} <br> 站点客流: ${param.value[2]}人`;
                         }
 
                         return label;
@@ -701,7 +705,8 @@ layui.use('laydate', function(){
                         success: function (result) {
                             splitFlow = result;
 
-                            uplineFlow = downlineFlow = [];
+                            uplineFlow = [];
+                            downlineFlow = [];
                             splitNames = Object.keys(splitFlow);
                             for (let index = 0; index < splitNames.length; index++){
                                 var split = splitFlow[splitNames[index]];
@@ -1349,7 +1354,8 @@ layui.use('laydate', function(){
                         success: function (result) {
                             splitFlow = result;
 
-                            uplineFlow = downlineFlow = [];
+                            uplineFlow = [];
+                            downlineFlow = [];
                             splitNames = Object.keys(splitFlow);
                             for (let index = 0; index < splitNames.length; index++){
                                 var split = splitFlow[splitNames[index]];

@@ -1,13 +1,14 @@
 from flask import Flask,Response,request
 from flask import render_template
 from flask import redirect, url_for, jsonify
-from flask.json import JSONEncoder
+from flask import session, g
 from sys import path
 import os
 import json
-import time
 import random
 import warnings
+
+from werkzeug.utils import html
 warnings.filterwarnings('ignore')
 path.append('..')
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0])
@@ -25,19 +26,40 @@ pred_api=PredictApi()
 
 abs_path = os.path.abspath(os.path.dirname(__file__))
 station_name='Sta1'
+require_login_path = ['history', 'sta', 'predict', 'client', 'selfcenter', 'userinf']
 
 #------------模板渲染------------
 @app.route('/')
 def root():                             
-    return redirect(url_for('history'))
+    return redirect(url_for('index'))
 
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    return render_template('log.html')
 
 @app.route('/index')
 def index():
     return render_template('index.html')
+
+# @app.route('/verify/<uid>/<utype>')
+# def verify(uid, utype):
+#     print('1', utype)
+#     response  = redirect(url_for('history'))
+#     response.set_cookie('utype', utype, max_age= 180000)
+#     return redirect(url_for('history'))
+
+# @app.before_request
+# def my_before_request():
+#     url_path = request.path.split('/')[1]
+
+#     if(url_path in require_login_path):
+#         utype = session.get('utype', None)
+#         print('3', utype)
+#         if(utype):
+#             if utype != 'admin' and (url_path not in ['selfcenter']):
+#                 return redirect(url_for('login'))
+#         else:
+#             return redirect(url_for('login'))
 
 @app.route('/predict')
 def predict():
@@ -51,9 +73,9 @@ def client():
 def selfcenter():
     return render_template('selfcenter.html')
 
-@app.route('/station')  
-def station():
-    return render_template('sta.html')
+@app.route('/station/<staname>')  
+def station(staname):
+    return render_template('sta.html', staname = staname)
 
 @app.route('/userinf')
 def userinf():
@@ -240,7 +262,7 @@ def sta_curr_week_flow():
 
     station = param_dict['sta']
     date = param_dict['date']
-
+    
     flow_dict = api.get_sta_curr_week_flow(date, station)
 
     return jsonify(flow_dict)
@@ -394,7 +416,7 @@ def pred_eval_radar():
 def sta_age_pie():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
-
+    
     station = param_dict['sta']
     date = param_dict['date']
 
@@ -412,8 +434,10 @@ def sta_schedule_line():
     date = param_dict['date']
 
     hour_list = [str(i) for i in range(6,22,3)]
-    volunteer = [str(random.randint(-20, 40)) for i in range(6, 22,3)]
-    worker = [str(random.randint(-20, 20)) for i in range(6, 22,3)]
+    volunteer = [random.randint(-20, 40)  for i in range(6, 22,3) if i != 0]
+    worker = [str(i - abs(i) / i * random.randint(-10, 15)) for i in volunteer]
+
+    volunteer = list(map(lambda x: str(x), volunteer))
 
     line = ChartApi.sta_schedule_line(hour_list, volunteer, worker)
 

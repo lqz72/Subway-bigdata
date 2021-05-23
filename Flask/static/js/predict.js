@@ -359,7 +359,7 @@ var graphOption = {
         formatter: function (param) {
             let label = "";
             if (param.value) {
-                label = `站点名称: ${param.name} <br> 站点客流: ${param.value[2]}人次`;
+                label = `站点名称: ${param.name} <br> 站点客流: ${param.value[2]}人`;
             }
 
             return label;

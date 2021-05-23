@@ -1,4 +1,5 @@
 var c_date = '2020-01-01';
+var c_staname = document.getElementById('staname').innerText;
 function change_data()
 {
     var s_date = JSON.stringify(c_date);//得到的字符串
@@ -6,14 +7,15 @@ function change_data()
     var markgraph = echarts.init(document.querySelector("#markpre"));
     markgraph.setOption(option_marksta);
     console.log(s_date)
+    console.log(c_staname);
     //向后端传取数据代码写这儿------------------------------------
 
     var week_line = echarts.init(document.getElementById('week_flow'));
 
     $.ajax({
         type: 'POST',
-        url: 'sta/curr_week_flow',
-        data:  JSON.stringify({date: c_date, sta: 'Sta1'}),
+        url: '/sta/curr_week_flow',
+        data:  JSON.stringify({date: c_date, sta: c_staname}),
         dataType: 'json',
         success: function (result) {
             var in_flow = [];
@@ -32,8 +34,8 @@ function change_data()
     var hour_line = echarts.init(document.getElementById('hour_flow'));
     $.ajax({
         type: 'POST',
-        url: 'sta/curr_day_flow',
-        data:  JSON.stringify({date: c_date, sta: 'Sta1'}),
+        url: '/sta/curr_day_flow',
+        data:  JSON.stringify({date: c_date, sta: c_staname}),
         dataType: 'json',
         success: function (result) {
             console.log(result);
@@ -56,9 +58,10 @@ function change_data()
     $.ajax({
         type: 'POST',
         url: '/sta/age/pie',
-        data:  JSON.stringify({date: c_date, sta: 'Sta1'}),
+        data:  JSON.stringify({date: c_date, sta: c_staname}),
         dataType: 'json',
         success: function (result) {
+            
             age_pie.setOption(result);
         }
     })
@@ -67,7 +70,7 @@ function change_data()
     $.ajax({
         type: 'POST',
         url: '/sta/schedule/line',
-        data:  JSON.stringify({date: c_date, sta: 'Sta1'}),
+        data:  JSON.stringify({date: c_date, sta: c_staname}),
         dataType: 'json',
         success: function (result) {
             schedule_line.setOption(result);
@@ -631,7 +634,7 @@ var aixin_bar_opts = {
         {
             name: '百分比 %',
             type: 'bar',
-            data: [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 13.6, 12.2, 32.6, 20.0, 6.4, 3.3],
+            data: [2.0, 4.9, 7.0, 11.2, 12.6, 13.7, 13.6, 12.2, 12.6, 11.0, 8.4, 7.3, 5.2, 4.4, 3.5, 2.1],
             markPoint: {
                 data: [
                     {type: 'max', name: '最大值'},
