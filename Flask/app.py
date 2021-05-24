@@ -2,31 +2,30 @@ from flask import Flask,Response,request
 from flask import render_template
 from flask import redirect, url_for, jsonify
 from flask import session, g
+from flask import flash
 from sys import path
 import os
 import json
 import random
 import warnings
-
-from werkzeug.utils import html
 warnings.filterwarnings('ignore')
 path.append('..')
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0])
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0] + 'SubwayModel\\')
 
-import numpy as np
 from DataAnalysis import DataApi
 from PredictResult import PredictApi
 from MakeChart import ChartApi
 from MysqlOS import SQLOS
 
 app=Flask(__name__)
+app.config['SECRET_KEY'] = '3c2d9d261a464e4e8814c5a39aa72f1c'
 api=DataApi()
 pred_api=PredictApi()
 
 abs_path = os.path.abspath(os.path.dirname(__file__))
 station_name='Sta1'
-require_login_path = ['history', 'sta', 'predict', 'client', 'selfcenter', 'userinf']
+require_login_path = ['history', 'station', 'predict', 'client', 'selfcenter', 'userinf']
 
 #------------模板渲染------------
 @app.route('/')
@@ -35,31 +34,35 @@ def root():
 
 @app.route('/login')
 def login():
-    return render_template('log.html')
+    return render_template('login.html')
 
 @app.route('/index')
 def index():
     return render_template('index.html')
 
-# @app.route('/verify/<uid>/<utype>')
-# def verify(uid, utype):
-#     print('1', utype)
-#     response  = redirect(url_for('history'))
-#     response.set_cookie('utype', utype, max_age= 180000)
-#     return redirect(url_for('history'))
+#设置cookie和session
+@app.route('/verify/<uid>/<utype>')
+def verify(uid, utype):
+    response  = redirect(url_for('history'))
+    session['utype'] = utype
+    response.set_cookie('utype', utype, max_age= 60*60*24)
+    return response
 
-# @app.before_request
-# def my_before_request():
-#     url_path = request.path.split('/')[1]
-
-#     if(url_path in require_login_path):
-#         utype = session.get('utype', None)
-#         print('3', utype)
-#         if(utype):
-#             if utype != 'admin' and (url_path not in ['selfcenter']):
-#                 return redirect(url_for('login'))
-#         else:
-#             return redirect(url_for('login'))
+#路由拦截及重启向
+@app.before_request
+def my_before_request():
+    url_head = request.path.split('/')[1]
+    if(url_head == 'history' and request.path.split('/')[-1] != url_head):
+        return 
+    if(url_head in require_login_path):
+        utype = session.get('utype', None)
+        if(utype):
+            if utype != 'admin' and (url_head not in ['client']):
+                flash("很抱歉！您没有权限访问")
+                return redirect(url_for('client'))
+        else:
+            flash("您还没有登录账号！")
+            return redirect(url_for('login'))
 
 @app.route('/predict')
 def predict():

@@ -412,18 +412,17 @@ class ChartApi(object):
         return grid
 
     def eval_radar() -> Radar:
-        data = [{"value": [0.8, 0.6, 0.9, 0.5, 0.7, 0.5], "name": "交通拥堵系数"}]
+        data = [{"value": [0.8, 0.6, 0.9, 0.5, 0.7], "name": "交通拥堵系数"}]
 
         radar = (
             Radar(init_opts=opts.InitOpts(width="1280px", height="720px", bg_color="#fff"))
             .add_schema(
                 schema=[
-                    opts.RadarIndicatorItem(name="高峰拥堵系数", max_=1),
-                    opts.RadarIndicatorItem(name="拥堵不均衡系数", max_=1),
-                    opts.RadarIndicatorItem(name="常发性拥堵里程占比", max_=1),
-                    opts.RadarIndicatorItem(name="严重拥堵站点占比", max_=1),
-                    opts.RadarIndicatorItem(name="拥堵持续程度", max_=1),
-                    opts.RadarIndicatorItem(name="线路负荷度", max_=1),
+                    opts.RadarIndicatorItem(name="高峰拥堵指数", max_=1),
+                    opts.RadarIndicatorItem(name="高峰客流占比", max_=1),
+                    opts.RadarIndicatorItem(name="高峰时间占比", max_=1),
+                    opts.RadarIndicatorItem(name="不均衡系数", max_=1),
+                    opts.RadarIndicatorItem(name="满载率", max_=1),
                 ],
                 splitarea_opt=opts.SplitAreaOpts(
                     is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1)
@@ -441,7 +440,9 @@ class ChartApi(object):
             # .render("basic_radar_chart.html")  
         )
 
-        return radar
+        grid = Grid()
+        grid.add(chart=radar, grid_opts=opts.GridOpts(pos_left="15%"))
+        return grid
 
     def sta_age_pie(age, percent) -> Pie:
         '''
