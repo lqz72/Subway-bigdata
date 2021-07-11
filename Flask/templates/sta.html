@@ -7,12 +7,12 @@
     <title>Document</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static',filename ='layui/css/layui.css') }}" media="all">
-    <link href="{{ url_for('static',filename ='css/font-awesome.min.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static',filename ='css/sta.css') }}">
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/sta.css">
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
-    <script src="{{ url_for('static',filename ='js/echarts-wordcloud.min.js') }}"></script>
+    <script src="../static/js/echarts-wordcloud.min.js"></script>
 </head>
 <style>
     .layui-laydate, .layui-laydate-hint {
@@ -43,14 +43,10 @@
             </div>
 
             <!-- 搜索框 -->
-            <div class="searchsta" >
-                <form method = 'POST' action = '/sta/search'>
-                    <input type="text" name = "search" class="sousuo" placeholder="请输入您要搜索的站点...">
-                    <button></button>
-                </form>
-                
+            <div class="searchsta">
+                <input type="text" class="sousuo" placeholder="请输入您要搜索的站点...">
+                <button></button>
             </div>
-            
 
             <div class="stainfo">
                 <div class="staname" id = "staname">
@@ -60,21 +56,21 @@
                     <div class="graph">
                         站点位置
                         <div class="instance">
-                            <img src="{{ url_for('static', filename = 'images/loc.png') }}" alt="">
+                            <img src="../static/images/loc.png" alt="">
                         </div>
                     </div>
-                    <p id = 'area'>所属区域：{{sta_info.area}}</p>
-                    <p id = 'line'>所属线路：{{sta_info.line}}</p>
-                    <p id = 'dict'>所属功能区域：居住区</p>
+                    <p>所属区域：4115</p>
+                    <p>所属线路：3号线</p>
+                    <p>所属功能区域：居住区</p>
                 </div>
                 <div class="datainfo">
                     <p>客流量对比</p>
                     <ul>
-                        <li>较昨日：<span id= 'day_cmp' class='font-blue'>+23.6%</span></li> 
-                        <li>较月平均：<span id = 'month_cmp' class='font-blue'>+12.1%</span></li> 
-                        <li>较年平均：<span id = 'year_cmp' class='font-blue'>+10.3%</span></li>
-                        <li>早高峰客流：<span> <em id = 'am_peak_flow' class='font-blue'>231</em> 人次</span></li>
-                        <li>晚高峰客流：<span> <em id = 'pm_peak_flow' class='font-blue'>315</em> 人次</span></li>
+                        <li>较昨日：<span class='font-blue'>+23.6%</span></li> 
+                        <li>较月平均：<span class='font-blue'>+12.1%</span></li> 
+                        <li>较年平均：<span class='font-blue'>+10.3%</span></li>
+                        <li>早高峰客流：<span> <em class='font-blue'>231</em> 人次</span></li>
+                        <li>晚高峰客流：<span> <em class='font-blue'>315</em> 人次</span></li>
                     </ul>
                 </div>
                 <div class="cloud">
@@ -217,8 +213,7 @@
  
         </div>
     </div>
-    
     <script src="{{ url_for('static',filename ='layui/layui.js') }}"></script>
-    <script src="{{ url_for('static',filename ='js/sta.js') }}"></script>
+    <script src="../static/js/sta.js"></script>
 </body>
 </html>

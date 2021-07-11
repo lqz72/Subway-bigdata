@@ -212,7 +212,6 @@ class SQLOS(object):
         '''
         flow_df = SQLOS.get_df_data('flow')
         flow_df.drop('id', axis=1, inplace=True)
-        flow_df.time = pd.to_datetime(flow_df.time)
         flow_df.day = pd.to_datetime(flow_df.day)
     
         return flow_df

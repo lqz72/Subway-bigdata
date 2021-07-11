@@ -65,11 +65,6 @@ layui.use('laydate', function(){
             var weather_info = document.getElementById('weather');
             var is_hoilday = document.getElementById('is_hoilday');
             var day_flow = document.getElementById('day_flow');
-            var day_cmp = document.getElementById('day_cmp');
-            var month_cmp = document.getElementById('month_cmp');
-            var year_cmp = document.getElementById('year_cmp');
-            var am_peak_flow = document.getElementById('am_peak_flow');
-            var pm_peak_flow = document.getElementById('pm_peak_flow');
             $.ajax({
                 type: 'POST',
                 data: value,
@@ -80,11 +75,6 @@ layui.use('laydate', function(){
                     weather_info.innerHTML = result.weather;
                     is_hoilday.innerHTML = result.is_hoilday;
                     day_flow.innerHTML = result.day_flow;
-                    day_cmp.innerHTML = result.day_cmp + '%';
-                    month_cmp.innerHTML = result.month_cmp + '%';
-                    year_cmp.innerHTML = result.year_cmp + '%';
-                    am_peak_flow.innerHTML = result.am_peak_flow;
-                    pm_peak_flow.innerHTML = result.pm_peak_flow;
                 }
             });
     
@@ -768,28 +758,20 @@ layui.use('laydate', function(){
             var weather_info = document.getElementById('weather');
             var is_hoilday = document.getElementById('is_hoilday');
             var day_flow = document.getElementById('day_flow');
-            var day_cmp = document.getElementById('day_cmp');
-            var month_cmp = document.getElementById('month_cmp');
-            var year_cmp = document.getElementById('year_cmp');
-            var am_peak_flow = document.getElementById('am_peak_flow');
-            var pm_peak_flow = document.getElementById('pm_peak_flow');
             $.ajax({
                 type: 'POST',
-                data: value,
+                data: value ,
                 async: true,
                 url: '/thisday_info',
                 dataType: 'json',
                 success: function (result) {
+                    // console.log(result);
                     weather_info.innerHTML = result.weather;
                     is_hoilday.innerHTML = result.is_hoilday;
                     day_flow.innerHTML = result.day_flow;
-                    day_cmp.innerHTML = result.day_cmp + '%';
-                    month_cmp.innerHTML = result.month_cmp + '%';
-                    year_cmp.innerHTML = result.year_cmp + '%';
-                    am_peak_flow.innerHTML = result.am_peak_flow;
-                    pm_peak_flow.innerHTML = result.pm_peak_flow;
                 }
             });
+        
             $.ajax({
                 type: 'POST',
                 data: value,
