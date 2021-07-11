@@ -9,6 +9,24 @@ function change_data()
     console.log(s_date)
     console.log(c_staname);
     //向后端传取数据代码写这儿------------------------------------
+    var day_cmp = document.getElementById('day_cmp');
+    var month_cmp = document.getElementById('month_cmp');
+    var year_cmp = document.getElementById('year_cmp');
+    var am_peak_flow = document.getElementById('am_peak_flow');
+    var pm_peak_flow = document.getElementById('pm_peak_flow');
+    $.ajax({
+        type: 'POST',
+        data: JSON.stringify({date: c_date, sta: c_staname}),
+        url: '/sta/thisday_info',
+        dataType: 'json',
+        success: function (result) {
+            day_cmp.innerHTML = result.day_cmp + '%';
+            month_cmp.innerHTML = result.month_cmp + '%';
+            year_cmp.innerHTML = result.year_cmp + '%';
+            am_peak_flow.innerHTML = result.am_peak_flow;
+            pm_peak_flow.innerHTML = result.pm_peak_flow;
+        }
+    });
 
     var week_line = echarts.init(document.getElementById('week_flow'));
 
