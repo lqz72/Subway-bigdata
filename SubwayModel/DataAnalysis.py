@@ -168,11 +168,11 @@ class DataApi(object):
         in_series.index = range(in_series.shape[0])
         print(in_series.y.sum())
 
-    def get_peak_flow(df):
+    def get_sta_peak_flow(df, station):
         '''
         获取各个站点在早晚高峰时的进/出客流
         传入一个in_df 或者 out_df
-        返回两个字典 分别为早高峰(7-9)和晚高峰(5-7)时的客流量 
+        返回两个字典 分别为早高峰(7-9)和晚高峰(5-7)时的客流量之和
         格式: {'station':am_num}, {'station':pm_num}
         '''
         df.columns = ['user_id', 'sta_name', 'time']
@@ -188,8 +188,26 @@ class DataApi(object):
             am_peak, pm_peak =grouped[7:10], grouped[5:8]
             am_dict[sta], pm_dict[sta] = am_peak.sum(), pm_peak.sum()
 
-        print(am_dict)
         return am_dict, pm_dict
+
+    def get_peak_flow(flow_df, date):
+        """
+        获取当天早晚高峰时的客流
+        传入一个flow_df和日期date
+        返回一个元组 分别为早高峰(7-9)和晚高峰(5-7)时的客流量之和
+        """
+        flow_df.drop(['sta', 'weekday', 'month'], axis = 1, inplace = True)
+        flow_df['flow'] = 1
+        date_df = flow_df[flow_df['day'].isin([date])]
+        date_df['hour'] = date_df.time.dt.hour
+
+        peak_df = date_df[date_df.hour.isin([7,8,9,17,18,19])]
+        peak_df = peak_df.groupby('hour').flow.sum()
+
+        am_peak_flow = int(peak_df[0:3].sum())
+        pm_peak_flow = int(peak_df[-3:].sum())
+
+        return am_peak_flow, pm_peak_flow
 
     def get_flow_data(flow_df):
         '''
@@ -238,7 +256,62 @@ class DataApi(object):
         month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
         return month_list
 
+    def get_station_info(station):
+        '''
+        返回指定站点信息 
+        '''
+        sta_df = SQLOS.get_df_data('station')
+        sta_df = sta_df[sta_df['sta_name'] == station] 
+
+        sta_dict = {
+                'line':sta_df['line'].tolist()[0], 
+                'area': sta_df['area'].tolist()[0][4:]
+        }
+        return sta_dict
+
+
     #--------------类方法---------------
+    def get_day_flow_info(self, date):
+        """
+        获取当前日期的客流对比信息
+        返回一个字典 包含了客流对比信息和早晚高峰客流
+        """
+        month = date.split('-')[1]
+        year = date.split('-')[0]
+
+        am_peak_flow, pm_peak_flow = DataApi.get_peak_flow(self.flow_df.copy(), date)
+
+        day_flow = self.date_flow[date]
+        date = datetime.datetime.strptime(date, '%Y-%m-%d')
+        one_day = datetime.timedelta(days=1)
+        pre_day_flow = self.date_flow[(date - one_day).strftime('%Y-%m-%d')]
+
+        flow_df = self.flow_df.copy()
+        flow_df.drop(['sta', 'time', 'weekday'], axis =1, inplace =True)
+        flow_df['flow'] = 1
+        flow_df['year'] = flow_df.day.dt.year
+
+        year_df = flow_df[flow_df['year'] == int(year)]
+        month_df = flow_df[flow_df['month'] == str(int(month))]
+        year_days = int(len(year_df.day.unique()))
+        month_days = int(len(month_df.day.unique()))
+        year_mean = int(year_df.shape[0]) / year_days
+        month_mean = int(month_df.shape[0]) / month_days
+
+        day_cmp = round((day_flow - pre_day_flow) / pre_day_flow * 100, 1)
+        month_cmp = round((day_flow - month_mean) / month_mean * 100, 1)
+        year_cmp = round((day_flow - year_mean) / year_mean * 100, 1)
+     
+        info_dict = {
+            'day_cmp':  '+{}'.format(day_cmp) if day_cmp > 0 else '{}'.format(day_cmp),
+             'month_cmp': '+{}'.format(month_cmp) if month_cmp > 0 else '{}'.format(month_cmp),
+             'year_cmp': '+{}'.format(year_cmp) if year_cmp > 0 else '{}'.format(year_cmp),
+             'am_peak_flow': am_peak_flow,
+             'pm_peak_flow': pm_peak_flow
+        }
+
+        return info_dict
+
     def get_curr_week_flow(self, date):
         '''
         获取当前周的客流变化 
@@ -546,6 +619,50 @@ class DataApi(object):
             })
 
         return weather_list
+
+    def get_sta_flow_info(self, station, date):
+        """
+        获取指定站点当前日期的客流对比信息
+        返回一个字典 包含了客流对比信息和早晚高峰客流
+        """
+        month = date.split('-')[1]
+        year = date.split('-')[0]
+
+        flow_df = self.flow_df.copy()
+        sta_df = flow_df[flow_df['sta'] == station]
+
+        am_peak_flow, pm_peak_flow = DataApi.get_peak_flow(sta_df.copy(), date)
+  
+        sta_df['flow'] = 1
+        sta_df['hour'] = sta_df.day.dt.hour
+        sta_df['year'] = sta_df.day.dt.year
+
+
+        day_flow = int(sta_df[sta_df.day == date].shape[0])
+        date = datetime.datetime.strptime(date, '%Y-%m-%d')
+        one_day = datetime.timedelta(days=1)
+
+        pre_day_flow = int(sta_df[sta_df.day == (date - one_day).strftime('%Y-%m-%d')].shape[0])
+
+        year_df = sta_df[sta_df['year'] == int(year)]
+        month_df = sta_df[sta_df['month'] == str(int(month))]
+        year_days = int(len(year_df.day.unique()))
+        month_days = int(len(month_df.day.unique()))
+        year_mean = int(year_df.shape[0]) / year_days
+        month_mean = int(month_df.shape[0]) / month_days
+
+        day_cmp = round((day_flow - pre_day_flow) / pre_day_flow * 100, 1)
+        month_cmp = round((day_flow - month_mean) / month_mean * 100, 1)
+        year_cmp = round((day_flow - year_mean) / year_mean * 100, 1)
+     
+        info_dict = {
+            'day_cmp':  '+{}'.format(day_cmp) if day_cmp > 0 else '{}'.format(day_cmp),
+            'month_cmp': '+{}'.format(month_cmp) if month_cmp > 0 else '{}'.format(month_cmp),
+            'year_cmp': '+{}'.format(year_cmp) if year_cmp > 0 else '{}'.format(year_cmp),
+            'am_peak_flow': am_peak_flow,
+            'pm_peak_flow': pm_peak_flow
+        }
+        return info_dict
         
     def get_sta_curr_week_flow(self, date, station):
         '''
@@ -659,7 +776,8 @@ class DataApi(object):
         
 if __name__ == '__main__':
     api = DataApi()
-    print(api.get_sta_age_structure('2020-07-01', 'Sta101'))
+    api.get_sta_flow_info('Sta101', '2020-07-01')
+    # print(api.get_sta_age_structure('2020-07-01', 'Sta101'))
 
     
 
