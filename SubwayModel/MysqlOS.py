@@ -262,17 +262,28 @@ class SQLOS(object):
         '''
         返回管理员账号信息 返回一个列表
         '''
-        df = SQLOS.get_df_data('admin')
+        conn = SQLOS.connect_to_db()
 
-        admin_list = []
-        for i in range(df.shape[0]):
-            name = df['name'].values[i]
-            pwd = df['pwd'].values[i]
-            tips = df['tips'].values[i]
-            admin_dict = {'name': name, 'pwd': pwd, 'tips': tips}
-            admin_list.append(admin_dict)
+        try:
+            sql = 'SELECT * from admin'
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            data = cursor.fetchall()
 
-        return admin_list
+            admin_list = []
+            for each in data:
+                admin_dict = {'name': each[0], 'pwd': each[1], 'tips': each[2]}
+                admin_list.append(admin_dict)
+
+            conn.close()
+            return admin_list
+
+        except Exception as e:
+            print('error:', e)
+            conn.rollback()
+            conn.close()
+
+        return 'UnKnow'
 
     def get_weather_info(date):
         '''
@@ -394,4 +405,3 @@ class SQLOS(object):
         predict_df.set_index('time', inplace=True)
 
         return predict_df
-

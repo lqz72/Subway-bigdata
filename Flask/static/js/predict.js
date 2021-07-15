@@ -179,7 +179,7 @@ layui.use('form', function(){
     form = layui.form;
     
     //各种基于事件的操作，下面会有进一步介绍
-    form.on('select(model)', function(data){
+    form.on('select(xgb_model)', function(data){
     // console.log(data.value); //得到被选中的值
         alg = data.value;
     }); 

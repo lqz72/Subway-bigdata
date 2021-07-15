@@ -1,5 +1,3 @@
-from flask import render_template
-
 from apps.api_view import *
 
 history_bp = Blueprint('history_bp', __name__)
@@ -43,7 +41,7 @@ def sta_rank() -> json:
 
     return jsonify(sta_rank_list)
 
-@api_bp.route('/in_hour_flow', methods = ['POST', 'GET'])
+@history_bp.route('/in_hour_flow', methods=['POST', 'GET'])
 def in_hour_flow() -> json:
     """返回当前日期各站点6点-9点的进站客流量
     """
@@ -52,7 +50,7 @@ def in_hour_flow() -> json:
 
     return jsonify(in_hour_dict)
 
-@api_bp.route('/out_hour_flow', methods = ['POST', 'GET'])
+@history_bp.route('/out_hour_flow', methods=['POST', 'GET'])
 def out_hour_flow() -> json:
     """返回当前日期各站点6点-9点的出站客流量
     """
@@ -61,7 +59,7 @@ def out_hour_flow() -> json:
 
     return jsonify(out_hour_dict)
 
-@api_bp.route('/split_flow/<int:line>', methods=['POST', 'GET'])
+@history_bp.route('/split_flow/<int:line>', methods=['POST', 'GET'])
 def split_flow(line) -> json:
     """返回地铁断面客流
     """
@@ -70,7 +68,7 @@ def split_flow(line) -> json:
 
     return jsonify(split_flow)
 
-@api_bp.route('/od_flow', methods=['POST', 'GET'])
+@history_bp.route('/od_flow', methods=['POST', 'GET'])
 def od_flow() -> json:
     """返回OD客流
     """

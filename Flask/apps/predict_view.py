@@ -1,4 +1,3 @@
-from flask import render_template
 from apps.api_view import *
 
 predict_bp = Blueprint('predict_view', __name__)

@@ -1,5 +1,4 @@
 import random
-from flask import render_template
 from apps.api_view import *
 
 station_bp = Blueprint('station_bp', __name__)
@@ -9,7 +8,7 @@ def station(staname):
     sta_info = DataApi.get_station_info(staname)
     return render_template('sta.html', staname=staname, sta_info=sta_info)
 
-@api_bp.route('/sta/search', methods=['POST', 'GET'])
+@station_bp.route('/sta/search', methods=['POST', 'GET'])
 def sta_search():
     if request.method == 'POST':
         inner_text = request.form.get('search')
@@ -17,7 +16,7 @@ def sta_search():
         staname = pattern.findall(inner_text)[0]
     return redirect('/station/Sta{}'.format(staname))
 
-@api_bp.route('/sta/thisday_info', methods=['POST', 'GET'])
+@station_bp.route('/sta/thisday_info', methods=['POST', 'GET'])
 def sta_thisday_info():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -37,7 +36,7 @@ def sta_thisday_info():
 
     return jsonify(info_dict)
 
-@api_bp.route('/sta/curr_week_flow', methods=['POST', 'GET'])
+@station_bp.route('/sta/curr_week_flow', methods=['POST', 'GET'])
 def sta_curr_week_flow():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -49,7 +48,7 @@ def sta_curr_week_flow():
 
     return jsonify(flow_dict)
 
-@api_bp.route('/sta/curr_day_flow', methods=['POST', 'GET'])
+@station_bp.route('/sta/curr_day_flow', methods=['POST', 'GET'])
 def sta_curr_day_flow():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)

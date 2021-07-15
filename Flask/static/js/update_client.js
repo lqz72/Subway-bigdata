@@ -17,6 +17,7 @@ btn_search.onclick = function () {
         type: 'POST',
         data: user_id.value,
         dataType: 'json',
+        async: true,
         success: function(result){
             var id = document.getElementById('id');
             var age = document.getElementById('age');
@@ -36,16 +37,18 @@ btn_search.onclick = function () {
         url: '/history/user_flow/line',
         data: user_id.value,
         dataType: 'json',
-        success: function (result) {    
+        async: true,
+        success: function (result) {
             user_flow_line.setOption(result);
         }
     });
 
     //出行记录展示
     $.ajax({
-        type:'post',
+        type:'POST',
         url:'/user_record',
         data: user_id.value,
+        async: true,
         success: function(data)
         {
             userRecord = data.reverse();
@@ -71,7 +74,6 @@ var age_pie = echarts.init(document.getElementById('age_pie'));
 $.ajax({
     type: 'POST',
     url: 'history/age/pie',
-
     dataType: 'json',
     success: function (result) {
         age_pie.setOption(result);
@@ -81,7 +83,6 @@ $.ajax({
 $.ajax({
     type: 'POST',
     url: 'history/age/bar',
-
     dataType: 'json',
     success: function (result) {
         age_bar.setOption(result);
@@ -279,7 +280,6 @@ function getLinesData(userRecord, stations) {
 
 linesOption.series[1].data = getLinesData(userRecord, stations);
 linesChart.setOption(linesOption);
-
 
 //获取分类信息 
 function getCate(x)

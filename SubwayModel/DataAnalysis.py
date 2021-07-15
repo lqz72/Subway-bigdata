@@ -374,8 +374,8 @@ class DataApi(object):
         '''
         获取用户信息 返回一个字典
         '''
-        df = SQLOS.get_df_data('users')
-        df = df[df['user_id'] == user_id]
+        df = SQLOS.get_user_df()
+        df = df[df['user_id'].isin([user_id])]
 
         age = 2021 - int(df['birth_year'].values[0])
         area = df['area'].values[0]
@@ -384,7 +384,7 @@ class DataApi(object):
         trips_df = self.trips_df
         trips_num = trips_df[trips_df['user_id'] == user_id].shape[0]
 
-        return {'id':user_id, 'age':int(age), 'area':area, 'trips_num':int(trips_num), 'category':category} 
+        return {'id': user_id, 'age': int(age), 'area': area, 'trips_num': int(trips_num), 'category': category}
 
     def get_users_by_index(self, index):
         '''
@@ -399,7 +399,7 @@ class DataApi(object):
             user_id = getattr(user, 'user_id')
             area = getattr(user, 'area')
             age = 2021 - int(getattr(user, 'birth_year'))
-            sex='男' if getattr(user, 'sex') == '0' else '女'
+            sex = '男' if getattr(user, 'sex') == '0' else '女'
             
             user_list.append({
                 'user_id': user_id,
@@ -511,7 +511,7 @@ class DataApi(object):
         获取线路断面字典 格式: {split:0,}
         '''
         try:
-            with open(self.abs_path + '/json/{}line.json'.format(flag), 'r', encoding  = 'utf-8') as f:
+            with open(self.abs_path + '/json/{}line.json'.format(flag), 'r', encoding='utf-8') as f:
                 line_list = json.load(f)[line]
             
                 line_split = []
@@ -530,7 +530,7 @@ class DataApi(object):
         '''
         sp = ShortestPath()
         #获取断面字典
-        upline_split = self.get_line_split(line, flag = 'up')
+        upline_split = self.get_line_split(line, flag='up')
         downline_split = self.get_line_split(line, flag='down')
         line_split_dict = {i: {'up': 0, 'down': 0} for i in upline_split} #列表分别存储上行和下行客流
 

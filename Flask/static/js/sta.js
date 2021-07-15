@@ -559,7 +559,7 @@ var hour_line_opts = {
         //     }
         // },
         splitLine: {
-            show: true
+            show: false
         }
     }],
     series: [{

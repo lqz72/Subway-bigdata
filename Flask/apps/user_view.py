@@ -1,4 +1,3 @@
-from flask import render_template
 from apps.api_view import *
 
 user_bp = Blueprint('user_bp', __name__)
