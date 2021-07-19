@@ -12,23 +12,6 @@
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
 </head>
-<style>
-    .layui-laydate, .layui-laydate-hint {
-        box-shadow: none !important;
-        border: none !important;
-    }
-    .layui-form-item {
-        width: 250px;
-        /* top:60px; */
-    }
-    .layui-form-label {
-        width: 100px;
-        /* top:60px; */
-    }
-    .layui-form {
-        margin-top: -10px;
-    }
-</style>
 <body>
     <div class="w">
         <!-- 左侧导航栏 -->
@@ -51,199 +34,224 @@
                 <span class="name">超级管理员</span>
             </div>
 
-            <!-- 时间控件 -->
-            <div class="time" id='timectrlpre'>
-            
+            <div class="addflex">
+                <!-- 时间控件 -->
+                <div class="time" id='timectrlpre'>
+                
+                </div>
+                
+                <!-- 天气控件等 -->
+                <div class="weather">
+                    <div class="addflex">
+                        <div class="todayweatherpre">
+                            <div class="w-img" id="today_weather">
+                                &#xe625;
+                            </div>
+                            <div class="description">
+                                <p id="today">2020-01-01</p>
+                                <p id="today_wea_txt">多云</p>
+                                <strong class="temp" id="today_temp">18℃</strong>
+                                <p id = "today_wind">风向：无持续风向1-2级</p>
+                                <p>节假日：否</p>
+                            </div>
+                        </div>
+                        <div class="ctrl">
+                            <h3>选择预测因子</h3>
+                            <div class="layui-form">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">预测算法</label>
+                                    <div class="layui-input-block">
+                                    <select name="interest" lay-filter="model">
+                                        <!-- <option value="0">请选择</option> -->
+                                        <option value="1" selected>Xgboost</option>
+                                        <option value="2">Arima</option>
+                                        <option value="3">指数平滑</option>
+                                    </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-form">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">天气状况</label>
+                                    <div class="layui-input-block">
+                                    <select name="interest" lay-filter="wea">
+                                        <option value="0">请选择</option>
+                                        <option value="1">多云</option>
+                                        <option value="2">晴</option>
+                                        <option value="3">阴</option>
+                                        <option value="4">阵雨</option>
+                                        <option value="5">小雨</option>
+                                        <option value="6">中雨</option>
+                                        <option value="7">大雨</option>
+                                        <option value="8">暴雨</option>
+                                    </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p id="T"></p>
+                            <em>温度</em>
+                            <button class="layui-btn layui-btn-warm confirm" id="apply">应用</button>
+                            
+                        </div>
+                    </div>
+                    <div class="addflex">
+                        <div class="nextdayspre">
+                            <ul>
+                                <li>
+                                    <p>今天</p>
+                                    <div class="image" id = "d0_icon">
+                                        &#xe646;
+                                    </div>
+                                    <div class="tempe" id = "d0_temp">
+                                        18℃
+                                    </div>
+                                </li>
+                                <li>
+                                    <p>明天</p>
+                                    <div class="image" id = "d1_icon">
+                                        &#xe646;
+                                    </div>
+                                    <div class="tempe" id = "d1_temp">
+                                        18℃
+                                    </div>
+                                </li>
+                                <li>
+                                    <p>后天</p>
+                                    <div class="image" id = "d2_icon">
+                                        &#xe646;
+                                    </div>
+                                    <div class="tempe" id = "d2_temp">
+                                        18℃
+                                    </div>
+                                </li>
+                                <li>
+                                    <p id="d3_date">4日</p>
+                                    <div class="image" id = "d3_icon">
+                                        &#xe646;
+                                    </div>
+                                    <div class="tempe" id = "d3_temp">
+                                        18℃
+                                    </div>
+                                </li>
+                                <li>
+                                    <p id="d4_date">5日</p>
+                                    <div class="image" id = "d4_icon">
+                                        &#xe646;
+                                    </div>
+                                    <div class="tempe" id = "d4_temp">
+                                        18℃
+                                    </div>
+                                </li>
+                                <li>
+                                    <p id="d5_date">6日</p>
+                                    <div class="image" id = "d5_icon">
+                                        &#xe646;
+                                    </div>
+                                    <div class="tempe" id = "d5_temp">
+                                        18℃
+                                    </div>
+                                </li>
+                                <li>
+                                    <p id="d6_date">7日</p>
+                                    <div class="image" id = "d6_icon">
+                                        &#xe646;
+                                    </div>
+                                    <div class="tempe" id = "d6_temp">
+                                        18℃
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                    
             </div>
             
-            <!-- 天气控件等 -->
-            <div class="weather">
-                <div class="todayweatherpre">
-                    <div class="w-img" id="today_weather">
-                        &#xe625;
+            <div class="addflex">
+                <!-- 本月客流 -->
+                <div class="thismonthpre" id = "month_line">
+                    本月客流
+                </div>
+            </div>
+            
+            <div class="addflex">
+                <!-- 本周客流 -->
+                <div class="thisweekpre" id = "week_line">
+                    本周客流
+                </div>
+
+                <!-- 当天总客流 -->
+                <div class="thisdayall">
+                    <p>今日客流总量</p>
+                    <p id = "day_flow">1213</p>
+                </div>
+                <!-- 当天其他信息 -->
+                <div  class="thisdayinfopre">
+                    <p>客流量对比</p>
+                    <ul>
+                        <li>较昨日：<span class='font-blue' id = "cmp_day">+21.1%</span></li> 
+                        <li>较月平均：<span class='font-blue' id = "cmp_month">+10.3%</span></li> 
+                        <li>较年平均：<span class='font-blue' id = "cmp_year">-1.6%</span></li>
+                        <li>早高峰客流：<span> <em class='font-blue' id = "am_peak_flow">231</em> 人次</span></li>
+                        <li>晚高峰客流：<span> <em class='font-blue' id = "pm_peak_flow">315</em> 人次</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+
+            <div class="addflex">
+                <!-- 线路流量占比 -->
+                <div class="line-percentpre" id = "line_pie">
+                    线路流量占比
+                </div>
+
+                <!-- 今日具体时刻客流 -->
+                <div class="exacthourpre" id = "hour_line">
+                    今日具体时刻客流
+                </div>
+            </div>
+            
+            <div class="addflex">
+                <!-- 客流评分及预警措施 -->
+                <div class="markpre">
+                    <h4>客流评分及预警措施</h4>
+                    <div class="graph" id="markpre">
+                        
+                    </div>
+                    <div class="words">
+                        评分
                     </div>
                     <div class="description">
-                        <p id="today">2020-01-01</p>
-                        <p id="today_wea_txt">多云</p>
-                        <strong class="temp" id="today_temp">18℃</strong>
-                        <p id = "today_wind">风向：无持续风向1-2级</p>
-                        <p>节假日：否</p>
+                        <ul>
+                            <li>采取出入口人员提醒、广播疏导客流、警示牌及警戒线导流等现场疏散措施。</li>
+                            <li>视情况对客流进行限量进入。</li>
+                            <li>开启部分备用通道，疏散客流。</li>
+                            <li>加派安全员现场疏导客流和维护秩序。</li>
+                            <li>加强对站台乘客候车动态及站台屏蔽门工作状态的监控。</li>
+                        </ul>
+                    </div>
+                    <div class="graph2" id = "eval_radar">
+                        
                     </div>
                 </div>
-                <div class="ctrl">
-                    <h3>选择预测因子</h3>
-                    <div class="layui-form">
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">预测算法</label>
-                            <div class="layui-input-block">
-                              <select name="interest" lay-filter="model">
-                                <!-- <option value="0">请选择</option> -->
-                                <option value="1" selected>Xgboost</option>
-                                <option value="2">Arima</option>
-                                <option value="3">指数平滑</option>
-                              </select>
-                            </div>
+
+            </div>
+            
+            <div class="addflex">
+                <!-- 进站出站 -->
+                <div class="graphpre layui-form change">
+                    <div class="layui-form-item bug1">
+                        <!-- <label class="layui-form-label">客流方向</label> -->
+                        <div class="layui-input-block m-radio bug2">
+                        <input type="radio" name="sex" value="0" title="入站">
+                        <input type="radio" name="sex" value="1" title="出站" checked>
                         </div>
                     </div>
-                    <div class="layui-form">
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">天气状况</label>
-                            <div class="layui-input-block">
-                              <select name="interest" lay-filter="wea">
-                                <option value="0">请选择</option>
-                                <option value="1">多云</option>
-                                <option value="2">晴</option>
-                                <option value="3">阴</option>
-                                <option value="4">阵雨</option>
-                                <option value="5">小雨</option>
-                                <option value="6">中雨</option>
-                                <option value="7">大雨</option>
-                                <option value="8">暴雨</option>
-                              </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <p id="T"></p>
-                    <em>温度</em>
-                    <button class="layui-btn layui-btn-warm confirm" id="apply">应用</button>
-                    
-                </div>
-                <div class="nextdayspre">
-                    <ul>
-                        <li>
-                            <p>明天</p>
-                            <div class="image" id = "d1_icon">
-                                &#xe646;
-                            </div>
-                            <div class="tempe" id = "d1_temp">
-                                18℃
-                            </div>
-                        </li>
-                        <li>
-                            <p>后天</p>
-                            <div class="image" id = "d2_icon">
-                                &#xe646;
-                            </div>
-                            <div class="tempe" id = "d2_temp">
-                                18℃
-                            </div>
-                        </li>
-                        <li>
-                            <p id="d3_date">4日</p>
-                            <div class="image" id = "d3_icon">
-                                &#xe646;
-                            </div>
-                            <div class="tempe" id = "d3_temp">
-                                18℃
-                            </div>
-                        </li>
-                        <li>
-                            <p id="d4_date">5日</p>
-                            <div class="image" id = "d4_icon">
-                                &#xe646;
-                            </div>
-                            <div class="tempe" id = "d4_temp">
-                                18℃
-                            </div>
-                        </li>
-                        <li>
-                            <p id="d5_date">6日</p>
-                            <div class="image" id = "d5_icon">
-                                &#xe646;
-                            </div>
-                            <div class="tempe" id = "d5_temp">
-                                18℃
-                            </div>
-                        </li>
-                        <li>
-                            <p id="d6_date">7日</p>
-                            <div class="image" id = "d6_icon">
-                                &#xe646;
-                            </div>
-                            <div class="tempe" id = "d6_temp">
-                                18℃
-                            </div>
-                        </li>
-                    </ul>
+                    <div id= "graph"></div>
                 </div>
             </div>
-
-            <!-- 本月客流 -->
-            <div class="thismonthpre" id = "month_line">
-                本月客流
-            </div>
-
-            <!-- 本周客流 -->
-            <div class="thisweekpre" id = "week_line">
-                本周客流
-            </div>
-
-            <!-- 当天总客流 -->
-            <div class="thisdayall">
-                <p>今日客流总量</p>
-                <p id = "day_flow">1213</p>
-            </div>
-            <!-- 当天其他信息 -->
-            <div  class="thisdayinfopre">
-                <p>客流量对比</p>
-                <ul>
-                    <li>较昨日：<span class='font-blue' id = "cmp_day">+21.1%</span></li> 
-                    <li>较月平均：<span class='font-blue' id = "cmp_month">+10.3%</span></li> 
-                    <li>较年平均：<span class='font-blue' id = "cmp_year">-1.6%</span></li>
-                    <li>早高峰客流：<span> <em class='font-blue' id = "am_peak_flow">231</em> 人次</span></li>
-                    <li>晚高峰客流：<span> <em class='font-blue' id = "pm_peak_flow">315</em> 人次</span></li>
-                </ul>
-            </div>
-
-            <!-- 线路流量占比 -->
-            <div class="line-percentpre" id = "line_pie">
-                线路流量占比
-            </div>
-
-            <!-- 今日具体时刻客流 -->
-            <div class="exacthourpre" id = "hour_line">
-                今日具体时刻客流
-            </div>
-
-            <!-- 客流评分及预警措施 -->
-            <div class="markpre">
-                <h4>客流评分及预警措施</h4>
-                <div class="graph" id="markpre">
-                    
-                </div>
-                <div class="words">
-                    评分
-                </div>
-                <div class="description">
-                    <ul>
-                        <li>采取出入口人员提醒、广播疏导客流、警示牌及警戒线导流等现场疏散措施。</li>
-                        <li>视情况对客流进行限量进入。</li>
-                        <li>开启部分备用通道，疏散客流。</li>
-                        <li>加派安全员现场疏导客流和维护秩序。</li>
-                        <li>加强对站台乘客候车动态及站台屏蔽门工作状态的监控。</li>
-                    </ul>
-                </div>
-                <div class="graph2" id = "eval_radar">
-                    图表
-                </div>
-            </div>
-
-            <!-- 进站出站 -->
-            <div class="graphpre layui-form change">
-                <div class="layui-form-item bug1">
-                    <!-- <label class="layui-form-label">客流方向</label> -->
-                    <div class="layui-input-block m-radio bug2">
-                      <input type="radio" name="sex" value="0" title="入站">
-                      <input type="radio" name="sex" value="1" title="出站" checked>
-                    </div>
-                </div>
-                <div id= "graph"></div>
-            </div>
-
-
-
- 
+            
         </div>
     </div>
     <script src="{{ url_for('static',filename ='layui/layui.js') }}"></script>

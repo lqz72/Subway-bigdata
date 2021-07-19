@@ -1,16 +1,12 @@
-from apps.api_view import *
+import json
+from flask import request
+from flask import jsonify
+from flask import Blueprint
 
-user_bp = Blueprint('user_bp', __name__)
+from apps import api
+user_bp = Blueprint('user_bp', __name__, url_prefix='/user')
 
-@user_bp.route('/client')
-def client():
-    return render_template('client.html')
-
-@user_bp.route('/userinf')
-def userinf():
-    return render_template('userinf.html')
-
-@user_bp.route('/user_info', methods=['POST', 'GET'])
+@user_bp.route('/info', methods=['POST', 'GET'])
 def user_info() -> json:
     """返回指定用户的个人信息
     """
@@ -27,7 +23,7 @@ def users_info(page) -> json:
 
     return jsonify(users_info_list)
 
-@user_bp.route('/user_record', methods=['POST', 'GET'])
+@user_bp.route('/trip_record', methods=['POST', 'GET'])
 def user_trip_record():
     """返回用户近期出行记录
     """

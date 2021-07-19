@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static',filename ='layui/css/layui.css') }}" media="all">
     <link href="{{ url_for('static',filename ='css/font-awesome.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static',filename ='css/sta.css') }}">
-	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
     <script src="{{ url_for('static',filename ='js/echarts-wordcloud.min.js') }}"></script>
 </head>
@@ -42,94 +42,113 @@
                 <span class="name">超级管理员</span>
             </div>
 
-            <!-- 搜索框 -->
-            <div class="searchsta" >
-                <form method = 'POST' action = '/sta/search'>
-                    <input type="text" name = "search" class="sousuo" placeholder="请输入您要搜索的站点...">
-                    <button></button>
-                </form>
-                
+            <div class="addflex">
+                <!-- 搜索框 -->
+                <div class="searchsta" >
+                    <form method = 'POST' action = '/sta/search'>
+                        <input type="text" name = "search" class="sousuo" placeholder="请输入您要搜索的站点...">
+                        <button></button>
+                    </form>
+                </div>
             </div>
             
-
-            <div class="stainfo">
-                <div class="staname" id = "staname">
-                    {{staname}}
-                </div>
-                <div class="locinfo">
-                    <div class="graph">
-                        站点位置
-                        <div class="instance">
-                            <img src="{{ url_for('static', filename = 'images/line'+ sta_info.line[:-2] +'.png') }}" alt="">
+            
+            <div class="addflex">
+                <div class="stainfo">
+                    <div class="sta_name" id = "sta_name">
+                        {{sta_name}}
+                    </div>
+                    <div class="addflex">
+                        <div class="locinfo">
+                            <div class="graph">
+                                站点位置
+                                <div class="instance">
+                                    <img src="{{ url_for('static', filename = 'images/line' + sta_info.line[:-2] + '.png') }}" alt="">
+                                </div>
+                            </div>
+                            <p id = 'area'>所属区域：{{sta_info.area}}</p>
+                            <p id = 'line'>所属线路：{{sta_info.line}}</p>
+                            <p id = 'dict'>所属功能区域：居住区</p>
+                        </div>
+                        <div class="datainfo">
+                            <p>客流量对比</p>
+                            <ul>
+                                <li>较昨日：<span id= 'day_cmp' class='font-blue'>+23.6%</span></li> 
+                                <li>较月平均：<span id = 'month_cmp' class='font-blue'>+12.1%</span></li> 
+                                <li>较年平均：<span id = 'year_cmp' class='font-blue'>+10.3%</span></li>
+                                <li>早高峰客流：<span> <em id = 'am_peak_flow' class='font-blue'>231</em> 人次</span></li>
+                                <li>晚高峰客流：<span> <em id = 'pm_peak_flow' class='font-blue'>315</em> 人次</span></li>
+                            </ul>
+                        </div>
+                        <div class="cloud">
+                            <p>人群词云图</p>
+                            <div class="yun" id = "wordclouds">
+        
+                            </div>
                         </div>
                     </div>
-                    <p id = 'area'>所属区域：{{sta_info.area}}</p>
-                    <p id = 'line'>所属线路：{{sta_info.line}}</p>
-                    <p id = 'dict'>所属功能区域：居住区</p>
-                </div>
-                <div class="datainfo">
-                    <p>客流量对比</p>
-                    <ul>
-                        <li>较昨日：<span id= 'day_cmp' class='font-blue'>+23.6%</span></li> 
-                        <li>较月平均：<span id = 'month_cmp' class='font-blue'>+12.1%</span></li> 
-                        <li>较年平均：<span id = 'year_cmp' class='font-blue'>+10.3%</span></li>
-                        <li>早高峰客流：<span> <em id = 'am_peak_flow' class='font-blue'>231</em> 人次</span></li>
-                        <li>晚高峰客流：<span> <em id = 'pm_peak_flow' class='font-blue'>315</em> 人次</span></li>
-                    </ul>
-                </div>
-                <div class="cloud">
-                    <p>人群词云图</p>
-                    <div class="yun" id = "wordclouds">
-
-                    </div>
-                </div>
-            </div>
-            <!-- 时间控件 -->
-            <div class="time" id='timectrlsta'>
-            
-            </div>
-
-            <div class="stamonth" id = "week_flow">
-                本周
-            </div>
-            
-            <div class="stahour" id = "hour_flow">
-                当日小时客流
-            </div>
-
-            <!-- 客流评分及预警措施 -->
-            <div class="markpre">
-                <h4>客流评分及预警措施</h4>
-                <div class="graph" id="markpre">
                     
                 </div>
-                <div class="words">
-                    评分
-                </div>
-                <div class="description">
-                    <ul>
-                        <li>采取出入口人员提醒、广播疏导客流、警示牌及警戒线导流等现场疏散措施。</li>
-                        <li>视情况对客流进行限量进入。</li>
-                        <li>开启部分备用通道，疏散客流。</li>
-                        <li>加派安全员现场疏导客流和维护秩序。</li>
-                        <li>加强对站台乘客候车动态及站台屏蔽门工作状态的监控。</li>
-                    </ul>
-                </div>
-                <div class="graph2" id = "schedule">
-                    图表
+                <!-- 时间控件 -->
+                <div class="time" id='timectrlsta'>
+                
                 </div>
             </div>
-            <div class="itemadvice">
-                <img src="../static/images/sta.png" alt="">
+            
+            <div class="addflex">
+                <div class="stamonth" id = "week_flow">
+                    本周
+                </div>
+                
+                <div class="stahour" id = "hour_flow">
+                    当日小时客流
+                </div>
             </div>
 
-            <div class="agestructure" id ="age_structure">
-                年龄结构
+            <div class="addflex">
+                <!-- 客流评分及预警措施 -->
+                <div class="markpre">
+                    <h4>客流评分及预警措施</h4>
+                    <div class="addflex">
+                        <div class="graph" id="markpre">
+                        
+                        </div>
+                        <div class="words">
+                            评分
+                        </div>
+                        <div class="description">
+                            <ul>
+                                <li>采取出入口人员提醒、广播疏导客流、警示牌及警戒线导流等现场疏散措施。</li>
+                                <li>视情况对客流进行限量进入。</li>
+                                <li>开启部分备用通道，疏散客流。</li>
+                                <li>加派安全员现场疏导客流和维护秩序。</li>
+                                <li>加强对站台乘客候车动态及站台屏蔽门工作状态的监控。</li>
+                            </ul>
+                        </div>
+                        <div class="graph2" id = "schedule">
+                            图表
+                        </div>
+                    </div>
+                    
+                </div>
             </div>
-
-            <div class="seats" id = "aixin">
-                座位摆放
+            
+            <div class="addflex">
+                <div class="itemadvice">
+                    <img src="../static/images/sta.png" alt="">
+                </div>
             </div>
+            
+            <div class="addflex">
+                <div class="agestructure" id ="age_structure">
+                    年龄结构
+                </div>
+    
+                <div class="seats" id = "aixin">
+                    座位摆放
+                </div>
+            </div>
+            
 
 
 

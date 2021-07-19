@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 import pymysql
@@ -56,13 +57,13 @@ class SQLOS(object):
         '''
         conn = SQLOS.connect_to_db()
         cursor = conn.cursor()
-        path =  ABS_PATH + '/txt_data/' 
+        path = ABS_PATH + '/txt_data/'
         txt_path = eval(repr(path).replace(r'\\', '/'))
 
         file_path = {
             # 'weather2020': txt_path + 'weather2020.txt',
             # 'hoilday2020': txt_path + 'hoilday2020.txt',
-            # 'station': txt_path + 'station.txt',
+            'station': txt_path + 'station.txt',
             # 'users': txt_path + 'users.txt',
             # 'flow': txt_path + 'flow.txt',
             # 'trips': txt_path +'trips.txt', 
@@ -131,11 +132,11 @@ class SQLOS(object):
         将dataframe写入mysql对应的表中
         '''
         config = SQLOS.get_mysql_config()
-        host=config['host']
-        port=config['port']
-        user=config['user']
-        passwd=config['passwd']
-        db=config['db']
+        host = config['host']
+        port = config['port']
+        user = config['user']
+        passwd = config['passwd']
+        db = config['db']
 
         conn = create_engine('mysql+pymysql://{user}:{passwd}@{host}:{port}/{db}?charset=utf8mb4'.format(
             user=user, passwd=passwd, host=host, port=port, db=db))
@@ -158,7 +159,7 @@ class SQLOS(object):
 
         # 创建一个字典用于存放 各年龄所对应的用户人数
         age_dict = dict(zip(age_index, age_values))
-        #print(age_dict)
+
         return age_dict
 
     def get_station_dict():
@@ -240,7 +241,7 @@ class SQLOS(object):
         out_df = out_df[out_df['out_time'].str.contains('2020')]
         
         in_df.in_time = pd.to_datetime(in_df.in_time)
-        in_df.set_index('in_time', inplace =True)
+        in_df.set_index('in_time', inplace=True)
         out_df.out_time = pd.to_datetime(out_df.out_time)
         out_df.set_index('out_time', inplace=True)
   
@@ -397,7 +398,6 @@ class SQLOS(object):
         return predict_df
 
     def get_pred_hour(type_):
-
         predict_df = SQLOS.get_df_data('pred_%s_hour' % type_)
         predict_df.time = pd.to_datetime(predict_df.time)
         predict_df['hour'] = predict_df.time.dt.hour
@@ -405,3 +405,5 @@ class SQLOS(object):
         predict_df.set_index('time', inplace=True)
 
         return predict_df
+
+# SQLOS.load_data()

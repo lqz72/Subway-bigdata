@@ -1,5 +1,5 @@
 var c_date = '2020-01-01';
-var c_staname = document.getElementById('staname').innerText;
+var c_staname = document.getElementById('sta_name').innerText;
 function change_data()
 {
     var s_date = JSON.stringify(c_date);//得到的字符串
@@ -467,7 +467,7 @@ var hour_line_opts = {
         bottom: '10%'
     },
     xAxis: [{
-        name: "",
+        name: "时间/时",
         type: 'category',
         data: ["6","7","8","9","10","11","12","13","14","15", "16", "17", "18", "19", "20", "21"],
         axisLine: {
@@ -559,7 +559,7 @@ var hour_line_opts = {
         //     }
         // },
         splitLine: {
-            show: false
+            show: true
         }
     }],
     series: [{

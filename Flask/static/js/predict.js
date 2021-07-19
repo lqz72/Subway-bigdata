@@ -21,10 +21,11 @@ function change_data()
     inout_s();
     //更新天气数据
     $.ajax({
-        url:"/weather_info",
+        url:"/api/weather_info",
         type:"POST",
         data:data_b['c_date'],
         success: function(data){
+            console.log(data);
             var today = document.querySelector("#today");
             today.innerText = data[0].date;
             var today_weather = document.querySelector("#today_weather");
@@ -35,7 +36,7 @@ function change_data()
             today_temp.innerHTML = data[0].temp;
             var today_wind = document.querySelector("#today_wind");
             today_wind.innerHTML = data[0].wind;
-            for(var i=1;i<=6;i++)
+            for(var i=0;i<=6;i++)
             {
                 var str1 = '#d'+i+'_icon';
                 document.querySelector(str1).innerHTML = get_icon_words(data[i].weather);
@@ -179,7 +180,7 @@ layui.use('form', function(){
     form = layui.form;
     
     //各种基于事件的操作，下面会有进一步介绍
-    form.on('select(xgb_model)', function(data){
+    form.on('select(model)', function(data){
     // console.log(data.value); //得到被选中的值
         alg = data.value;
     }); 
@@ -310,8 +311,8 @@ var option_markpre = {
 };
 
 
-var stations = getJsonData('/sta/json');
-var links = getJsonData('/link/json');
+var stations = getJsonData('/api/sta/json');
+var links = getJsonData('/api/link/json');
     
 //获取线路名称列表
 var lineNames = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线'];

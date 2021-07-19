@@ -30,7 +30,7 @@ class PredictApi(object):
         api = DataApi()
         try:
             for sta in api.sta_dict.keys():
-                if os.path.exists(api.abs_path + '/model/%s.pkl' % sta):
+                if os.path.exists(api.abs_path + '/xgb_model/%s.pkl' % sta):
                     continue
                 in_series, out_series = DataApi.get_sta_series(sta, api.in_df, api.out_df)
                 if in_series.shape[0] == 0:

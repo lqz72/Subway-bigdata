@@ -17,6 +17,36 @@
 
 //     }); 
 // });
+var nav = document.querySelector(".nav");
+var content = document.querySelector(".content");
+var taggle = document.querySelector(".mytoggle");
+taggle.addEventListener('click',function()
+{
+    if(!state){
+        nav.style.width = '50px';
+        content.style.marginLeft = '50px';
+        state = 1;
+    }
+    else{
+        nav.style.width = '250px';
+        content.style.marginLeft = '250px';
+        state = 0;
+    }
+    
+    month_chart.resize();
+    week_chart.resize();
+    line_pie.resize();
+    graphChart.resize();
+    splitChart.resize();
+    ODChart.resize();
+});
+var month_chart;
+var week_chart;
+var line_pie;
+var graphChart;
+var splitChart;
+var ODChart;
+var state = 0;//表示未折叠
 
 
 var n_date;
@@ -37,7 +67,7 @@ layui.use('laydate', function(){
             // $(
             //     function(){
             value = '2020-01-01';
-            var month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
+            month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
             // console.log(value);
             $.ajax({
                 type: 'POST',
@@ -50,7 +80,7 @@ layui.use('laydate', function(){
                 }
             });
     
-            var week_chart = echarts.init(document.getElementById('curr_week_line'), 'white', {renderer: 'canvas'});
+            week_chart = echarts.init(document.getElementById('curr_week_line'), 'white', {renderer: 'canvas'});
             $.ajax({
                 type: "POST",
                 data: value,
@@ -74,7 +104,7 @@ layui.use('laydate', function(){
                 type: 'POST',
                 data: value,
                 async: true,
-                url: '/thisday_info',
+                url: '/history/thisday_info',
                 dataType: 'json',
                 success: function (result) {
                     weather_info.innerHTML = result.weather;
@@ -92,7 +122,7 @@ layui.use('laydate', function(){
                 type: 'POST',
                 data: value,
                 async: true,
-                url: '/sta_rank',
+                url: '/history/sta_rank',
                 dataType: 'json',
                 success: function (result) {
                     for (let i = 1; i <= 25; i++){
@@ -110,7 +140,7 @@ layui.use('laydate', function(){
                 }
             });
     
-            var line_pie = echarts.init(document.getElementById('line_percent'));
+            line_pie = echarts.init(document.getElementById('line_percent'));
             $.ajax({
                 type: "POST",
                 data: value,
@@ -126,7 +156,7 @@ layui.use('laydate', function(){
             $.ajax({
                 type: "POST",
                 data: value,
-                url: '/out_hour_flow',
+                url: '/history/out_hour_flow',
                 dataType: 'json',
                 async: false,
                 success: function (result) {
@@ -149,11 +179,11 @@ layui.use('laydate', function(){
                 return jsData;
             }
     
-            var stations = getJsonData('/sta/json');
-            var links = getJsonData('/link/json');
+            var stations = getJsonData('/api/sta/json');
+            var links = getJsonData('/api/link/json');
     
             //初始化图表
-            var graphChart = echarts.init(document.getElementById('line_graph'));
+            graphChart = echarts.init(document.getElementById('line_graph'));
     
             //获取线路名称列表
             var lineNames = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线'];
@@ -256,8 +286,7 @@ layui.use('laydate', function(){
                             }
                         ]
                     },
-                    
-                    )    
+                    )
                 }
             }
             
@@ -343,11 +372,11 @@ layui.use('laydate', function(){
             setGraphOptions(graphOption, hourFlowData);
             graphChart.setOption(graphOption);
             
-            var splitChart = echarts.init(document.getElementById('split_bar'));
+            splitChart = echarts.init(document.getElementById('split_bar'));
             var splitFlow;
             $.ajax({
                 type: 'POST',
-                url: '/split_flow/1',
+                url: '/history/split_flow/1',
                 async: false,
                 data: value,
                 datatype: 'json',
@@ -485,47 +514,13 @@ layui.use('laydate', function(){
             setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
             splitChart.setOption(barOption);
 
-            //断面排行榜
-            var splitRank = [];
-            function getSplitRank(splitRank, line) {
-                for (let i = 0; i < splitNames.length - 1; i++){
-                    var k = i;
-                    var maxFlow = splitFlow[splitNames[i]].up;
-                    for (let j = i + 1; j < splitNames.length; j++){
-                        if (splitFlow[splitNames[j]].up > maxFlow) {
-                            k = j;
-                            maxFlow = splitFlow[splitNames[j]].up;
-                        }
-                    }
-                    splitRank.push({ 'split': splitNames[k], 'flow': maxFlow });
-                    delete splitFlow[splitNames[k]];
-                    splitNames = Object.keys(splitFlow);
-                }
-                
-    
-                for (let i = 1; i <= 6; i++){
-                    var split_rank = document.getElementById('split_rank' + `${i}`);
-                    var source = document.getElementById('source' + `${i}`);
-                    var target = document.getElementById('target' + `${i}`);
-                    var split_line = document.getElementById('split_line' + `${i}`);
-                    var split_flow = document.getElementById('split_flow' + `${i}`);
-
-                    split_rank.innerHTML = i;
-                    source.innerHTML = splitRank[i - 1]['split'].split('-')[0];
-                    target.innerHTML = splitRank[i - 1]['split'].split('-')[1];
-                    split_line.innerHTML = line + '号线';
-                    split_flow.innerHTML = splitRank[i - 1]['flow'];
-                }
-            }
-            
-            getSplitRank(splitRank, '1');
 
             //od关系图
-            var ODChart = echarts.init(document.getElementById('od_graph'));
+            ODChart = echarts.init(document.getElementById('od_graph'));
             var ODFlow;
             $.ajax({
                 type: 'POST',
-                url: '/od_flow',
+                url: '/history/od_flow',
                 async: false,
                 data: value,
                 dataType: 'json',
@@ -672,11 +667,11 @@ layui.use('laydate', function(){
                     var hourFlowUrl;
                     var type;
                     if (data.value == "0") {
-                        hourFlowUrl = '/in_hour_flow';
+                        hourFlowUrl = '/history/in_hour_flow';
                         type = "入站";
                     }
                     else if (data.value == "1"){
-                        hourFlowUrl = '/out_hour_flow';
+                        hourFlowUrl = '/history/out_hour_flow';
                         type = "出站";
                     }
                     else {
@@ -708,7 +703,7 @@ layui.use('laydate', function(){
                     //切换线路代码写这儿
                     $.ajax({
                         type: 'POST',
-                        url: '/split_flow/' + data.value,
+                        url: '/history/split_flow/' + data.value,
                         async: false,
                         data: value,
                         datatype: 'json',
@@ -733,8 +728,213 @@ layui.use('laydate', function(){
                     });
                 }); 
             });
+
+            var hoursList = ['7-9', '10-12', '13-15', '16-18', '19-21'];
             
-                    
+            inoutChart = echarts.init(document.getElementById('area_inout'));
+            var inoutOption =  {
+                timeline: {
+                    axisType: 'category',
+                    show: true,
+                    autoPlay: false,
+                    playInterval: 1000,
+                    data: hoursList
+                },
+                tooltip: {
+                  trigger: "axis",
+                  axisPointer: {
+                    type: "shadow"
+                  }
+                },
+                grid: {
+                  bottom: "10%"
+                },
+                legend: {
+                  data: [
+                    { name: "流入量", icon: "circle" },
+                    { name: "流出量", icon: "circle" },
+                  ],
+                  itemGap: 12,
+                  right: 20,
+                  textStyle: {
+                    fontSize: 14,
+                    color: "#5D6C8E",
+                    fontFamily: "SourceHanSansCN-Regular"
+                  }
+                },
+                xAxis: [
+                  {
+                    type: "value",
+                    axisPointer: {
+                      type: "shadow"
+                    },
+                    // 横坐标 分割线等取消显示
+                    axisTick: {
+                      show: false
+                    },
+                    axisLine: {
+                      show: false
+                    },
+                    splitLine: {
+                      show: false
+                    },
+                    axisLabel: {
+                      show: false
+                    }
+                  }
+                ],
+                yAxis: [
+                  {
+                    type: 'category',
+                    axisTick: {
+                        show: false
+                    },
+                    axisLine: {
+                        show: true,
+                        lineStyle: {
+                            color: 'rgba(121,121,121,0.3)'
+                        }
+                    },
+                    axisLabel: {
+                      textStyle: {
+                        fontSize: 15,
+                        color: "#5D6C8E",
+                        fontFamily: "SourceHanSansCN-Regular"
+                      }
+
+                    },
+                    data: [],
+                  },
+                  {
+                    type: "category",
+                    axisLine: {
+                      show: false
+                    },
+                    axisTick: {
+                      show: false
+                    },
+                    axisLabel: {
+                      textStyle: {
+                        fontSize: 18,
+                        color: "#5D6C8E",
+                        fontFamily: "SourceHanSansCN-Regular"
+                      }
+                    },
+                    data: []
+                  }
+                ],
+                series: [
+                  {
+                    name: "流入量",
+                    type: "bar",
+                    // 宽度
+                    barWidth: "16",
+                    // 堆叠
+                    stack: "总量",
+                    showBackground: true,
+                    // 全部背景
+                    backgroundStyle: {
+                      color: "#fff"
+                    },
+                    itemStyle: {
+                      normal: {
+                        show: true,
+                        textStyle: {
+                          fontSize: 16
+                        },
+                        color: new echarts.graphic.LinearGradient(
+                          0, 0, 1, 0,
+                          [
+                            {
+                              offset: 0,
+                              color: "#FFF0A0"
+                            },
+                            {
+                              offset: 1,
+                              color: "#FFD355"
+                            }
+                          ],
+                          false
+                        )
+                      }
+                    }
+                  },
+                  {
+                    name: "流出量",
+                    type: "bar",
+                    // 宽度
+                    barWidth: "16",
+                    // 堆叠
+                    stack: "总量",
+                    showBackground: true,
+                    // 全部背景
+                    backgroundStyle: {
+                      color: "#fff"
+                    },
+                    itemStyle: {
+                      normal: {
+                        show: true,
+                        textStyle: {
+                          fontSize: 16
+                        },
+                        color: new echarts.graphic.LinearGradient(
+                          0, 0, 1, 0,
+                          [
+                            {
+                              offset: 0,
+                              color: "#90BEFF"
+                            },
+                            {
+                              offset: 1,
+                              color: "#5EA1FF"
+                            }
+                          ],
+                          false
+                        )
+                      }
+                    }
+                  }
+                ],
+                options: []
+            };
+
+            $.ajax({
+                type: "POST",
+                url: '/history/area/inout_flow',
+                data: value,
+                dataType: 'json',
+                success: function (param) {
+                    console.log(param);
+                    setAreaInoutChart(param[0], param[1], param[2]);
+                    inoutChart.setOption(inoutOption);
+                    console.log(inoutOption);
+                }
+            });
+            
+            function setAreaInoutChart(staList, inFlow, outFlow){
+                console.log(inFlow);
+                inoutOption.options = [];
+                inoutOption.yAxis[0].data = staList;
+                //inoutOption.yAxis[1].data = inFlow + outFlow;
+                for(let i = 0; i < hoursList.length; i++){
+                    let hours = hoursList[i];
+                    inoutOption.options.push({
+                        title:{
+                            text: hours + "时间段点入点出流量分布",
+
+                        },
+                        series:[
+                            {
+                                data:inFlow[hours]
+                            },
+                            {
+                                data:outFlow[hours]
+                            }
+                        ]
+                    });
+                }
+            }
+
             //     }
             // )
 
@@ -777,7 +977,7 @@ layui.use('laydate', function(){
                 type: 'POST',
                 data: value,
                 async: true,
-                url: '/thisday_info',
+                url: '/history/thisday_info',
                 dataType: 'json',
                 success: function (result) {
                     weather_info.innerHTML = result.weather;
@@ -794,7 +994,7 @@ layui.use('laydate', function(){
                 type: 'POST',
                 data: value,
                 async: true,
-                url: '/sta_rank',
+                url: '/history/sta_rank',
                 dataType: 'json',
                 success: function (result) {
                     // console.log(result);
@@ -829,7 +1029,7 @@ layui.use('laydate', function(){
             $.ajax({
                 type: "POST",
                 data: value,
-                url: '/out_hour_flow',
+                url: '/history/out_hour_flow',
                 dataType: 'json',
                 async: false,
                 success: function (result) {
@@ -852,8 +1052,8 @@ layui.use('laydate', function(){
                 return jsData;
             }
     
-            var stations = getJsonData('/sta/json');
-            var links = getJsonData('/link/json');
+            var stations = getJsonData('/api/sta/json');
+            var links = getJsonData('/api/link/json');
     
             //初始化图表
             var graphChart = echarts.init(document.getElementById('line_graph'));
@@ -1041,11 +1241,11 @@ layui.use('laydate', function(){
             setGraphOptions(graphOption, hourFlowData);
             graphChart.setOption(graphOption);
             
-            var splitChart = echarts.init(document.getElementById('split_bar'));
+            splitChart = echarts.init(document.getElementById('split_bar'));
             var splitFlow;
             $.ajax({
                 type: 'POST',
-                url: '/split_flow/2',
+                url: '/history/split_flow/2',
                 async: false,
                 data: value,
                 datatype: 'json',
@@ -1182,7 +1382,7 @@ layui.use('laydate', function(){
             var ODFlow;
             $.ajax({
                 type: 'POST',
-                url: '/od_flow',
+                url: '/history/od_flow',
                 async: false,
                 data: value,
                 dataType: 'json',
@@ -1328,11 +1528,11 @@ layui.use('laydate', function(){
                     var hourFlowUrl;
                     var type;
                     if (data.value == "0") {
-                        hourFlowUrl = '/in_hour_flow';
+                        hourFlowUrl = '/history/in_hour_flow';
                         type = "入站";
                     }
                     else if (data.value == "1"){
-                        hourFlowUrl = '/out_hour_flow';
+                        hourFlowUrl = '/history/out_hour_flow';
                         type = "出站";
                     }
                     else {
@@ -1365,7 +1565,7 @@ layui.use('laydate', function(){
                     //切换线路代码写这儿
                     $.ajax({
                         type: 'POST',
-                        url: '/split_flow/' + data.value,
+                        url: '/history/split_flow/' + data.value,
                         async: false,
                         data: value,
                         datatype: 'json',

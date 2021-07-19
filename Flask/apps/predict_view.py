@@ -1,12 +1,13 @@
-from apps.api_view import *
+from flask import request
+from flask import jsonify, json
+from flask import Blueprint
 
-predict_bp = Blueprint('predict_view', __name__)
+from MakeChart import ChartApi
+from apps import api, pred_api
 
-@predict_bp.route('/predict')
-def predict():
-    return render_template('predict.html')
+predict_bp = Blueprint('predict_view', __name__, url_prefix='/pred')
 
-@predict_bp.route('/pred/hour_flow', methods=['POST', 'GET'])
+@predict_bp.route('/hour_flow', methods=['POST', 'GET'])
 def pred_out_hour_flow():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -17,7 +18,7 @@ def pred_out_hour_flow():
 
     return jsonify(flow_dict)
 
-@predict_bp.route('/pred/day/info', methods=['POST', 'GET'])
+@predict_bp.route('/day/info', methods=['POST', 'GET'])
 def pred_day_info():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -29,17 +30,8 @@ def pred_day_info():
 
     return jsonify(day_info)
 
-@predict_bp.route('/weather_info', methods=['POST', 'GET'])
-def weather_info():
-    """获取近7天的天气信息
-    """
-    curr_date = request.get_data().decode('utf-8')
-    curr_weather = api.get_recent_weather(curr_date)
-
-    return jsonify(curr_weather)
-
 ################Pyecharts
-@predict_bp.route('/pred/month/line', methods=['POST', 'GET'])
+@predict_bp.route('/month/line', methods=['POST', 'GET'])
 def pred_month_line():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -52,7 +44,7 @@ def pred_month_line():
 
     return line.dump_options_with_quotes()
 
-@predict_bp.route('/pred/week/line', methods=['POST', 'GET'])
+@predict_bp.route('/week/line', methods=['POST', 'GET'])
 def pred_week_line():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -64,7 +56,7 @@ def pred_week_line():
 
     return line.dump_options_with_quotes()
 
-@predict_bp.route('/pred/line/pie', methods=['POST', 'GET'])
+@predict_bp.route('/line/pie', methods=['POST', 'GET'])
 def pred_line_pie():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -75,7 +67,7 @@ def pred_line_pie():
 
     return pie.dump_options_with_quotes()
 
-@predict_bp.route('/pred/hour/line', methods=['POST', 'GET'])
+@predict_bp.route('/hour/line', methods=['POST', 'GET'])
 def pred_hour_line():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -88,7 +80,7 @@ def pred_hour_line():
 
     return line.dump_options_with_quotes()
 
-@predict_bp.route('/pred/eval/radar', methods=['POST', 'GET'])
+@predict_bp.route('/eval/radar', methods=['POST', 'GET'])
 def pred_eval_radar():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)

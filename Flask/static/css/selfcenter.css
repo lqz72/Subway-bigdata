@@ -44,6 +44,7 @@
     margin-right: 10px;
     margin-top: 20px;
     height: 570px;
+    width: 100%;
     background-color: #fff;
     /* overflow: scroll; */
     /* border-collapse: collapse; */
@@ -55,6 +56,7 @@
     border-right: 1px solid #E9E9E9;
     border-collapse: collapse;
     text-align: center;
+    width: 100%;
     background-color: #fff;
     /* line-height: 30px; */
 }
@@ -74,16 +76,16 @@
     border-top: 1px solid #E9E9E9;
 }
 .list table tr td:nth-child(1) {
-    width: 200px;
+    width: 25%;
 }
 .list table tr td:nth-child(2) {
-    width: 200px;
+    width: 25%;
 }
 .list table tr td:nth-child(3) {
-    width: 300px;
+    width: 25%;
 }
 .list table tr td:nth-child(4) {
-    width: 300px;
+    width: 25%;
 }
 /* ???????????????啥时候写的
 element.style {

@@ -9,6 +9,11 @@ path.append(os.path.abspath(os.path.dirname(__file__)).split('apps')[0])
 path.append(os.path.abspath(os.path.dirname(__file__)).split('apps')[0] + 'apps\\')
 path.append(os.path.abspath(os.path.dirname(__file__)).split('Flask')[0] + 'SubwayModel\\')
 
+from DataAnalysis import DataApi
+from PredictResult import PredictApi
+api = DataApi()
+pred_api = PredictApi()
+
 import settings
 from api_view import api_bp
 from login_view import login_bp

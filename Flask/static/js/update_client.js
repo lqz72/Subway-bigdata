@@ -3,7 +3,7 @@ var btn1 = document.querySelector('#btn_show');
 btn1.addEventListener('click',
 function()
 {
-    location.href = '/userinf';
+    location.href = '/userinfo';
 })
 
 //点击搜索后
@@ -13,11 +13,10 @@ var userRecord;
 btn_search.onclick = function () {
     //更改三条基本信息
     $.ajax({
-        url: '/user_info',
+        url: '/user/info',
         type: 'POST',
         data: user_id.value,
         dataType: 'json',
-        async: true,
         success: function(result){
             var id = document.getElementById('id');
             var age = document.getElementById('age');
@@ -37,18 +36,16 @@ btn_search.onclick = function () {
         url: '/history/user_flow/line',
         data: user_id.value,
         dataType: 'json',
-        async: true,
-        success: function (result) {
+        success: function (result) {    
             user_flow_line.setOption(result);
         }
     });
 
     //出行记录展示
     $.ajax({
-        type:'POST',
-        url:'/user_record',
+        type:'post',
+        url:'/user/trip_record',
         data: user_id.value,
-        async: true,
         success: function(data)
         {
             userRecord = data.reverse();
@@ -74,6 +71,7 @@ var age_pie = echarts.init(document.getElementById('age_pie'));
 $.ajax({
     type: 'POST',
     url: 'history/age/pie',
+
     dataType: 'json',
     success: function (result) {
         age_pie.setOption(result);
@@ -83,6 +81,7 @@ $.ajax({
 $.ajax({
     type: 'POST',
     url: 'history/age/bar',
+
     dataType: 'json',
     success: function (result) {
         age_bar.setOption(result);
@@ -92,7 +91,7 @@ $.ajax({
 //默认显示
 var init_id = "d4ec5a712f2b24ce226970a8d315dfce";
 $.ajax({
-    url: '/user_info',
+    url: '/user/info',
     type: 'POST',
     data: init_id,
     dataType: 'json',
@@ -122,7 +121,7 @@ $.ajax({
 
 $.ajax({
     type:'post',
-    url: '/user_record',
+    url: '/user/trip_record',
     async: false,
     data: init_id,
     success: function(data)
@@ -157,8 +156,8 @@ function getJsonData(url){
     return jsData;
 }
 
-var stations = getJsonData('/sta/json');
-var links = getJsonData('/link/json');
+var stations = getJsonData('/api/sta/json');
+var links = getJsonData('/api/link/json');
 
 //初始化图表
 var linesChart = echarts.init(document.getElementById('road'));
@@ -272,7 +271,9 @@ function getLinesData(userRecord, stations) {
             else if (target == stations[j].name) {
                 data.coords[1] = stations[j].value;
             }
-        }  
+        }
+        data['source'] = source;
+        data['target'] = target;
         coordsList.push(data);
     }
     return coordsList;
@@ -280,6 +281,24 @@ function getLinesData(userRecord, stations) {
 
 linesOption.series[1].data = getLinesData(userRecord, stations);
 linesChart.setOption(linesOption);
+
+linesChart.on('click', function(param){
+    let linesData = {
+        'source': param.data.source,
+        'target': param.data.target,
+        'coords': param.data.coords
+    };
+    console.log(linesData);
+    $.ajax({
+        url:'',
+        type: 'POST',
+        data: linesData,
+        dataType: 'json',
+        success: function (){
+
+        }
+    });
+});
 
 //获取分类信息 
 function getCate(x)

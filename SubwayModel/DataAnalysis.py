@@ -2,38 +2,44 @@
 from ShortestPath import *
 from MysqlOS import SQLOS
 import pandas as pd
+import numpy as np
 import datetime
 import warnings
 import json
-import time
 import os
 warnings.filterwarnings('ignore')
 
 class DataApi(object):
-    '''
-    提供数据分析结果接口
-    '''
+    """提供数据分析结果接口
+    """
     def __init__(self):
-        '''
-        初始化 直接调用类属性获取数据 
-        '''
+        """初始化 直接调用类属性获取数据
+        """
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
-        self.age, self.percent = DataApi.get_age_structure()
         self.flow_df = SQLOS.get_flow_df()
         self.trips_df = SQLOS.get_trips_df()
         self.sta_dict = SQLOS.get_station_dict()
-        self.month_dict = DataApi.get_month_flow(self.flow_df)
-        self.date_flow = DataApi.get_date_series(self.flow_df)
         self.in_df, self.out_df = SQLOS.get_in_out_df()
         self.user_df = SQLOS.get_user_df()
-    
-    def get_age_structure():
-        '''
-        获取年龄结构 返回一个元组 分别为年龄段 和 对应的百分比
-        '''
+        self.age, self.percent = DataApi.get_age_structure(self.user_df)
+        self.month_dict = DataApi.get_month_flow(self.flow_df)
+        self.date_flow = DataApi.get_date_series(self.flow_df)
+
+    @staticmethod
+    def get_age_structure(user_df):
+        """获取年龄结构 返回一个元组 分别为年龄段 和 对应的百分比
+        """
         label = ["0-20岁", "21-30岁", "31-40岁", "41—50岁", "大于50岁"]
-        percent  = []
-        age_dict = SQLOS.get_age_data()
+        percent = []
+        df = user_df.copy()
+        df.birth_year = df.birth_year.apply(lambda x: -int(x) + 2021)
+
+        age_series = df.groupby(by="birth_year").count()["user_id"]
+        age_index = age_series.index
+        age_values = age_series.values
+
+        # 创建一个字典用于存放 各年龄所对应的用户人数
+        age_dict = dict(zip(age_index, age_values))
 
         # 创建一个字典用于存放 年龄段分布
         temp_dict = dict.fromkeys(label, 0)
@@ -55,11 +61,12 @@ class DataApi(object):
 
         return label, percent
 
+    @staticmethod
     def get_month_flow(flow_df):
-        '''
+        """
         单月整体的客流波动分析
         返回一个字典 包含每个月份客流量的数据 格式 {'year-month':{'day':flow,},}
-        '''
+        """
         date_flow = DataApi.get_date_series(flow_df)
 
         #获取所有行程中出现的年月
@@ -74,11 +81,12 @@ class DataApi(object):
             
         return month_dict
 
+    @staticmethod
     def get_week_flow(flow_df):
-        '''
-        获取不同月份每周客流量 
+        """
+        获取不同月份每周客流量
         返回一个字典 格式{'month':{'weekday':num,},}
-        '''
+        """
         flow_df['flow'] = 1 
 
         #获取所有行程中出现的年月
@@ -98,11 +106,12 @@ class DataApi(object):
 
         return week_dict
 
+    @staticmethod
     def get_sta_flow():
-        '''
+        """
         单站的点出/入站客流分析
         返回两个字典 格式{'station_name':{'month':num,},}
-        '''
+        """
         in_df, out_df = SQLOS.get_trips_df()
 
         #重组聚合
@@ -127,11 +136,11 @@ class DataApi(object):
             out_data_dict[station] = dict(zip(out_time, out_amount))
 
         return in_data_dict, out_data_dict
-                                     
+
+    @staticmethod
     def get_sta_series(sta_name, in_flow = None, out_flow = None):
-        '''
-        获取指定站点入站和出站客流的series
-        '''
+        """获取指定站点入站和出站客流的series
+        """
         if in_flow is None and out_flow is None:
             in_df, out_df = SQLOS.get_in_out_df()
         else:
@@ -146,11 +155,11 @@ class DataApi(object):
         out_series = out_sta_df.resample('D').sum()['y']
 
         return in_series, out_series
-    
+
+    @staticmethod
     def get_sta_hour_series(sta_name, hour): 
-        '''
-        获取指定站点指定时间入站和出站客流的series 
-        '''
+        """获取指定站点指定时间入站和出站客流的series
+        """
         in_df, out_df = SQLOS.get_trips_df()
         
         in_sta_df = in_df[in_df['in_sta_name'] == sta_name]
@@ -168,13 +177,14 @@ class DataApi(object):
         in_series.index = range(in_series.shape[0])
         print(in_series.y.sum())
 
+    @staticmethod
     def get_sta_peak_flow(df, station):
-        '''
+        """
         获取各个站点在早晚高峰时的进/出客流
         传入一个in_df 或者 out_df
         返回两个字典 分别为早高峰(7-9)和晚高峰(5-7)时的客流量之和
         格式: {'station':am_num}, {'station':pm_num}
-        '''
+        """
         df.columns = ['user_id', 'sta_name', 'time']
         df['flow'] = 1
 
@@ -185,11 +195,12 @@ class DataApi(object):
             my_df['time'] = pd.to_datetime(my_df['time']).dt.hour
 
             grouped = my_df.groupby(by=['time'])['flow'].sum()
-            am_peak, pm_peak =grouped[7:10], grouped[5:8]
+            am_peak, pm_peak = grouped[7:10], grouped[5:8]
             am_dict[sta], pm_dict[sta] = am_peak.sum(), pm_peak.sum()
 
         return am_dict, pm_dict
 
+    @staticmethod
     def get_peak_flow(flow_df, date):
         """
         获取当天早晚高峰时的客流
@@ -209,9 +220,9 @@ class DataApi(object):
 
         return am_peak_flow, pm_peak_flow
 
+    @staticmethod
     def get_flow_data(flow_df):
-        '''
-        获取日期序列对应站点的客流量(入站和出站之和) 返回一个dataframe
+        """获取日期序列对应站点的客流量(入站和出站之和) 返回一个dataframe
         dataframe格式如下
                     day     sta  flow
         0     2019-12-26    Sta1    1
@@ -222,53 +233,82 @@ class DataApi(object):
         30504 2020-07-16   Sta99  100
 
         [30505 rows x 3 columns]
-        '''
+        """
         flow_data = flow_df
         flow_data['flow'] = 1
 
         flow_data = flow_data.groupby(by=['day', 'sta'], as_index=False)['flow'].count()
         return flow_data
-    
+
+    @staticmethod
     def get_date_series(flow_df):
-        '''
-        获得对应日期的总体客流量 返回一个series
+        """获得对应日期的总体客流量 返回一个series
         series格式如下
         2019-12-26      145
         2019-12-27      409
         2019-12-28      711
-                    ...  
+                    ...
         2020-07-15    14390
         2020-07-16    14379
-        '''
+        """
         flow_data = flow_df
         flow_data['flow'] = 1
 
         date_series = flow_data.groupby(by=['day'])['flow'].sum()
         return date_series
 
+    @staticmethod
     def get_month_list(time_list):
-        '''
+        """
         获取所有行程中出现的年月
         接收一个时间序列 返回一个有序的字符串列表
-        '''
+        """
         month_list = [i.strftime("%Y-%m") for i in time_list]
         month_list = list(set(month_list))
         month_list.sort(key=lambda x: (int(x[2:4]), int(x[5:7])))
         return month_list
 
+    @staticmethod
     def get_station_info(station):
-        '''
-        返回指定站点信息 
-        '''
+        """
+        返回指定站点信息
+        """
         sta_df = SQLOS.get_df_data('station')
         sta_df = sta_df[sta_df['sta_name'] == station] 
 
         sta_dict = {
-                'line':sta_df['line'].tolist()[0], 
+                'line': sta_df['line'].tolist()[0],
                 'area': sta_df['area'].tolist()[0][4:]
         }
         return sta_dict
 
+    @staticmethod
+    def get_sta_in_out_flow(_type, flow_dict):
+        """
+        获取所有站点的点入或点出
+        """
+        sta_list = list(flow_dict.keys())
+
+        df = pd.DataFrame(index=sta_list, data=np.zeros((len(sta_list), 5), 'int'),
+                          columns=['7-9', '10-12', '13-15', '16-18', '19-21'])
+
+        for sta, sta_dict in flow_dict.items():
+            flow_list = list(sta_dict.values())
+            new_list = [
+                sum(flow_list[0:3]),
+                sum(flow_list[3:6]),
+                sum(flow_list[6:9]),
+                sum(flow_list[9:12]),
+                sum(flow_list[12:15])
+            ]
+            df.loc[sta] = new_list
+
+        df.reset_index(inplace=True)
+        df.columns = ['sta_name', '7-9', '10-12', '13-15', '16-18', '19-21']
+        df.sort_values(by='sta_name', key=lambda x: x.str.lstrip('Sta').astype('int'), inplace=True)
+
+        # df.to_csv(self.abs_path + '/csv_data/sta_%s_flow.csv' % _type, encoding='gb18030', index=None)
+        return df
 
     #--------------类方法---------------
     def get_day_flow_info(self, date):
@@ -313,10 +353,10 @@ class DataApi(object):
         return info_dict
 
     def get_curr_week_flow(self, date):
-        '''
-        获取当前周的客流变化 
+        """
+        获取当前周的客流变化
         返回一个字典 格式: {month-day:flow,}
-        '''
+        """
         date = datetime.datetime.strptime(date, '%Y-%m-%d')
         monday, sunday = date, date
         one_day = datetime.timedelta(days=1)
@@ -336,10 +376,10 @@ class DataApi(object):
         return dict(zip(day, flow))
    
     def get_top_sta(self, date):
-        '''
+        """
         获取客流量前25名的站点
         返回一个列表 格式: [(station, line, flow),]
-        '''
+        """
         sta_dict = self.sta_dict
         flow_df = self.flow_df[self.flow_df['day'] == date]
         flow_df['flow'] = 1
@@ -353,10 +393,10 @@ class DataApi(object):
         return top_sta_list
 
     def get_line_flow_percent(self, date):
-        '''
-        获取某日的线路流量占比 
+        """
+        获取某日的线路流量占比
         返回一个元组 包含线路列表和客流列表
-        '''
+        """
         sta_dict = self.sta_dict
 
         df = self.flow_df[self.flow_df['day'] == date]
@@ -371,9 +411,9 @@ class DataApi(object):
         return line_series.index, line_series.values
 
     def get_user_info(self, user_id):
-        '''
+        """
         获取用户信息 返回一个字典
-        '''
+        """
         df = SQLOS.get_user_df()
         df = df[df['user_id'].isin([user_id])]
 
@@ -387,9 +427,9 @@ class DataApi(object):
         return {'id': user_id, 'age': int(age), 'area': area, 'trips_num': int(trips_num), 'category': category}
 
     def get_users_by_index(self, index):
-        '''
+        """
         根据索引获取某页的用户数据 偏移量15
-        '''
+        """
         user_df = SQLOS.get_user_df()
         start = (index - 1) * 15
         end = start + 15
@@ -411,10 +451,10 @@ class DataApi(object):
         return user_list
 
     def get_user_month_flow(self, user_id):
-        '''
+        """
         获取用户每月出行次数
         返回一个字典 格式: {year-month:num,}
-        '''
+        """
         df = self.trips_df.copy()
 
         df['in_time'] = df['in_time'].dt.normalize()
@@ -432,10 +472,11 @@ class DataApi(object):
         return month_dict
 
     def get_user_trip_record(self, user_id):
-        '''
+        """
         获取单个用户出行记录
-        返回一个有序列表 格式[('in_sta_name', 'in_time', 'out_sta_name', 'out_time'),]
-        '''
+        返回一个有序列表
+        格式[('in_sta_name', 'in_time', 'out_sta_name', 'out_time'),]
+        """
         df = self.trips_df.copy()
 
         user_df = df[df['user_id'].isin([user_id])].drop('user_id', axis = 1)
@@ -447,21 +488,20 @@ class DataApi(object):
         
         return list(zip(in_sta_name, in_time, out_sta_name, out_time))
         
-    def get_in_hour_flow(self, date):              
-        '''
-        获取各个站点6-21点的进站客流量 
+    def get_in_hour_flow(self, date, start=6, end=21):
+        """
+        获取各个站点6-21点的进站客流量
         传入一个一个有效日期
         返回值为一个字典 格式:{station:{hour:num,},}
-        '''
+        """
         df = self.in_df.copy()
-
+        print(date)
         df = df.loc[date]
         df['flow'] = 1 
         df.reset_index(level='in_time', inplace=True)
 
-        sta_hour_dict = {}
-        hour_list = [str(i) for i in range(6,22)]
-        sta_dict = self.sta_dict
+        hour_list = [str(i) for i in range(start, end + 1)]
+        sta_hour_dict = dict.fromkeys(self.sta_dict.keys(), dict.fromkeys(hour_list, 0))
 
         for sta, sta_df in df.groupby(by=['in_sta_name']):
             sta_df['in_time'] = sta_df['in_time'].dt.hour.astype('str')
@@ -475,43 +515,39 @@ class DataApi(object):
         
         return sta_hour_dict
 
-    def get_out_hour_flow(self, date):              
-        '''
-        获取各个站点6-21点的出站客流量 
+    def get_out_hour_flow(self, date, start=6, end=21):
+        """
+        获取各个站点6-21点的出站客流量
         传入一个一个有效日期
         返回值为一个字典 格式:{station:{hour:num,},}
-        '''
+        """
         df = self.out_df.copy()
 
         df = df.loc[date]
         df['flow'] = 1 
         df.reset_index(level='out_time', inplace=True)
-      
-        sta_hour_dict = {}
-        hour_list = [str(i) for i in range(6,22)]
-        sta_dict = self.sta_dict
 
-        for sta in sta_dict:
-            hour_dict = dict.fromkeys(hour_list, 0)
-            sta_df = df[df['out_sta_name'] == sta]
+        hour_list = [str(i) for i in range(start, end + 1)]
+        sta_hour_dict = dict.fromkeys(self.sta_dict.keys(), dict.fromkeys(hour_list, 0))
 
+        for sta, sta_df in df.groupby(by=['out_sta_name']):
             sta_df['out_time'] = sta_df['out_time'].dt.hour.astype('str')
-            sta_df = sta_df[sta_df['out_time'].isin(hour_list)]
-          
-            grouped = sta_df.groupby(by = ['out_time'], as_index = True)['flow'].sum()
-            
+            grouped = sta_df.groupby(by='out_time')['flow'].sum()
+
+            hour_dict = dict.fromkeys(hour_list, 0)
             for hour in grouped.index:
                 hour_dict[hour] = int(grouped[hour])
+
             sta_hour_dict[sta] = hour_dict
 
         return sta_hour_dict
 
     def get_line_split(self, line, flag='up'):
-        '''
+        """
         获取线路断面字典 格式: {split:0,}
-        '''
+        """
         try:
-            with open(self.abs_path + '/json/{}line.json'.format(flag), 'r', encoding='utf-8') as f:
+            with open(self.abs_path + '/json/{}line.json'.format(flag), 'r', encoding  = 'utf-8') as f:
                 line_list = json.load(f)[line]
             
                 line_split = []
@@ -525,12 +561,13 @@ class DataApi(object):
             print('error', e)
 
     def get_line_split_flow(self, date, line):
-        '''
-        获取线路断面客流 格式:{split:{up:flow, down:flow},}
-        '''
+        """
+        获取线路断面客流
+        返回一个字典 格式:{split:{up:flow, down:flow},}
+        """
         sp = ShortestPath()
         #获取断面字典
-        upline_split = self.get_line_split(line, flag='up')
+        upline_split = self.get_line_split(line, flag = 'up')
         downline_split = self.get_line_split(line, flag='down')
         line_split_dict = {i: {'up': 0, 'down': 0} for i in upline_split} #列表分别存储上行和下行客流
 
@@ -568,11 +605,11 @@ class DataApi(object):
         return line_split_dict
 
     def get_od_flow(self, date):
-        '''
+        """
         获取一个OD客流量数据
         传入一个一个有效日期
         返回值为一个字典 格式:{Sta1 :[lin1,{Sta:[line2, flow],} ],}
-        '''
+        """
         #读取od站点信息
         with open(self.abs_path + '/json/sta_od.json', 'r', encoding='utf-8') as f:
             od_dict = json.load(f)
@@ -665,10 +702,10 @@ class DataApi(object):
         return info_dict
         
     def get_sta_curr_week_flow(self, date, station):
-        '''
-        获取站点当前周的客流变化 
+        """
+        获取站点当前周的客流变化
         返回一个字典 格式: {weekday:[in_flow,out_flow],}
-        '''
+        """
         weekday = datetime.datetime.strptime(date, '%Y-%m-%d')
         one_day = datetime.timedelta(days=1)
 
@@ -686,7 +723,7 @@ class DataApi(object):
 
         weekday_list = ['1', '2', '3', '4', '5', '6', '7']
         curr_week_dict = dict.fromkeys(weekday_list, 0)
-        in_series_date  = [i.strftime('%Y-%m-%d') for i in in_series.index]
+        in_series_date = [i.strftime('%Y-%m-%d') for i in in_series.index]
         out_series_date = [i.strftime('%Y-%m-%d') for i in out_series.index]
 
         for i in range(7):
@@ -707,11 +744,11 @@ class DataApi(object):
         return curr_week_dict
 
     def get_sta_curr_day_flow(self, date, station):
-        '''
-        获取本站点6-21点的进出站客流量 
+        """
+        获取本站点6-21点的进出站客流量
         传入一个一个有效日期
         返回值为一个字典 格式:{hour:[in_flow,out_flow],}
-        '''
+        """
         def _get_data(_type):
             if _type == 'in':
                 df = self.in_df.copy().drop('user_id', axis = 1)
@@ -739,9 +776,9 @@ class DataApi(object):
         return hour_dict
     
     def get_sta_age_structure(self, date, station):
-        '''
+        """
         获取出入本站的乘客年龄结构分布
-        '''
+        """
         in_df, out_df = self.in_df.loc[date], self.out_df.loc[date]
         user_df = self.user_df.copy().set_index('user_id')
        
@@ -757,6 +794,7 @@ class DataApi(object):
         age_dict = dict.fromkeys(label, 0)
         for user in user_list:
             age = 2021 - int(user_df.loc[user].birth_year)
+
             if (0 < age) & (age <= 20):
                 age_dict["0-20岁"] += 1
             elif (20 < age) & (age <= 30):
@@ -773,10 +811,48 @@ class DataApi(object):
             percent.append(round(val * 100 / all_num, 2))
 
         return label, percent
-        
+
+    def get_area_in_out_flow(self, date, category):
+        """
+        获取城市分区的点入和点出
+        """
+        in_df = DataApi.get_sta_in_out_flow('in', self.get_in_hour_flow(date, 7, 21))
+        out_df = DataApi.get_sta_in_out_flow('out', self.get_out_hour_flow(date, 7, 21))
+        #area_list = ['工业区', '商业区', '住宅区', '仓储区', '文教区', '中心商业区', '综合区', '风景区', '卫星城']
+
+        time_list = ['7-9', '10-12', '13-15', '16-18', '19-21']
+
+        with open(self.abs_path + '/json/sta_section.json', 'r', encoding='gb18030') as f:
+            area_dict = json.load(f)
+
+        sta_list = area_dict[category]
+
+        in_df = in_df[in_df.sta_name.isin(sta_list)].set_index('sta_name')
+        out_df = out_df[out_df.sta_name.isin(sta_list)].set_index('sta_name')
+
+        in_flow_dict = dict.fromkeys(time_list, 0)
+        out_flow_dict = dict.fromkeys(time_list, 0)
+        for each in time_list:
+            in_flow_dict[each] = []
+            out_flow_dict[each] = []
+            for sta in sta_list:
+                in_flow_dict[each].append(int(in_df.loc[sta][each]))
+                out_flow_dict[each].append(int(out_df.loc[sta][each]))
+
+        return sta_list, in_flow_dict, out_flow_dict
+
 if __name__ == '__main__':
     api = DataApi()
-    api.get_sta_flow_info('Sta101', '2020-07-01')
+    begin = time.time()
+    api.get_area_in_out_flow('2020-07-01', '住宅区')
+    end = time.time()
+
+    print(end - begin)
+
+
+    #api.get_section_in_out_flow('in', api.get_in_hour_flow('2020-07-01', 7, 21))
+    #api.get_section_in_out_flow('out', api.get_out_hour_flow('2020-07-01', 7, 21))
+    # api.get_sta_flow_info('Sta101', '2020-07-01')
     # print(api.get_sta_age_structure('2020-07-01', 'Sta101'))
 
     

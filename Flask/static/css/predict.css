@@ -1,20 +1,26 @@
 /* 天气控件 */
 .weather {
-    float: left;
-    width: 626px;
+    flex:1;
+    /* display: flex; */
+    /* width: 626px; */
     height: 280px;
+    margin-right: 30px;
     background-color: #ffffff;
 }
 .weather .todayweatherpre {
     float: left;
     width: 313px;
+    display: flex;
+    flex:1;
     height: 175px;
     background-color: #ffffff;
     border-bottom: 2px solid #e2e0e0;
+    /* padding-right: 30px; */
 }
 .weather .todayweatherpre .w-img {
     float: left;
     width: 140px;
+    flex:1;
     height: 173px;
     /* border: solid 1px pink; */
     background-color: #fff;
@@ -26,10 +32,13 @@
 }
 .weather .todayweatherpre>.description {
     float: left;
+    flex:2;
     width: 173px;
     height: 173px;
     /* border: solid 1px black; */
     background-color: #fff;
+    padding-right: 30px;
+    /* padding-left: 30px; */
 }
 .weather .todayweatherpre>.description p {
     height: 28px;
@@ -58,6 +67,7 @@
     float: left;
     position: relative;
     width: 313px;
+    flex:1;
     height: 175px;
     /* margin-bottom: 10px; */
     background-color: #ffffff;
@@ -73,7 +83,7 @@
 }
 
 .weather .ctrl p {
-    margin-left: 70px;
+    margin-left: 155px;
     margin-top: 23px;
     width: 200px;
 }
@@ -85,7 +95,7 @@
 }
 .weather .ctrl .confirm {
     position: absolute;
-    left: 200px;
+    left: 285px;
     width: 50px;
     height: 28px;
     line-height: 28px;
@@ -97,11 +107,16 @@
 .weather .nextdayspre {
     float: left;
     width: 626px;
+    flex:1;
     height: 105px;
     background-color: #ffffff;
 }
+.weather .nextdayspre ul {
+    display: flex;
+}
 .weather .nextdayspre ul li {
     float: left;
+    flex: 1;
     width: 104px;
     height: 105px;
     /* border: 1px solid pink; */
@@ -128,50 +143,57 @@
 .thismonthpre {
     float: left;
     width: 910px;
+    flex:1;
     height: 300px;
-    margin: 10px 20px 0 20px;
+    margin: 10px 30px 0 20px;
     background-color: #ffffff;
 }
 .thisweekpre {
     float: left;
+    flex:6;
     width: 390px;
     height: 300px;
     margin: 10px -10px 0 20px;
     background-color: #ffffff;
 }
 .line-percentpre {
-    float: left;
-    width: 390px;
-    height: 300px;
+    flex:2;
+    height: 400px;
     margin: 10px 10px 0 20px;
     background-color: #fff;
 }
 .exacthourpre {
-    float: left;
-    width: 510px;
-    height: 300px;
+    flex:3;
+    height: 400px;
     background-color: #fff;
     margin-top: 10px;
+    margin-right: 30px;
 }
 
  /* 客流评分及预警措施  */
 .markpre {
     float: left;
+    flex:1;
+    display: flex;
     position: relative;
     width: 910px;
     height: 300px;
-    margin: 10px 20px 0 20px;
+    margin: 10px 30px 0 20px;
+    padding-top: 20px;
     background-color: #ffffff;
 }
 .markpre h4 {
+    position: absolute;
+    top:0;
     font-size: 18px;
     height: 20px;
     line-height: 20px;
     padding-left: 5px;
 }
 .markpre .graph {
-    float: left;
-    width: 280px;
+    /* float: left;
+    width: 280px; */
+    flex:1;
     height: 280px;
     margin-right: 20px;
 }
@@ -179,20 +201,20 @@
     position: absolute;
     bottom: 30px;
     left: 0;
-    width: 300px;
+    width: 31%;
     height: 20px;
     line-height: 20px;
     font-size: 18px;
     z-index: 99999;
-    width: 300px;
     text-align: center;
 }
 
 .markpre .description {
-    float: left;
-    width: 290px;
+    /* float: left;
+    width: 290px; */
+    flex:1;
     height: 280px;
-    padding-right: 20px;
+    padding-right: 40px;
     padding-top: 15px;
     padding-left: 10px;
 }
@@ -207,6 +229,9 @@
     line-height: 50px;
 }
 .markpre .description ul li:nth-child(4) {
+    line-height: 50px;
+}
+.markpre .description ul li:nth-child(5) {
     line-height: 50px;
 }
 
@@ -237,17 +262,19 @@
 }
 
 .markpre .graph2 {
-    float: left;
-    width: 320px;
+    /* float: left;
+    width: 320px; */
+    flex:1;
     height: 280px;
 }
 
 
 .graphpre {
     float: left;
+    flex:1;
     width: 910px;
     height: 700px;
-    margin: 10px 20px 0 20px;
+    margin: 10px 30px 0 20px;
     background-color: #ffffff;
 }
 
@@ -255,8 +282,9 @@
 .thisdayinfopre {
     float: left;
     width: 300px;
+    flex:4;
     height: 300px;
-    margin-right: 10px;
+    margin-right: 30px;
     margin-top: 10px;
     background-color: #ffffff;
 }
@@ -304,8 +332,8 @@
 }
 .m-radio {
     position: absolute;
-    left: 675px;
-    top: 60px;
+    left: 80%;
+    top: 10%;
 }
 .graphpre {
     position: relative;
@@ -319,4 +347,21 @@
 
 .change {
     margin-top: 10px!important;
+}
+
+.layui-laydate, .layui-laydate-hint {
+    box-shadow: none !important;
+    border: none !important;
+}
+.layui-form-item {
+    width: 335px;
+}
+.layui-input-block {
+    margin-left: 150px;
+}
+.layui-form-label {
+    width: 100px;
+}
+.layui-form {
+    margin-top: -10px;
 }

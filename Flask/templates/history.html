@@ -10,6 +10,9 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
     <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+
+    <link id="mainStyle" rel="stylesheet" href="{{ url_for('static',filename ='css/style.css') }}" />
+
     <script type="text/javascript" src="{{ url_for('static',filename ='js/date.js') }}" ></script>
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/lodash.js') }}"></script>
@@ -26,8 +29,8 @@
 }
 .m-radio {
     position: absolute;
-    left: 475px;
-    top: 60px;
+    left: 80%;
+    top: 10%;
 }
 .twograph {
     position: relative;
@@ -47,8 +50,8 @@
 .cmb {
     position: absolute;
     width: 87px;
-    left: 810px;
-    top: 40px;
+    left: 90%;
+    top: 10%;
 }
 #split_bar {
     width: 100%;
@@ -74,130 +77,132 @@
         <div class="content">
             <!-- 用户信息 -->
             <div class="user">
+                <div class="mytoggle"></div>
                 <div class="loc">轨道交通智慧系统>历史轨道数据储库</div>
                 <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
                 <span class="name">超级管理员</span>
             </div>
 
-            <!-- 时间控件 -->
-            <div class="time" id='timectrl'>
+            <div class="addflex">
+                <!-- 时间控件 -->
+                <div class="time" id='timectrl'>
+                
+                </div>
+                
+
+
+                <!-- 当月客流变化 -->
+                <div id = "month_line" class="thismonth">
+                    <!-- 当月客流变化折线图 -->
+                </div>
+            </div>
+
+            <div class="addflex">
+                <!-- 当天总客流 -->
+                <div class="thisdayall">
+                    <p>今日客流总量</p>
+                    <p id = "day_flow">1213</p>
+                </div>
+                <!-- 当天其他信息 -->
+                <div id = "thisday_info" class="thisdayinfo">
+                    <p>今日天气情况：<span id = "weather">晴朗</span></p>
+                    <p>是否节假日：<span id = "is_hoilday">否</span></p>
+                    <p>客流量对比</p>
+                    <ul>
+                        <li>较昨日：<span id = 'day_cmp' class='font-blue'>-10.6%</span></li>
+                        <li>较月平均：<span id = 'month_cmp' class='font-blue'>-15.1%</span></li>
+                        <li>较年平均：<span id = 'year_cmp' class='font-blue'>-18.1%</span></li>
+                        <li>早高峰客流：<span > <em id = 'am_peak_flow' class='font-blue'>214</em> 人次</span></li>
+                        <li>晚高峰客流：<span > <em id = 'pm_peak_flow' class='font-blue'>235</em> 人次</span></li>
+                    </ul>
+                </div>
+                <!-- 这一周 -->
+                <div id = "curr_week_line" class="thisweek">
+                    <!-- 本周客流变化折线图 -->
+                </div>
+            </div>
             
-            </div>
-            
+            <div class="addflex">
+                <!-- 线路流量占比 -->
+                <div id = "line_percent" class="linepercent">
+                    <!-- 线路流量占比扇形图/风玫瑰图 -->
+                </div>
+                <!-- 站点od客流量 -->
+                <div id = "od_graph" class="od">
 
-
-            <!-- 当月客流变化 -->
-            <div id = "month_line" class="thismonth">
-                <!-- 当月客流变化折线图 -->
-            </div>
-            <!-- 当天总客流 -->
-            <div class="thisdayall">
-                <p>今日客流总量</p>
-                <p id = "day_flow">1213</p>
-            </div>
-            <!-- 当天其他信息 -->
-            <div id = "thisday_info" class="thisdayinfo">
-                <p>今日天气情况：<span id = "weather">晴朗</span></p>
-                <p>是否节假日：<span id = "is_hoilday">否</span></p>
-                <p>客流量对比</p>
-                <ul>
-                    <li>较昨日：<span id = 'day_cmp' class='font-blue'>-10.6%</span></li>
-                    <li>较月平均：<span id = 'month_cmp' class='font-blue'>-15.1%</span></li>
-                    <li>较年平均：<span id = 'year_cmp' class='font-blue'>-18.1%</span></li>
-                    <li>早高峰客流：<span > <em id = 'am_peak_flow' class='font-blue'>214</em> 人次</span></li>
-                    <li>晚高峰客流：<span > <em id = 'pm_peak_flow' class='font-blue'>235</em> 人次</span></li>
-                </ul>
-            </div>
-            <!-- 这一周 -->
-            <div id = "curr_week_line" class="thisweek">
-                <!-- 本周客流变化折线图 -->
-            </div>
-            <!-- 线路流量占比 -->
-            <div id = "line_percent" class="linepercent">
-                <!-- 线路流量占比扇形图/风玫瑰图 -->
-            </div>
-            <!-- 站点od客流量 -->
-            <div id = "od_graph" class="od">
-
-            </div>
-            <!-- 早晚高峰热力图和线路断面 -->
-            <div class="twograph layui-form">
-                <div class="layui-form-item">
-                    <!-- <label class="layui-form-label">客流方向</label> -->
-                    <div class="layui-input-block m-radio">
-                      <input type="radio" name="sex" value="0" title="入站">
-                      <input type="radio" name="sex" value="1" title="出站" checked>
+                </div>
+                </div>
+                
+                <div class="addflex">
+                    <!-- 早晚高峰热力图和线路断面 -->
+                    <div class="twograph layui-form">
+                        <div class="layui-form-item">
+                            <!-- <label class="layui-form-label">客流方向</label> -->
+                            <div class="layui-input-block m-radio">
+                            <input type="radio" name="sex" value="0" title="入站">
+                            <input type="radio" name="sex" value="1" title="出站" checked>
+                        </div>
+                    </div>
+                    <div id = "line_graph">
+                        <!-- 早晚高峰热力图 -->
                     </div>
                 </div>
-                <div id = "line_graph">
-                    <!-- 早晚高峰热力图 -->
-                </div>
-            </div>
-            <!-- 站点排行榜 -->
-            <div class="leaderboard">
-                <p>站点客流排行榜</p>
-                <table id = "sta_flow_list">
-                    <tr>
-                        <th>排名</th>
-                        <th>站点名</th>
-                        <th>所在线路</th>
-                        <th>客流</th>  
-                    </tr>
-                    {% for i in range(1,26) %}
-                    <tr>
-                        <td id = "{{i}}">{{i}}</td>
-                        <td id = "Sta{{i}}">{{'Sta%d' % i}}</td>
-                        <td id = "line{{i}}">{{'%d号线' % i}}</td>
-                        <td id = "flow{{i}}">{{i * 1000}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <!-- 线路断面 -->
-            <div class="cutline layui-form">
-                <div class="layui-form-item cmb">
-                    <!-- <label class="layui-form-label">选择线路</label> -->
-                    <div class="layui-input-block">
-                      <select name="interest" lay-filter="aihao">
-                        <option value="1">1号线</option>
-                        <option value="2">2号线</option>
-                        <option value="3">3号线</option>
-                        <option value="4">4号线</option>
-                        <option value="5">5号线</option>
-                        <option value="10">10号线</option>
-                        <option value="11">11号线</option>
-                        <option value="12">12号线</option>
-                      </select>
-                    </div>
-                </div>
-                <div id = "split_bar">
-
-                </div>
-            </div>
-            <!-- 线路断面流量排行榜 -->
-            <div class="leaderboard2">
-                <p>线路断面客流排行榜</p>
-                <table>
-                    <tr>
-                        <th>排名</th>
-                        <th>站点名1</th>
-                        <th>站点名2</th>
-                        <th>所在线路</th>
-                        <th>客流</th>
-                    </tr>
-                    {% for i in range(1, 7)%}
+                <!-- 站点排行榜 -->
+                <div class="leaderboard">
+                    <p>站点客流排行榜</p>
+                    <table id = "sta_flow_list">
                         <tr>
-                            <td id = "split_rank{{i}}">1</td>
-                            <td id = "source{{i}}">sta102</td>
-                            <td id = "target{{i}}">sta2</td>
-                            <td id = "split_line{{i}}">6号线</td>
-                            <td id = "split_flow{{i}}">1315</td>
+                            <th>排名</th>
+                            <th>站点名</th>
+                            <th>所在线路</th>
+                            <th>客流</th>  
                         </tr>
-                    {% endfor %}
-                    
-                    
-                </table>
-            </div>    
+                        {% for i in range(1,26) %}
+                        <tr>
+                            <td id = "{{i}}">{{i}}</td>
+                            <td id = "Sta{{i}}">{{'Sta%d' % i}}</td>
+                            <td id = "line{{i}}">{{'%d号线' % i}}</td>
+                            <td id = "flow{{i}}">{{i * 1000}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+
+            </div>
+            
+            <div class="addflex">
+                <!-- 进出客流统计 -->
+                <div class="inout" id="area_inout">
+                    进出客流统计
+                </div>
+            </div>
+
+            <div class="addflex">
+                <!-- 线路断面 -->
+                <div class="cutline layui-form">
+                    <div class="layui-form-item cmb">
+                        <!-- <label class="layui-form-label">选择线路</label> -->
+                        <div class="layui-input-block">
+                        <select name="interest" lay-filter="aihao">
+                            <option value="1">1号线</option>
+                            <option value="2">2号线</option>
+                            <option value="3">3号线</option>
+                            <option value="4">4号线</option>
+                            <option value="5">5号线</option>
+                            <option value="10">10号线</option>
+                            <option value="11">11号线</option>
+                            <option value="12">12号线</option>
+                        </select>
+                        </div>
+                    </div>
+                    <div id = "split_bar">
+
+                    </div>
+                </div>
+            </div>
+            
+           
+            
         </div>
     </div>
 

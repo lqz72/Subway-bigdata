@@ -1,22 +1,24 @@
+import re
+import json
 import random
-from apps.api_view import *
+from flask import request, redirect
+from flask import jsonify
+from flask import Blueprint
 
-station_bp = Blueprint('station_bp', __name__)
+from MakeChart import ChartApi
+from apps import api
 
-@station_bp.route('/station/<staname>', methods=['GET', 'POST'])
-def station(staname):
-    sta_info = DataApi.get_station_info(staname)
-    return render_template('sta.html', staname=staname, sta_info=sta_info)
+station_bp = Blueprint('station_bp', __name__, url_prefix='/sta')
 
-@station_bp.route('/sta/search', methods=['POST', 'GET'])
+@station_bp.route('/search', methods=['POST', 'GET'])
 def sta_search():
     if request.method == 'POST':
         inner_text = request.form.get('search')
         pattern = re.compile(r'\d+')
-        staname = pattern.findall(inner_text)[0]
-    return redirect('/station/Sta{}'.format(staname))
+        sta_name = pattern.findall(inner_text)[0]
+    return redirect('/station/Sta{}'.format(sta_name))
 
-@station_bp.route('/sta/thisday_info', methods=['POST', 'GET'])
+@station_bp.route('/thisday_info', methods=['POST', 'GET'])
 def sta_thisday_info():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -36,7 +38,7 @@ def sta_thisday_info():
 
     return jsonify(info_dict)
 
-@station_bp.route('/sta/curr_week_flow', methods=['POST', 'GET'])
+@station_bp.route('/curr_week_flow', methods=['POST', 'GET'])
 def sta_curr_week_flow():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -48,7 +50,7 @@ def sta_curr_week_flow():
 
     return jsonify(flow_dict)
 
-@station_bp.route('/sta/curr_day_flow', methods=['POST', 'GET'])
+@station_bp.route('/curr_day_flow', methods=['POST', 'GET'])
 def sta_curr_day_flow():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -60,7 +62,7 @@ def sta_curr_day_flow():
 
     return jsonify(flow_dict)
 
-@station_bp.route('/sta/age/pie', methods = ['POST', 'GET'])
+@station_bp.route('/age/pie', methods=['POST', 'GET'])
 def sta_age_pie():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -73,7 +75,7 @@ def sta_age_pie():
 
     return age_pie.dump_options_with_quotes()
 
-@station_bp.route('/sta/schedule/line', methods = ['POST', 'GET'])
+@station_bp.route('/schedule/line', methods=['POST', 'GET'])
 def sta_schedule_line():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)

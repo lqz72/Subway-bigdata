@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/selfcenter.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/bootstrap.min.css') }}">
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename ='js/bootstrap.min.js') }}"></script>
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <script src="../static/js/template-web.js"></script>
+    
+</head>
+<style>
+    a:hover {
+    text-decoration:none;
+    color: black;
+}
+    body {
+        font-size: 16px;
+    }
+    .aaddd {
+        border: 2px solid #A3D0C3!important;
+        border-left: none!important;
+        background-color: #A3D0C3!important;
+    }
+</style>
+<body>
+    <div class="w">
+        <!-- 左侧导航栏 -->
+        <div class="nav">
+            <p>&nbsp;&nbsp;轨道交通智慧系统</p>
+            <ul>
+                <li><a href="/history">&nbsp;&nbsp;历史轨道数据储库</a></li>
+                <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
+                <li  class='addbgc'><a href="/client">&nbsp;&nbsp;乘客特征分析系统</a></li>
+                <li><a href="/station/Sta101">&nbsp;&nbsp;运营规划辅助系统</a></li>
+                <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
+            </ul>
+        </div>
+        <!-- 右侧内容区域 -->
+        <div class="content">
+            <!-- 用户信息 -->
+            <div class="user">
+                <div class="loc">轨道交通智慧系统>乘客特征分析系统>用户信息库</div>
+                <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
+                <span class="name">超级管理员</span>
+            </div>
+
+            <div class="addflex">
+                <!-- 搜索框 -->
+                <div class="search">
+                    <input type="text">
+                    <button class='bt aaddd'></button>
+                </div>
+            </div>
+           
+            <div class="addflex">
+                <!-- 用户列表 -->
+                <div class="userlist">
+                    <table id='userlist'>
+                    
+                    </table>
+                    <div class="pageselector" id='pageselector'></div>
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+    
+    <script src="../static/layui/layui.js"></script>
+    <script id="test" type="text/html">
+        {%raw%}
+        <tr>
+            <td>ID</td> 
+            <td>区域</td>
+            <td>年龄</td>
+            <td>性别</td>
+        </tr>
+        {{each val value i}}
+            <tr>
+                <td>{{value.user_id}}</td>
+                <td>{{value.area}}</td>
+                <td>{{value.age}}</td>
+                <td>{{value.sex}}</td>
+            </tr>
+        {{/each}}
+            
+
+        {%endraw%}  
+        
+    </script>
+    <script src="../static/js/userinfo.js"></script>
+
+</body>
+</html>

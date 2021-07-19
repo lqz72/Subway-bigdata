@@ -8,10 +8,12 @@ from pyecharts.charts import Grid
 from DataAnalysis import DataApi
 from PredictResult import PredictApi
 
+
 class ChartApi(object):
     '''
     数据分析图表接口
     '''
+
     def __init__(self):
         pass
 
@@ -82,9 +84,9 @@ class ChartApi(object):
             flow = [str(j) for j in month_dict[i].values()]
             line = (
                 Line()
-                .add_xaxis(xaxis_data = day)
+                .add_xaxis(xaxis_data=day)
                 .add_yaxis(
-                    series_name= "{}月客流".format(int(i[-2:])),
+                    series_name="{}月客流".format(int(i[-2:])),
                     y_axis=flow,
                     label_opts=opts.LabelOpts(is_show=False)
                 )
@@ -92,16 +94,16 @@ class ChartApi(object):
                     title_opts=opts.TitleOpts(title="单月整体客流波动"),
                     tooltip_opts=opts.TooltipOpts(trigger="axis"),
                     yaxis_opts=opts.AxisOpts(
-                        name = "客流量/人次",
+                        name="客流量/人次",
                         type_="value",
                         splitline_opts=opts.SplitLineOpts(is_show=True),
                     ),
-                    xaxis_opts=opts.AxisOpts(name = "日期", type_="category", boundary_gap=False),
+                    xaxis_opts=opts.AxisOpts(name="日期", type_="category", boundary_gap=False),
                 )
             )
             tl.add(line, "{0}年{1}月".format(i[0:4], int(i[-2:])))
 
-        return t1
+        return tl
 
     def week_line(week_dict) -> Line:
         '''
@@ -114,9 +116,9 @@ class ChartApi(object):
             flow = [str(j) for j in week_dict[i].values()]
             line = (
                 Line()
-                .add_xaxis(xaxis_data = weekday)
+                .add_xaxis(xaxis_data=weekday)
                 .add_yaxis(
-                    series_name= "{}月各星期品平均客流分布".format(int(i[-2:])),
+                    series_name="{}月各星期品平均客流分布".format(int(i[-2:])),
                     y_axis=flow,
                     label_opts=opts.LabelOpts(is_show=False)
                 )
@@ -124,11 +126,11 @@ class ChartApi(object):
                     title_opts=opts.TitleOpts(title="工作日和周末客流分析"),
                     tooltip_opts=opts.TooltipOpts(trigger="axis"),
                     yaxis_opts=opts.AxisOpts(
-                        name = "客流量/平均人次",
+                        name="客流量/平均人次",
                         type_="value",
                         splitline_opts=opts.SplitLineOpts(is_show=True),
                     ),
-                    xaxis_opts=opts.AxisOpts(name = "星期", type_="category", boundary_gap=False),
+                    xaxis_opts=opts.AxisOpts(name="星期", type_="category", boundary_gap=False),
                 )
             )
             tl.add(line, "{0}年{1}月".format(i[0:4], int(i[-2:])))
@@ -143,9 +145,9 @@ class ChartApi(object):
 
         line = (
             Line()
-            .add_xaxis(xaxis_data = day)
+            .add_xaxis(xaxis_data=day)
             .add_yaxis(
-                series_name= "",
+                series_name="",
                 y_axis=flow,
                 label_opts=opts.LabelOpts(is_show=False)
             )
@@ -154,40 +156,93 @@ class ChartApi(object):
                 title_opts=opts.TitleOpts(title="本周客流波动", pos_left="center"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 yaxis_opts=opts.AxisOpts(
-                    name = "客流量/人次",
+                    name="客流量/人次",
                     type_="value",
                     splitline_opts=opts.SplitLineOpts(is_show=True),
                 ),
-                xaxis_opts=opts.AxisOpts(name = "星期", type_="category", boundary_gap=False),
+                xaxis_opts=opts.AxisOpts(name="星期", type_="category", boundary_gap=False),
             )
         )
 
         grid = Grid()
         grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
 
-        return grid 
+        return grid
 
     def day_line(month, day_dict) -> Line:
         day = list(day_dict.keys())
         flow = [str(j) for j in day_dict.values()]
+        color_list = ['#F8456B', '#9E87FF', '#73DDFF', '#FE9A8B', '#F56948']
         line = (
-            Line()
-            .add_xaxis(xaxis_data = day)
+            Line(init_opts=opts.InitOpts(bg_color='#fff'))
+            .add_xaxis(
+                xaxis_data=day
+            )
             .add_yaxis(
-                series_name= "",
+                series_name="",
                 y_axis=flow,
                 label_opts=opts.LabelOpts(is_show=False),
+                is_smooth=True,
+                symbol_size=1,
+                symbol='circle',
+                is_symbol_show=False,
+                linestyle_opts=opts.LineStyleOpts(
+                    width=3,
+                ),
+                itemstyle_opts=opts.ItemStyleOpts(
+                    color=color_list[1],
+                    border_color=color_list[1]
+                ),
+                markpoint_opts=opts.MarkPointOpts(
+                    symbol_size=60,
+                    symbol='pin',
+                    data=[opts.MarkPointItem(
+                        name="最大值",
+                        type_='max',
+                        itemstyle_opts=opts.ItemStyleOpts(
+                            border_color='#000',
+                            border_width=0,
+                            border_type='solid'
+                        )
+                    ),
+                        opts.MarkPointItem(
+                            name="最小值",
+                            type_='min',
+                            itemstyle_opts=opts.ItemStyleOpts(
+                                border_color='#000',
+                                border_width=0,
+                                border_type='solid'
+                            )
+                        )],
+                ),
+                markline_opts=opts.MarkLineOpts(
+                    data=[opts.MarkLineItem(
+                        name="平均值",
+                        type_='average'
+                    )],
+                    label_opts=opts.LabelOpts(is_show=False)
+                )
             )
-            .set_colors(['#fb7293'])
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="本月客流波动", pos_left="center"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 yaxis_opts=opts.AxisOpts(
-                    name = "客流量/人次",
+                    name="客流量/人次",
                     type_="value",
-                    splitline_opts=opts.SplitLineOpts(is_show=True),
+                    splitline_opts=opts.SplitLineOpts(
+                        is_show=True,
+                        linestyle_opts=opts.LineStyleOpts(type_='dashed')
+                    )
                 ),
-                xaxis_opts=opts.AxisOpts(name = "日期", type_="category", boundary_gap=False),
+                xaxis_opts=opts.AxisOpts(
+                    name="日期",
+                    type_="category",
+                    boundary_gap=False,
+                    splitline_opts=opts.SplitLineOpts(
+                        is_show=False,
+                        linestyle_opts=opts.LineStyleOpts(type_='dashed')
+                    )
+                ),
             )
         )
         grid = Grid()
@@ -195,7 +250,7 @@ class ChartApi(object):
 
         return grid
 
-    def station_bar(station, in_dict, out_dict) ->Bar:
+    def station_bar(station, in_dict, out_dict) -> Bar:
         '''
         绘制某站点出入客流分布
         返回一个Bar图表
@@ -254,24 +309,24 @@ class ChartApi(object):
     def user_month_line(month_dict) -> Line:
         month = [i for i in month_dict.keys()]
         flow = [str(i) for i in month_dict.values()]
-        
+
         line = (
             Line()
-            .add_xaxis(xaxis_data = month)
+            .add_xaxis(xaxis_data=month)
             .add_yaxis(
-                series_name= "",
-                y_axis=flow,  
+                series_name="",
+                y_axis=flow,
                 label_opts=opts.LabelOpts(is_show=False)
             )
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="各月出行次数分布", pos_left="cenetr"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 yaxis_opts=opts.AxisOpts(
-                    name = "出行数/次",
+                    name="出行数/次",
                     type_="value",
                     splitline_opts=opts.SplitLineOpts(is_show=True),
                 ),
-                xaxis_opts=opts.AxisOpts(name = "月份", type_="category", boundary_gap=False),
+                xaxis_opts=opts.AxisOpts(name="月份", type_="category", boundary_gap=False),
             )
         )
 
@@ -289,10 +344,10 @@ class ChartApi(object):
             .add(
                 series_name="流量占比",
                 data_pair=[list(i) for i in zip(line, percent)],
-                radius= [40, 110],
+                radius=[60, 160],
                 rosetype="area",
             )
-            .set_colors(['#37a2da','#32c5e9','#9fe6b8','#ffdb5c','#ff9f7f','#fb7293','#e7bcf3','#8378ea'])
+            .set_colors(['#37a2da', '#32c5e9', '#9fe6b8', '#ffdb5c', '#ff9f7f', '#fb7293', '#e7bcf3', '#8378ea'])
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="线路流量占比", pos_left='center'),
                 legend_opts=opts.LegendOpts(is_show=False),
@@ -305,7 +360,7 @@ class ChartApi(object):
         grid.add(chart=pie, grid_opts=opts.GridOpts(pos_bottom="10%"))
 
         return grid
-    
+
     def pred_month_line(month_dict, month) -> Line:
         '''
         绘制单月整体预测客流分布
@@ -315,9 +370,9 @@ class ChartApi(object):
         flow = [str(j) for j in month_dict.values()]
         line = (
             Line()
-            .add_xaxis(xaxis_data = day)
+            .add_xaxis(xaxis_data=day)
             .add_yaxis(
-                series_name= "",
+                series_name="",
                 y_axis=flow,
                 # is_smooth=True,
                 label_opts=opts.LabelOpts(is_show=False)
@@ -327,11 +382,11 @@ class ChartApi(object):
                 title_opts=opts.TitleOpts(title="{}月整体客流波动".format(month), pos_left="center"),
                 tooltip_opts=opts.TooltipOpts(trigger="axis"),
                 yaxis_opts=opts.AxisOpts(
-                    name = "客流量/人次",
+                    name="客流量/人次",
                     type_="value",
                     splitline_opts=opts.SplitLineOpts(is_show=True),
                 ),
-                xaxis_opts=opts.AxisOpts(name = "日期", type_="category", boundary_gap=False),
+                xaxis_opts=opts.AxisOpts(name="日期", type_="category", boundary_gap=False),
             )
             # .render('./test.html')
         )
@@ -341,51 +396,51 @@ class ChartApi(object):
         return grid
 
     def pred_week_line(week_dict) -> Line:
-            '''
+        '''
             绘制本周预测客流分布
             返回一个Line图表
             '''
-            weekday = ['周一', '周二', '周三', '周四', '周五', '周六', '周末']
-            flow = [str(i) for i in week_dict.values()]
-     
-            line = (
-                Line()
-                .add_xaxis(xaxis_data = weekday)
-                .add_yaxis(
-                    series_name= "",
-                    y_axis=flow,
-                    label_opts=opts.LabelOpts(is_show=False),
-                    is_smooth=True
-                )
-                .set_global_opts(
-                    title_opts=opts.TitleOpts(title="本周客流分布", pos_left="center"),
-                    tooltip_opts=opts.TooltipOpts(trigger="axis"),
-                    yaxis_opts=opts.AxisOpts(
-                        name = "客流量/人次",
-                        type_="value",
-                        splitline_opts=opts.SplitLineOpts(is_show=True),
-                    ),
-                    xaxis_opts=opts.AxisOpts(name = "星期", type_="category", boundary_gap=False),
-                )
-                # .render('./test.html')
-            )
-            grid = Grid()
-            grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
+        weekday = ['周一', '周二', '周三', '周四', '周五', '周六', '周末']
+        flow = [str(i) for i in week_dict.values()]
 
-            return grid
+        line = (
+            Line()
+            .add_xaxis(xaxis_data=weekday)
+            .add_yaxis(
+                series_name="",
+                y_axis=flow,
+                label_opts=opts.LabelOpts(is_show=False),
+                is_smooth=True
+            )
+            .set_global_opts(
+                title_opts=opts.TitleOpts(title="本周客流分布", pos_left="center"),
+                tooltip_opts=opts.TooltipOpts(trigger="axis"),
+                yaxis_opts=opts.AxisOpts(
+                    name="客流量/人次",
+                    type_="value",
+                    splitline_opts=opts.SplitLineOpts(is_show=True),
+                ),
+                xaxis_opts=opts.AxisOpts(name="星期", type_="category", boundary_gap=False),
+            )
+            # .render('./test.html')
+        )
+        grid = Grid()
+        grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
+
+        return grid
 
     def hour_line(hour_list, hour_flow) -> Line:
         if len(hour_flow) == 0:
             hour_flow = [0] * len(hour_list)
         line = (
             Line()
-            .add_xaxis(xaxis_data = hour_list)
+            .add_xaxis(xaxis_data=hour_list)
             .add_yaxis(
-                series_name = "",
-                y_axis = hour_flow,
+                series_name="",
+                y_axis=hour_flow,
                 markpoint_opts=opts.MarkPointOpts(data=[
-                    opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color ='#E271DE')),
-                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color ='red'))
+                    opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color='#E271DE')),
+                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color='red'))
                 ]),
                 # is_smooth=True
                 label_opts=opts.LabelOpts(is_show=False)
@@ -394,15 +449,15 @@ class ChartApi(object):
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="当天小时客流分布", pos_left="center"),
                 yaxis_opts=opts.AxisOpts(
-                    name = "客流量 /人次",
+                    name="客流量 /人次",
                     type_="value",
                     splitline_opts=opts.SplitLineOpts(
                         is_show=True,
                         linestyle_opts=opts.LineStyleOpts(opacity=1)
                     ),
                 ),
-                xaxis_opts=opts.AxisOpts(name = "/时", type_="category", boundary_gap=False),
-                
+                xaxis_opts=opts.AxisOpts(name="/时", type_="category", boundary_gap=False),
+
             )
             # .render("line_markpoint.html")
         )
@@ -436,7 +491,7 @@ class ChartApi(object):
                 linestyle_opts=opts.LineStyleOpts(color="#CD0000"),
             )
             .set_series_opts(label_opts=opts.LabelOpts(is_show=False))
-      
+
             # .render("basic_radar_chart.html")  
         )
 
@@ -455,13 +510,13 @@ class ChartApi(object):
                 "",
                 [list(i) for i in zip(age, percent)],
                 center=["50%", "60%"],
-                radius = ['35%', '60%']
+                radius=['35%', '60%']
             )
-            .set_colors( ['#58D5FF', '#73ACFF', '#FDD56A', '#FDB36A', '#FD866A'])
+            .set_colors(['#58D5FF', '#73ACFF', '#FDD56A', '#FDB36A', '#FD866A'])
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="用户年龄结构分布", pos_left="center"),
-                legend_opts=opts.LegendOpts(pos_right="0%", pos_top="5%",orient="vertical",
-                    item_width=12, item_height=12, legend_icon="circle"),
+                legend_opts=opts.LegendOpts(pos_right="0%", pos_top="5%", orient="vertical",
+                                            item_width=12, item_height=12, legend_icon="circle"),
                 tooltip_opts=opts.TooltipOpts(formatter="{b} : {c}%")
             )
             .set_series_opts(label_opts=opts.LabelOpts(is_show=False))
@@ -471,26 +526,26 @@ class ChartApi(object):
         grid.add(chart=pie, grid_opts=opts.GridOpts(pos_bottom="5%"))
 
         return grid
-    
+
     def sta_schedule_line(hour_list, volunteer, worker) -> Line:
         line = (
             Line()
-            .add_xaxis(xaxis_data = hour_list)
+            .add_xaxis(xaxis_data=hour_list)
             .add_yaxis(
-                series_name = "志愿者",
-                y_axis = volunteer,
+                series_name="志愿者",
+                y_axis=volunteer,
                 markpoint_opts=opts.MarkPointOpts(data=[
-                    opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color ='#F8456B')),
-                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color ='#F8456B'))
+                    opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color='#F8456B')),
+                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color='#F8456B'))
                 ]),
                 label_opts=opts.LabelOpts(is_show=False)
             )
             .add_yaxis(
-                series_name = "工作人员",
-                y_axis = worker,
+                series_name="工作人员",
+                y_axis=worker,
                 markpoint_opts=opts.MarkPointOpts(data=[
-                    opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color ='#E271DE')),
-                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color ='#E271DE'))
+                    opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color='#E271DE')),
+                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color='#E271DE'))
                 ]),
                 label_opts=opts.LabelOpts(is_show=False)
             )
@@ -498,14 +553,14 @@ class ChartApi(object):
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="地铁人员调度比例", pos_left="center", pos_top="0%"),
                 yaxis_opts=opts.AxisOpts(
-                    name = "百分比 %",
+                    name="百分比 %",
                     type_="value",
                     splitline_opts=opts.SplitLineOpts(
                         is_show=True,
                         linestyle_opts=opts.LineStyleOpts(opacity=1)
                     ),
                 ),
-                xaxis_opts=opts.AxisOpts(name = "/时", type_="category", boundary_gap=False),
+                xaxis_opts=opts.AxisOpts(name="/时", type_="category", boundary_gap=False),
                 legend_opts=opts.LegendOpts(pos_top="10%")
             )
             # .render("line_markpoint.html")
@@ -514,6 +569,7 @@ class ChartApi(object):
         grid.add(chart=line, grid_opts=opts.GridOpts(pos_bottom="10%"))
 
         return grid
+
 
 if __name__ == '__main__':
     chartapi = ChartApi

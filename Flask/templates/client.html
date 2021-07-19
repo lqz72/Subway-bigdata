@@ -36,23 +36,28 @@
                 <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
                 <span class="name">超级管理员</span>
             </div>
-
-            <!-- 年龄结构图1 -->
-            <div id = "age_bar" class="agegraph1">
-            </div>
-            <!-- 年龄结构图2 -->
-            <div id = "age_pie" class="agegraph2">
+            
+            <div class="addflex">
+              <!-- 年龄结构图1 -->
+              <div id = "age_bar" class="agegraph1">
+              </div>
+              <!-- 年龄结构图2 -->
+              <div id = "age_pie" class="agegraph2">
+              </div>
             </div>
             
-            <!-- 搜索框 -->
-            <div class="search">
-                <button id= "btn_show" >&#xe663;</button>
-                <input id = "user_search" type="text" placeholder="请输入您要搜索的用户ID...">
-                <button id= "btn_search"></button>
+            <div class="addflex">
+                <!-- 搜索框 -->
+                <div class="search">
+                  <button id= "btn_show" >&#xe663;</button>
+                  <input id = "user_search" type="text" placeholder="请输入您要搜索的用户ID...">
+                  <button id= "btn_search"></button>
+                </div>
             </div>
-
-            <!-- 用户信息 -->
-            <div id = "user_info" class="userinfo">
+            
+            <div class="addflex">
+              <!-- 用户信息 -->
+              <div id = "user_info" class="userinfo">
                 <ul>
                     <li>
                         <span>   
@@ -80,22 +85,27 @@
             <div id = "monthout" class="monthout">
                 用户每月出行次数折线图
             </div>
-
-            <!-- 出行记录展示1 -->
-            <div class="outshow1" id="outshow1">
-              
             </div>
+            
 
-            <!-- 出行记录路径 -->
-            <div class="road" id="road">
-               
+            <div class="addflex">
+                <!-- 出行记录路径 -->
+                <div class="road" id="road">
+                  
+                </div>
             </div>
-
-            <!-- 历史出行 -->
-            <div class="outshow2" id="outshow2">
-               
+            
+            <div class="addflex">
+              <!-- 出行记录展示1 -->
+              <div class="outshow1" id="outshow1">
+                
+              </div>
+              <div class="otherdata">
+                
+              </div>
             </div>
-
+            
+          
         </div>
     </div>
 
@@ -158,30 +168,7 @@
             
         {{/each}}
         {%endraw%}  
-    </script>
-    <script id='historylist' type="text/html">
-      {%raw%}
-        <p>用户历史出行记录</p>
-        <table>
-            <tr>
-                <th>进站时间</th>
-                <th>进站站点</th>
-                <th>出站时间</th>
-                <th>出站站点</th>
-            </tr>
-            {{each list as value}}
-            <tr>
-                <td>{{value[1]}}</td>
-                <td>{{value[0]}}</td>
-                <td>{{value[3]}}</td>
-                <td>{{value[2]}}</td>
-            </tr>
-            {{/each}}
-        </table>
-        {%endraw%}
-    </script>
-
-    
+    </script>    
     <script src="{{ url_for('static',filename ='js/update_client.js') }}"></script>
     
     

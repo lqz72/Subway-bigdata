@@ -1,12 +1,14 @@
-from apps.api_view import *
+from flask import request
+from flask import jsonify, json
+from flask import Blueprint
 
-history_bp = Blueprint('history_bp', __name__)
+from MakeChart import ChartApi
+from MysqlOS import SQLOS
+from apps import api
 
-@history_bp.route('/history')
-def history():
-    return render_template('history.html')
+history_bp = Blueprint('history_bp', __name__, url_prefix='/history')
 
-@history_bp.route('/thisday_info', methods = ['POST', 'GET'])
+@history_bp.route('/thisday_info', methods=['POST', 'GET'])
 def thisday_info() -> json:
     """返回指定日期天气、节假日、客流信息
     """
@@ -30,7 +32,6 @@ def thisday_info() -> json:
     }
 
     return jsonify(info_dict)
-
 
 @history_bp.route('/sta_rank', methods=['POST', 'GET'])
 def sta_rank() -> json:
@@ -77,9 +78,17 @@ def od_flow() -> json:
 
     return jsonify(od_flow)
 
-#################Pyecharts
+@history_bp.route('/area/inout_flow', methods=['POST', 'GET'])
+def inout_flow() -> json:
+    """返回区域点入点出客流
+    """
+    curr_date = request.get_data().decode('utf-8')
+    sta_list, in_flow, out_flow = api.get_area_in_out_flow(curr_date, '住宅区')
 
-@history_bp.route('/history/day_flow/line', methods=['POST', 'GET'])
+    return jsonify(sta_list, in_flow, out_flow)
+
+#################Pyecharts
+@history_bp.route('/day_flow/line', methods=['POST', 'GET'])
 def day_flow():
     current_date = request.get_data().decode('utf-8')
     month = current_date[:-3]
@@ -89,7 +98,7 @@ def day_flow():
 
     return day_line.dump_options_with_quotes()
 
-@history_bp.route('/history/curr_week_flow/line', methods=['POST', 'GET'])
+@history_bp.route('/curr_week_flow/line', methods=['POST', 'GET'])
 def curr_week_flow():
     current_date = request.get_data().decode('utf-8')
     curr_week_dict = api.get_curr_week_flow(current_date)
@@ -97,19 +106,19 @@ def curr_week_flow():
 
     return curr_week_line.dump_options_with_quotes()
 
-@history_bp.route('/history/age/pie', methods=['POST', 'GET'])
+@history_bp.route('/age/pie', methods=['POST', 'GET'])
 def age_pie():
     age, percent = api.age, api.percent
     age_pie = ChartApi.age_pie(age, percent)
     return age_pie.dump_options_with_quotes()
 
-@history_bp.route('/history/age/bar', methods=['POST', 'GET'])
+@history_bp.route('/age/bar', methods=['POST', 'GET'])
 def age_bar():
     age, percent = api.age, api.percent
     age_bar = ChartApi.age_bar(age, percent)
     return age_bar.dump_options_with_quotes()
 
-@history_bp.route('/history/user_flow/line', methods=['POST', 'GET'])
+@history_bp.route('/user_flow/line', methods=['POST', 'GET'])
 def user_flow_line():
     user_id = request.get_data().decode('utf-8')
 
@@ -121,7 +130,7 @@ def user_flow_line():
 
     return flow_line.dump_options_with_quotes()
 
-@history_bp.route('/history/line/pie', methods=['POST', 'GET'])
+@history_bp.route('/line/pie', methods=['POST', 'GET'])
 def line_pie():
     current_date = request.get_data().decode('utf-8')
     line, percent = api.get_line_flow_percent(current_date)

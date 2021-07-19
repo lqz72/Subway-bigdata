@@ -1,15 +1,11 @@
 import json
-from flask import request, render_template
+from flask import request
 from flask import jsonify
 from flask import Blueprint
 
 from MysqlOS import SQLOS
 
 selfcenter_bp = Blueprint('selfcenter_bp', __name__)
-
-@selfcenter_bp.route('/selfcenter')
-def selfcenter():
-    return render_template('selfcenter.html')
 
 @selfcenter_bp.route('/admin_info', methods=['POST', 'GET'])
 def admin_info() -> json:
