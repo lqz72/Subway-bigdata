@@ -63,10 +63,11 @@ class SQLOS(object):
         file_path = {
             # 'weather2020': txt_path + 'weather2020.txt',
             # 'hoilday2020': txt_path + 'hoilday2020.txt',
-            'station': txt_path + 'station.txt',
+            # 'station': txt_path + 'station.txt',
             # 'users': txt_path + 'users.txt',
             # 'flow': txt_path + 'flow.txt',
-            # 'trips': txt_path +'trips.txt', 
+            # 'trips': txt_path +'trips.txt',
+            # 'day_pass_num':txt_path + 'day_pass_num.txt',
             # 'weather_info': txt_path + 'weather_info.txt',
             # 'feature_day':  txt_path + 'feature_day.txt',
             # 'feature_in_hour': txt_path + '/feature/feature_in_hour.txt',
@@ -127,7 +128,6 @@ class SQLOS(object):
             conn.close()
 
     def write_df_data(df, table_name):
-
         '''
         将dataframe写入mysql对应的表中
         '''
@@ -173,6 +173,30 @@ class SQLOS(object):
         sta_dict = dict(zip(sta_df['sta_name'], sta_df['line']))
 
         return sta_dict
+
+    def get_station_list(line):
+        """
+        获取指定线路的所有站点
+        """
+        conn = SQLOS.connect_to_db()
+
+        try:
+            cursor = conn.cursor()
+            sql = 'SELECT sta_name FROM station WHERE `line` = "%s"' % line
+            cursor.execute(sql)
+            res = cursor.fetchall()
+
+            sta_list = []
+            for item in res:
+                sta_list.append(item[0])
+            return sta_list
+
+        except Exception as e:
+            conn.rollback()
+            print('error', e)
+            conn.close()
+
+        return 'UnKnow'
 
     def get_clean_data():
         '''
@@ -405,5 +429,26 @@ class SQLOS(object):
         predict_df.set_index('time', inplace=True)
 
         return predict_df
+
+    def get_day_pass_num(date):
+        """
+        获取当日出行乘客总数
+        """
+        conn = SQLOS.connect_to_db()
+
+        try:
+            sql = 'SELECT user_num from day_pass_num WHERE `day` = "%s"' % date
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            data = cursor.fetchall()
+            conn.close()
+            return data[0][0]
+
+        except Exception as e:
+            print('error:', e)
+            conn.rollback()
+            conn.close()
+
+        return 'UnKnow'
 
 # SQLOS.load_data()

@@ -138,7 +138,7 @@ class DataApi(object):
         return in_data_dict, out_data_dict
 
     @staticmethod
-    def get_sta_series(sta_name, in_flow = None, out_flow = None):
+    def get_sta_series(sta_name, in_flow=None, out_flow=None):
         """获取指定站点入站和出站客流的series
         """
         if in_flow is None and out_flow is None:
@@ -178,7 +178,7 @@ class DataApi(object):
         print(in_series.y.sum())
 
     @staticmethod
-    def get_sta_peak_flow(df, station):
+    def get_sta_peak_flow(df):
         """
         获取各个站点在早晚高峰时的进/出客流
         传入一个in_df 或者 out_df
@@ -188,7 +188,8 @@ class DataApi(object):
         df.columns = ['user_id', 'sta_name', 'time']
         df['flow'] = 1
 
-        sta_dict = am_dict = pm_dict = {}
+        am_dict = {}
+        pm_dict = {}
         sta_list = list(set(df['sta_name'].values))
         for sta in sta_list:
             my_df = df[df['sta_name'] == sta]
@@ -352,6 +353,25 @@ class DataApi(object):
 
         return info_dict
 
+    def get_day_pass_df(self):
+        """获取单日出行总人数
+        """
+        df = self.trips_df.copy()
+        df.in_time = df.in_time.dt.normalize()
+        day_list = df.in_time.dt.strftime('%Y-%m-%d').unique()
+        ddf = df.set_index('in_time')
+
+        my_df = pd.DataFrame(index=day_list, data=np.zeros((len(day_list), 1)), dtype = 'int', columns=['flow'])
+        for day in day_list:
+            day_df = ddf.loc[day]
+            user_list = day_df.user_id.unique()
+            my_df.loc[day] = len(user_list)
+
+        my_df.reset_index(inplace=True)
+        my_df.columns = ['day', 'flow']
+
+        my_df.to_csv('./day_pass_num.csv', encoding='gb18030', index=None)
+
     def get_curr_week_flow(self, date):
         """
         获取当前周的客流变化
@@ -495,7 +515,7 @@ class DataApi(object):
         返回值为一个字典 格式:{station:{hour:num,},}
         """
         df = self.in_df.copy()
-        print(date)
+
         df = df.loc[date]
         df['flow'] = 1 
         df.reset_index(level='in_time', inplace=True)
@@ -657,7 +677,7 @@ class DataApi(object):
 
         return weather_list
 
-    def get_sta_flow_info(self, station, date):
+    def get_sta_flow_info(self, date, station):
         """
         获取指定站点当前日期的客流对比信息
         返回一个字典 包含了客流对比信息和早晚高峰客流
@@ -762,7 +782,7 @@ class DataApi(object):
             rs = df.resample('H')['flow'].sum()
 
             hours = [i.strftime('%H').lstrip('0') for i in rs.index]
-            flow  = rs.values
+            flow = rs.values
             return dict(zip(hours, flow))
 
         in_dict, out_dict = _get_data('in'), _get_data('out')
@@ -843,19 +863,15 @@ class DataApi(object):
 
 if __name__ == '__main__':
     api = DataApi()
-    begin = time.time()
-    api.get_area_in_out_flow('2020-07-01', '住宅区')
-    end = time.time()
 
-    print(end - begin)
-
+    # begin = time.time()
+    # api.get_area_in_out_flow('2020-07-01', '住宅区')
+    # end = time.time()
+    #
+    # print(end - begin)
 
     #api.get_section_in_out_flow('in', api.get_in_hour_flow('2020-07-01', 7, 21))
     #api.get_section_in_out_flow('out', api.get_out_hour_flow('2020-07-01', 7, 21))
     # api.get_sta_flow_info('Sta101', '2020-07-01')
     # print(api.get_sta_age_structure('2020-07-01', 'Sta101'))
 
-    
-
-
-    

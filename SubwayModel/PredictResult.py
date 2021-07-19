@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from DataAnalysis import DataApi
 from PredictModel import *
@@ -6,9 +7,9 @@ import datetime
 import os
 
 class PredictApi(object):
-    '''
+    """
     提供预测数据分析接口
-    '''
+    """
     def __init__(self):
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
         self.ml_predictor = MLPredictor()
@@ -110,21 +111,21 @@ class PredictApi(object):
 
         return week_dict
 
-    def get_sta_flow(self,sta_name):
+    def get_sta_flow(self, sta_name):
         """
         单站的点出/入站客流分析
         返回两个字典 格式{'month':{'day':num,},}
         """
         in_series, out_series = DataApi.get_sta_series(sta_name)
 
-        in_feature_df =  self.ml_predictor.get_sta_feature(in_series)
+        in_feature_df = self.ml_predictor.get_sta_feature(in_series)
         in_predict_results = self.ml_predictor.forecast_day_flow(in_feature_df, sta_name)
 
-        out_feature_df =  self.ml_predictor.get_sta_feature(out_series)
-        out_predict_results =  self.ml_predictor.forecast_day_flow(out_feature_df, sta_name)
+        out_feature_df = self.ml_predictor.get_sta_feature(out_series)
+        out_predict_results = self.ml_predictor.forecast_day_flow(out_feature_df, sta_name)
         
         
-        def get_month_dict(predict_results):
+        def _get_month_dict(predict_results):
             date_flow = predict_results['y']
 
             # 获取所有行程中出现的年月
@@ -253,6 +254,23 @@ class PredictApi(object):
         }
         return info_dict
 
+    def get_day_sta_flow(self, date):
+        """
+        获取所有站点客流量的降序列表
+        返回一个字典 格式:{station: flow}
+        """
+        sta_df = self.pred_sta_df.copy()
+        sta_df.day = pd.to_datetime(sta_df.day)
+        day_df = sta_df.set_index('day').loc[date]
+
+        grouped = day_df.groupby(by='sta')['y'].sum()
+        grouped.sort_values(ascending=False, inplace=True)
+
+        sta_list = grouped.index
+        flow_list = [(i+1) for i in grouped.values]
+
+        return dict(zip(sta_list, flow_list))
+
     def get_line_flow_percent(self, date, sta_dict):
         """
         获取线路流量占比
@@ -275,27 +293,50 @@ class PredictApi(object):
 
         return line_dict.keys(), line_dict.values()
 
-    def get_hour_flow(self, date, type_ = 'out'):
-        '''
-        获取本日各小时进出站客流
-        传入一个一个有效日期 以及进出站标识
-        返回一个字典 格式:{hour:'flow'}
-        '''
-        pred_df = self.pred_in_hour_df[date] if type_ == 'in' else self.pred_out_hour_df[date]
-        
-        gb = pred_df.groupby('hour')['y'].sum()
-        
-        hour_flow = [str(i) for i in gb.values]
+    def get_hour_flow(self, date, _type='out', line=None):
+        """获取本日6-21点进出站客流
+
+        Parameters
+        ----------
+        date:   有效日期
+        _type:  类别 可选in, out, all
+        line：  线路名称 默认为None
+
+        Returns
+        -------
+        List:   列表 包含6-21小时对应的客流
+        """
+        if _type == 'all':
+            in_pred_df = self.pred_in_hour_df[date]
+            out_pred_df = self.pred_out_hour_df[date]
+
+            if line is not None:
+                sta_list = SQLOS.get_station_list(line)
+
+                in_pred_df = in_pred_df[in_pred_df.sta.isin(sta_list)]
+                out_pred_df = out_pred_df[out_pred_df.sta.isin(sta_list)]
+
+            in_list = in_pred_df.groupby('hour')['y'].sum().values
+            out_list = out_pred_df.groupby('hour')['y'].sum().values
+
+            all_list = np.array(in_list) + np.array(out_list)
+            hour_flow = [int(i) for i in all_list]
+        else:
+            pred_df = self.pred_in_hour_df[date] if _type == 'in' else self.pred_out_hour_df[date]
+
+            gb = pred_df.groupby('hour')['y'].sum()
+
+            hour_flow = [int(i) for i in gb.values]
 
         return hour_flow
 
-    def get_sta_hour_flow(self, date, type_ = 'out'):
-        '''
+    def get_sta_hour_flow(self, date, _type='out'):
+        """
         获取各个站点6-21点的进站客流量 
         传入一个一个有效日期 以及进出站标识
         返回值为一个字典 格式:{station:{hour:flow,},}
-        '''
-        pred_df = self.pred_in_hour_df[date] if type_== 'in' else self.pred_in_hour_df[date]
+        """
+        pred_df = self.pred_in_hour_df[date] if _type == 'in' else self.pred_in_hour_df[date]
         sta_list = SQLOS.get_station_dict().keys()
 
         sta_dict = dict.fromkeys(sta_list, 0)
@@ -337,7 +378,8 @@ class PredictApi(object):
 
 if __name__ == '__main__':
     pred_api = PredictApi()
-    pred_api.get_curr_month_flow('6', c_date = '2020-07-17')
+    # res = pred_api.get_day_sta_flow('2020-07-21')
+    # print(res)
     # ml = MLPredictor()
     # rs = ml.forecast_by_factor('2020-07-17', choose_wea='阴', choose_temp='22')
     # print(rs)
