@@ -3,7 +3,7 @@ $(function(){
         type:'GET',
         url:'/admin_info',
         success: function(data){
-            console.log(data)
+            // console.log(data)
             var t = {};
             t.list = data;
             var html = template('admindata', t);

@@ -52,12 +52,13 @@ btn_search.onclick = function () {
             test = {title:'用户记录'};
             test['list'] = userRecord;
             test['length'] = data.length;
+            
             var html = template('historyshow', test);
             document.getElementById('outshow1').innerHTML = html;
 
             var html2 = template('historylist', test);
             document.getElementById('outshow2').innerHTML = html2;
-
+            
             linesOption.series[1].data = getLinesData(userRecord, stations);
             linesChart.setOption(linesOption);
         }
@@ -139,6 +140,7 @@ $.ajax({
         
         linesOption.series[1].data = getLinesData(userRecord, stations);
         linesChart.setOption(linesOption);
+        console.log('success');
     }
 });
 
@@ -158,6 +160,12 @@ function getJsonData(url){
 
 var stations = getJsonData('/api/sta/json');
 var links = getJsonData('/api/link/json');
+
+stations.forEach(function (param){
+    if(param.category != 1){
+        param.label.show = false; 
+    }
+});
 
 //初始化图表
 var linesChart = echarts.init(document.getElementById('road'));
@@ -208,13 +216,20 @@ var linesOption = {
             edgeSymbolSize: [0, 8], //边两端的标记大小，可以是一个数组分别指定两端，也可以是单个统一指定
             edgeLabel: {
                 normal: {
-                textStyle: {
-                    fontSize: 60
-                }
+                    textStyle: {
+                        fontSize: 60
+                    }
                 }
             },
             symbol: "rect",
             symbolOffset: ["15%", 0],
+            tooltip: {
+                trigger: 'item',
+                formatter: function (param) {
+                    let label = `站点名称: ${param.name}`;
+                    return label;
+                }
+            },
             data: stations,
             links: links,
             label: {
@@ -235,10 +250,17 @@ var linesOption = {
             zlevel: 5,
             draggable: false,
             coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
+            tooltip: {
+                trigger: 'item',
+                formatter: function (param) {
+                    let label = `出发地：${param.data.source} <br> 目的地：${param.data.target}`;
+                    return label;
+                }
+            },
             effect: {
                 show: true,
                 period: 4, //箭头指向速度，值越小速度越快
-                trailLength: 0.02, //特效尾迹长度[0,1]值越大，尾迹越长重
+                trailLength: 0.01, //特效尾迹长度[0,1]值越大，尾迹越长重
                 symbol: 'arrow', //箭头图标
                 symbolSize: 5, //图标大小
             },

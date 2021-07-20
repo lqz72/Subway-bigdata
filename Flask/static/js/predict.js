@@ -481,6 +481,7 @@ function getHourFlowData(hourFlow, stations) {
             var sta = JSON.parse(JSON.stringify(station));
 
             if (lineNames.indexOf(sta.name) == -1) {
+                sta.label.show = false 
                 sta.itemStyle.color = station.itemStyle.color;
                 sta.symbolSize = [10, 10];
                 sta.value.push(0);
