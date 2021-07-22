@@ -24,22 +24,25 @@
     <div class="w">
         <!-- 左侧导航栏 -->
         <div class="nav">
-            <p>&nbsp;&nbsp;轨道交通智慧系统</p>
+            <p><span>&nbsp;&nbsp;轨道交通智慧系统</span></p>
             <ul>
-                <li><a href="/history">&nbsp;&nbsp;历史轨道数据储库</a></li>
-                <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
-                <li><a href="/client">&nbsp;&nbsp;乘客特征分析系统</a></li>
-                <li  class='addbgc'><a href="/station/Sta101">&nbsp;&nbsp;运营规划辅助系统</a></li>
-                <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
+                <li><a href="/history" data-ctt='>'><span>&nbsp;&nbsp;历史轨道数据储库</span></a></li>
+                <li><a href="/predict" data-ctt='>'><span>&nbsp;&nbsp;智慧轨道预测系统</span></a></li>
+                <li><a href="/client" data-ctt='>'><span>&nbsp;&nbsp;乘客特征分析系统</span></a></li>
+                <li class='addbgc'><a href="/station/Sta101" data-ctt='>'><span>&nbsp;&nbsp;运营规划辅助系统</span></a></li>
+                <li><a href="/selfcenter" data-ctt='>'><span>&nbsp;&nbsp;个人中心</span></a></li>
             </ul>
         </div>
         <!-- 右侧内容区域 -->
         <div class="content">
             <!-- 用户信息 -->
             <div class="user">
+                <div class="mytoggle">&#xe8b2;</div>
                 <div class="loc">轨道交通智慧系统>运营规划辅助系统</div>
-                <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
-                <span class="name">超级管理员</span>
+                <div class="usr">
+                    <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
+                    <span class="name">超级管理员</span>
+                </div>
             </div>
 
             <div class="addflex">

@@ -125,7 +125,7 @@ button {
 .stainfo .cloud {
     float: left;
     flex:2;
-    width: 226px;
+    width: 426px;
     height: 230px;
 }
 .stainfo .cloud p{
@@ -136,8 +136,8 @@ button {
     font-size: 20px;
 }
 .stainfo .cloud .yun {
-    height: 190px;
-    width: 226px;
+    height: 220px;
+    width: 100%;
     /* background-color: pink; */
 }
 

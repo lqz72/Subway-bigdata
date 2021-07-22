@@ -16,22 +16,25 @@
     <div class="w">
         <!-- 左侧导航栏 -->
         <div class="nav">
-            <p>&nbsp;&nbsp;轨道交通智慧系统</p>
+            <p><span>&nbsp;&nbsp;轨道交通智慧系统</span></p>
             <ul>
-                <li><a href="/history">&nbsp;&nbsp;历史轨道数据储库</a></li>
-                <li  class='addbgc'><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
-                <li><a href="/client">&nbsp;&nbsp;乘客特征分析系统</a></li>
-                <li><a href="/station/Sta101">&nbsp;&nbsp;运营规划辅助系统</a></li>
-                <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
+                <li><a href="/history" data-ctt='>'><span>&nbsp;&nbsp;历史轨道数据储库</span></a></li>
+                <li class='addbgc'><a href="/predict" data-ctt='>'><span>&nbsp;&nbsp;智慧轨道预测系统</span></a></li>
+                <li><a href="/client" data-ctt='>'><span>&nbsp;&nbsp;乘客特征分析系统</span></a></li>
+                <li><a href="/station/Sta101" data-ctt='>'><span>&nbsp;&nbsp;运营规划辅助系统</span></a></li>
+                <li><a href="/selfcenter" data-ctt='>'><span>&nbsp;&nbsp;个人中心</span></a></li>
             </ul>
         </div>
         <!-- 右侧内容区域 -->
         <div class="content">
             <!-- 用户信息 -->
             <div class="user">
+                <div class="mytoggle">&#xe8b2;</div>
                 <div class="loc">轨道交通智慧系统>智慧轨道预测系统</div>
-                <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
-                <span class="name">超级管理员</span>
+                <div class="usr">
+                    <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
+                    <span class="name">超级管理员</span>
+                </div>
             </div>
 
             <div class="addflex">
@@ -169,35 +172,64 @@
             </div>
             
             <div class="addflex">
+                <div class="preinfo">
+                    <div class="info1">
+                        <p>今日客流总量预测</p>
+                        <div class="tolcnt">
+                            5523
+                        </div>
+                    </div>
+                    <div class="info2">
+                        <div class="addyes">
+                            较昨日&nbsp;&nbsp;&nbsp;
+                            <i>&#xe608;</i>
+                            <span>18%</span>
+                        </div>
+                        <div class="addmonth">
+                            较月平均
+                            <i>&#xe607;</i>
+                            <span>28%</span>
+                        </div>
+                        <div class="addyear">
+                            较年平均
+                            <i>&#xe607;</i>
+                            <span>31%</span>
+                        </div>
+                    </div>
+                    <div class="info3">
+                        <p>高峰客流预测</p>
+                        <div class="morning">
+                            早高峰<i>&#xe69b;</i>
+                            <span>896</span>
+                        </div>
+                        <div class="evening">
+                            晚高峰<i>&#xe69c;</i>
+                            <span>1103</span>
+                        </div>
+                    </div>
+                    <div class="info4">
+                        <p>高峰时段占比</p>
+                        <div class="words">20%</div>
+                        <div class="layui-progress per" lay-showpercent="true">
+                            <div class="layui-progress-bar layui-bg-red" lay-percent="20%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+            <div class="addflex">
                 <!-- 本月客流 -->
                 <div class="thismonthpre" id = "month_line">
                     本月客流
                 </div>
-            </div>
-            
-            <div class="addflex">
                 <!-- 本周客流 -->
                 <div class="thisweekpre" id = "week_line">
                     本周客流
                 </div>
-
-                <!-- 当天总客流 -->
-                <div class="thisdayall">
-                    <p>今日客流总量</p>
-                    <p id = "day_flow">1213</p>
-                </div>
-                <!-- 当天其他信息 -->
-                <div  class="thisdayinfopre">
-                    <p>客流量对比</p>
-                    <ul>
-                        <li>较昨日：<span class='font-blue' id = "cmp_day">+21.1%</span></li> 
-                        <li>较月平均：<span class='font-blue' id = "cmp_month">+10.3%</span></li> 
-                        <li>较年平均：<span class='font-blue' id = "cmp_year">-1.6%</span></li>
-                        <li>早高峰客流：<span> <em class='font-blue' id = "am_peak_flow">231</em> 人次</span></li>
-                        <li>晚高峰客流：<span> <em class='font-blue' id = "pm_peak_flow">315</em> 人次</span></li>
-                    </ul>
-                </div>
             </div>
+            
+            
             
 
             <div class="addflex">

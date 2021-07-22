@@ -21,7 +21,6 @@ layui.use('laypage', function(){
                 var t = {};
                 t.tt = '这是怎么回事';
                 t.val = data;
-                console.log(t);
                 var html = template('test', t);
                 document.getElementById('userlist').innerHTML = html;
                 

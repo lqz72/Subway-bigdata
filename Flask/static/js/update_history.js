@@ -20,17 +20,38 @@
 var nav = document.querySelector(".nav");
 var content = document.querySelector(".content");
 var taggle = document.querySelector(".mytoggle");
+var tohid = document.querySelectorAll(".nav span");
+var aa = document.querySelectorAll(".nav ul li a");
+var des = document.querySelectorAll("[data-ctt]");
 taggle.addEventListener('click',function()
 {
     if(!state){
-        nav.style.width = '50px';
+        nav.style.width = '55px';
         content.style.marginLeft = '50px';
         state = 1;
+        console.log(tohid);
+        for(var i=0;i<6;i++)
+        {
+            tohid[i].style.display = 'none';
+        }
+        for(var i=0;i<5;i++)
+        {
+            aa[i].dataset.ctt = '';
+        }
+
     }
     else{
         nav.style.width = '250px';
         content.style.marginLeft = '250px';
         state = 0;
+        for(var i=0;i<6;i++)
+        {
+            tohid[i].style.display = 'inline';
+        }
+        for(var i=0;i<5;i++)
+        {
+            aa[i].dataset.ctt = '>';
+        }
     }
     
     month_chart.resize();

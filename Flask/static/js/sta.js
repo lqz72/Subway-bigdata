@@ -127,12 +127,12 @@ var option = {
     series: [ {
         type: 'wordCloud',
         gridSize: 2,
-        sizeRange: [6, 30],
+        sizeRange: [15, 45],
         // sizeRange: [12, 50],
-        rotationRange: [-90, 90],
+        rotationRange: [-30,30],
         shape: 'pentagon',
-        width: 226,
-        height: 190,
+        width: 456,
+        height: 220,
         drawOutOfBound: true,
         textStyle: {
             color: function () {
@@ -154,7 +154,7 @@ var option = {
                 name: '通勤乘客',
                 value: 10000,
                 textStyle: {
-                    color: 'black'
+                    color: 'red'
                 },
                 emphasis: {
                     textStyle: {

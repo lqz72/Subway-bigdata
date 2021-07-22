@@ -64,23 +64,25 @@
     <div class="w">
         <!-- 左侧导航栏 -->
         <div class="nav">
-            <p>&nbsp;&nbsp;轨道交通智慧系统</p>
+            <p><span>&nbsp;&nbsp;轨道交通智慧系统</span></p>
             <ul>
-                <li class='addbgc'><a href="/history">&nbsp;&nbsp;历史轨道数据储库</a></li>
-                <li><a href="/predict">&nbsp;&nbsp;智慧轨道预测系统</a></li>
-                <li><a href="/client">&nbsp;&nbsp;乘客特征分析系统</a></li>
-                <li><a href="/station/Sta101">&nbsp;&nbsp;运营规划辅助系统</a></li>
-                <li><a href="/selfcenter">&nbsp;&nbsp;个人中心</a></li>
+                <li class='addbgc'><a href="/history" data-ctt='>'><span>&nbsp;&nbsp;历史轨道数据储库</span></a></li>
+                <li><a href="/predict" data-ctt='>'><span>&nbsp;&nbsp;智慧轨道预测系统</span></a></li>
+                <li><a href="/client" data-ctt='>'><span>&nbsp;&nbsp;乘客特征分析系统</span></a></li>
+                <li><a href="/station/Sta101" data-ctt='>'><span>&nbsp;&nbsp;运营规划辅助系统</span></a></li>
+                <li><a href="/selfcenter" data-ctt='>'><span>&nbsp;&nbsp;个人中心</span></a></li>
             </ul>
         </div>
         <!-- 右侧内容区域 -->
         <div class="content">
             <!-- 用户信息 -->
             <div class="user">
-                <div class="mytoggle"></div>
+                <div class="mytoggle">&#xe8b2;</div>
                 <div class="loc">轨道交通智慧系统>历史轨道数据储库</div>
-                <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
-                <span class="name">超级管理员</span>
+                <div class="usr">
+                    <span class="head"><img src="{{ url_for('static', filename = 'images/head.jpg') }}" alt=""></span>
+                    <span class="name">超级管理员</span>
+                </div>
             </div>
 
             <div class="addflex">
@@ -88,33 +90,36 @@
                 <div class="time" id='timectrl'>
                 
                 </div>
-                
+                <div class="maininfo">
+                    <div class="wea">
 
+                    </div>
+                    <div class="info13">
+                        <div class="part1">
 
-                <!-- 当月客流变化 -->
-                <div id = "month_line" class="thismonth">
-                    <!-- 当月客流变化折线图 -->
+                        </div>
+                        <div class="part3">
+
+                        </div>
+                    </div>
+                    <div class="info24">
+                        <div class="part2">
+
+                        </div>
+                        <div class="part4">
+
+                        </div>
+                    </div>
                 </div>
+
+
+                
             </div>
 
             <div class="addflex">
-                <!-- 当天总客流 -->
-                <div class="thisdayall">
-                    <p>今日客流总量</p>
-                    <p id = "day_flow">1213</p>
-                </div>
-                <!-- 当天其他信息 -->
-                <div id = "thisday_info" class="thisdayinfo">
-                    <p>今日天气情况：<span id = "weather">晴朗</span></p>
-                    <p>是否节假日：<span id = "is_hoilday">否</span></p>
-                    <p>客流量对比</p>
-                    <ul>
-                        <li>较昨日：<span id = 'day_cmp' class='font-blue'>-10.6%</span></li>
-                        <li>较月平均：<span id = 'month_cmp' class='font-blue'>-15.1%</span></li>
-                        <li>较年平均：<span id = 'year_cmp' class='font-blue'>-18.1%</span></li>
-                        <li>早高峰客流：<span > <em id = 'am_peak_flow' class='font-blue'>214</em> 人次</span></li>
-                        <li>晚高峰客流：<span > <em id = 'pm_peak_flow' class='font-blue'>235</em> 人次</span></li>
-                    </ul>
+                <!-- 当月客流变化 -->
+                <div id = "month_line" class="thismonth">
+                    <!-- 当月客流变化折线图 -->
                 </div>
                 <!-- 这一周 -->
                 <div id = "curr_week_line" class="thisweek">

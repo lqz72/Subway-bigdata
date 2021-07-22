@@ -18,6 +18,7 @@ function change_data()
     var markgraph = echarts.init(document.querySelector("#markpre"));            
     markgraph.setOption(option_markpre);
 
+    //更新进出站图表信息
     inout_s();
     //更新天气数据
     $.ajax({
@@ -25,7 +26,7 @@ function change_data()
         type:"POST",
         data:data_b['c_date'],
         success: function(data){
-            console.log(data);
+            // console.log(data);
             var today = document.querySelector("#today");
             today.innerText = data[0].date;
             var today_weather = document.querySelector("#today_weather");
@@ -153,7 +154,7 @@ function inout_s()
         async: false,
         success: function (result) {
             var hourFlow = result;
-            console.log(result);
+           // console.log(result);
             var hourFlowData = getHourFlowData(hourFlow, stations);
             graphOption = setGraphOptions(graphOption, hourFlowData);
             graphChart.setOption(graphOption);
@@ -245,6 +246,10 @@ layui.use('laydate', function(){
             change_data();            
         }
     });
+});
+
+layui.use('element', function(){
+    var element = layui.element;
 });
 
 function get_icon_words(wea){
