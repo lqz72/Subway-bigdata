@@ -22,10 +22,11 @@ function change_data()
     inout_s();
     //更新天气数据
     $.ajax({
-        url:"/api/weather_info/day",
+        url:"/api/weather_info/week",
         type:"POST",
         data:data_b['c_date'],
         success: function(data){
+            // console.log(data);
             var today = document.querySelector("#today");
             today.innerText = data[0].date;
             var today_weather = document.querySelector("#today_weather");
@@ -52,6 +53,19 @@ function change_data()
         }
     });
 
+    //更新当日总体预测信息
+    $.ajax({
+        url: '/pred/day/info',
+        type: 'POST',
+        data: s_data,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+            console.log(data);
+            change_dayinfomation(data);
+        }
+    })
+
     /*------------------pyecharts 图表------------------*/
     var monthLine = echarts.init(document.getElementById('month_line'));
     $.ajax({
@@ -73,29 +87,6 @@ function change_data()
         dataType: 'json',
         success: function (option) {
             weekLine.setOption(option);
-        }
-    })
-
-    $.ajax({
-        url: '/pred/day/info',
-        type: 'POST',
-        data: s_data,
-        dataType: 'json',
-        success: function (result) {
-            var day_flow = document.getElementById('day_flow');
-            var cmp_day = document.getElementById('cmp_day');
-            var cmp_month = document.getElementById('cmp_month');
-            var cmp_year = document.getElementById('cmp_year');
-            var am_peak_flow = document.getElementById('am_peak_flow');
-            var pm_peak_flow = document.getElementById('pm_peak_flow');
-
-            console.log(result);
-            day_flow.innerHTML = result['day_flow'];
-            cmp_day.innerHTML = result['cmp_day'] + "%";
-            cmp_month.innerHTML = result['cmp_month'] + "%";
-            cmp_year.innerHTML = result['cmp_year'] + "%";
-            am_peak_flow.innerHTML = result['am_peak_flow'];
-            pm_peak_flow.innerHTML = result['pm_peak_flow'];
         }
     })
 
@@ -133,6 +124,61 @@ function change_data()
     })
     /*------------------------------------------------*/
 
+}
+//更新当日总体客流信息
+function change_dayinfomation(data)
+{
+    var day_flow = document.querySelector("#day_flow");
+    var yesstate = document.querySelector("#yesstate");
+    var yesper = document.querySelector("#yesper");
+    var monthstate = document.querySelector("#monthstate");
+    var monthper = document.querySelector("#monthper");
+    var yearstate = document.querySelector("#yearstate");
+    var yearper = document.querySelector("#yearper");
+
+    day_flow.innerHTML = data.day_flow;
+    if(data.cmp_day<0) {
+        yesstate.innerHTML = '&#xe607;';
+        yesstate.style.color = 'red';
+        yesper.innerHTML = -data.cmp_day + '%';
+    }
+    else {
+        yesstate.innerHTML = '&#xe608';
+        yesstate.style.color = '#1296DB';
+        yesper.innerHTML = data.cmp_day + '%';
+    }
+
+    if(data.cmp_month<0) {
+        monthstate.innerHTML = '&#xe607;';
+        monthstate.style.color = 'red';
+        monthper.innerHTML = -data.cmp_month + '%';
+    }
+    else {
+        monthstate.innerHTML = '&#xe608';
+        monthstate.style.color = '#1296DB';
+        monthper.innerHTML = data.cmp_month + '%';
+    }
+
+    if(data.cmp_year<0) {
+        yearstate.innerHTML = '&#xe607;';
+        yearstate.style.color = 'red';
+        yearper.innerHTML = -data.cmp_year + '%';
+    }
+    else {
+        yearstate.innerHTML = '&#xe608';
+        yearstate.style.color = '#1296DB';
+        yearper.innerHTML = data.cmp_year + '%';
+    }
+    
+    var am_peak = document.querySelector("#am_peak");
+    var pm_peak = document.querySelector("#pm_peak");
+    am_peak.innerHTML = data.am_peak_flow;
+    pm_peak.innerHTML = data.pm_peak_flow;
+
+    var peakper = document.querySelector("#peakper");
+    peakper.innerHTML = data.peak_hour_rate + '%';
+    var rate = data.peak_hour_rate + '%';
+    element.progress('peakrate', rate);
 }
 
 //进出站改变的代码写这儿
@@ -246,8 +292,9 @@ layui.use('laydate', function(){
     });
 });
 
+var element;
 layui.use('element', function(){
-    var element = layui.element;
+    element = layui.element;
 });
 
 function get_icon_words(wea){

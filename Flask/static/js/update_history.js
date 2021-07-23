@@ -1,22 +1,3 @@
-// layui.use('form', function(){
-//     var form = layui.form;
-    
-//     //各种基于事件的操作，下面会有进一步介绍
-     
-//     form.on('radio', function(data){
-//         console.log(data.value); //被点击的radio的value值
-//         console.log(n_date);
-//         //切换 上行、下行 0表示上行 代码写这儿
-        
-//     }); 
-
-//     form.on('select', function(data){
-//         console.log(data.value); //得到被选中的值
-//         console.log(n_date);
-//         //切换线路代码写这儿
-
-//     }); 
-// });
 var nav = document.querySelector(".nav");
 var content = document.querySelector(".content");
 var taggle = document.querySelector(".mytoggle");
@@ -71,6 +52,337 @@ var state = 0;//表示未折叠
 
 
 var n_date;
+function updatewea(data)
+{
+    // console.log(data);
+    var today_weather = document.querySelector("#today_weather");
+    today_weather.innerHTML = get_icon_words(data[0].weather);
+    var today_wea_txt =  document.querySelector("#today_wea_txt");
+    today_wea_txt.innerHTML = data[0].weather;
+    var today_temp = document.querySelector("#today_temp");
+    today_temp.innerHTML = data[0].temp;
+    var today_wind = document.querySelector("#today_wind");
+    today_wind.innerHTML = data[0].wind;
+}
+
+function updateinfo(data)
+{
+    var day_flow = document.querySelector("#day_flow");
+    var yesstate = document.querySelector("#yesstate");
+    var yesper = document.querySelector("#yesper");
+    var monthstate = document.querySelector("#monthstate");
+    var monthper = document.querySelector("#monthper");
+    var yearstate = document.querySelector("#yearstate");
+    var yearper = document.querySelector("#yearper");
+
+    day_flow.innerHTML = data.day_flow;
+    if(data.day_cmp<0) {
+        yesstate.innerHTML = '&#xe607;';
+        yesstate.style.color = 'red';
+        yesper.innerHTML = -data.day_cmp + '%';
+    }
+    else {
+        yesstate.innerHTML = '&#xe608';
+        yesstate.style.color = '#1296DB';
+        yesper.innerHTML = data.day_cmp + '%';
+    }
+
+    if(data.month_cmp<0) {
+        monthstate.innerHTML = '&#xe607;';
+        monthstate.style.color = 'red';
+        monthper.innerHTML = -data.month_cmp + '%';
+    }
+    else {
+        monthstate.innerHTML = '&#xe608';
+        monthstate.style.color = '#1296DB';
+        monthper.innerHTML = data.month_cmp + '%';
+    }
+
+    if(data.year_cmp<0) {
+        yearstate.innerHTML = '&#xe607;';
+        yearstate.style.color = 'red';
+        yearper.innerHTML = -data.year_cmp + '%';
+    }
+    else {
+        yearstate.innerHTML = '&#xe608';
+        yearstate.style.color = '#1296DB';
+        yearper.innerHTML = data.year_cmp + '%';
+    }
+    
+    var am_peak = document.querySelector("#am_peak");
+    var pm_peak = document.querySelector("#pm_peak");
+    am_peak.innerHTML = data.am_peak_flow;
+    pm_peak.innerHTML = data.pm_peak_flow;
+
+    var tolpersoncnt = document.querySelector("#tolpersoncnt");
+    tolpersoncnt.innerHTML = data.day_pass_num;
+
+    var rest = document.querySelector("#rest");
+    if(data.is_hoilday=="是") rest.innerHTML = "休息日";
+    else rest.innerHTML = "工作日";
+}
+
+function change()
+{
+    var value = n_date;
+
+    //测试接口
+    $.ajax({
+        type: 'POST',
+        data: value,
+        async: true,
+        url: ' /history/thisday_info',
+        dataType: 'json',
+        success: function (data) {
+            // console.log(data);
+            updateinfo(data);
+        }
+    });
+    $.ajax({
+        type: 'POST',
+        data: value,
+        async: true,
+        url: '/api/weather_info/day',
+        dataType: 'json',
+        success: function (data) {
+            // console.log(data);
+            updatewea(data);
+        }
+    });
+
+    var month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
+    $.ajax({
+        type: 'POST',
+        data: value,
+        async: true,
+        url: 'history/day_flow/line',
+        dataType: 'json',
+        success: function (result) {
+            month_chart.setOption(result);
+        }
+    });
+
+    var week_chart = echarts.init(document.getElementById('curr_week_line'), 'white', {renderer: 'canvas'});
+    $.ajax({
+        type: "POST",
+        data: value,
+        async: true,
+        url: "/history/curr_week_flow/line",
+        dataType: 'json',
+        success: function (result) {
+            week_chart.setOption(result);
+        }
+    });
+    
+    $.ajax({
+        type: 'POST',
+        data: value,
+        async: true,
+        url: '/history/sta_rank',
+        dataType: 'json',
+        success: function (result) {
+            // console.log(result);
+            for (let i = 1; i <= 25; i++){
+                
+                var rank = document.getElementById(i+"");
+                var sta_name = document.getElementById('Sta' + i+"");
+                var line = document.getElementById('line' + i+"");
+                var flow = document.getElementById('flow' + i+"");
+                
+                rank.innerHTML = i;
+                sta_name.innerHTML = result[i-1][0];
+                line.innerHTML = result[i-1][1];
+                flow.innerHTML = result[i-1][2];
+            }
+        }
+    });
+
+    var line_pie = echarts.init(document.getElementById('line_percent'));
+    $.ajax({
+        type: "POST",
+        data: value,
+        async: true,
+        url: "/history/line/pie",
+        dataType: 'json',
+        success: function (result) {
+            line_pie.setOption(result);
+        }
+    });
+
+    //线路关系图
+    graphChart = echarts.init(document.getElementById('line_graph'));
+
+    graphChart.on('click', function (param) {
+        var reg = /Sta[1-9][0-9][0-9]/;
+        if(reg.test(param.data.name)){
+            location.href = '/station/' + param.data.name;
+        }
+    });
+
+
+    $.ajax({
+        type: "POST",
+        data: value,
+        url: '/history/out_hour_flow',
+        dataType: 'json',
+        async: true,
+        success: function (result) {
+            var hourFlow = result;
+            var res = getHourFlowData(hourFlow, stations);
+
+            var hourFlowData = res['hourFlow'];
+            var alertStations = res['alertStations'];
+            setGraphOptions(graphOption, hourFlowData, alertStations);
+            graphChart.setOption(graphOption);
+        }
+    });
+    
+    
+    // 线路断面图
+    splitChart = echarts.init(document.getElementById('split_bar'));
+
+    $.ajax({
+        type: 'POST',
+        url: '/history/split_flow/1',
+        async: true,
+        data: value,
+        datatype: 'json',
+        success: function (result) {
+            var splitFlow = result;
+
+            var uplineFlow  = [];
+            var downlineFlow = [];
+            var splitNames = Object.keys(splitFlow);
+            for (let index = 0; index < splitNames.length; index++){
+                var split = splitFlow[splitNames[index]];
+                uplineFlow.push(split.up);
+                downlineFlow.push(split.down);
+            }
+
+            setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
+            splitChart.setOption(barOption);
+        }
+    });
+    
+
+    //od关系图
+    ODChart = echarts.init(document.getElementById('od_graph'));
+
+    $.ajax({
+        type: 'POST',
+        url: '/history/od_flow',
+        async: true,
+        data: value,
+        dataType: 'json',
+        success: function (result) {
+            var ODLinks = [];
+            var ODstations = [];
+            var stationNames = Object.keys(result);
+            
+            getODFlowData(result, ODLinks, ODstations, stationNames);
+            setODOption(ODOption, ODstations, ODLinks);
+            ODChart.setOption(ODOption);
+        }
+    });
+
+    //单站点入点出图表
+    inoutChart = echarts.init(document.getElementById('area_inout'));
+
+    $.ajax({
+        type: "POST",
+        url: '/history/area/inout_flow',
+        data: value,
+        dataType: 'json',
+        success: function (param) {
+            setAreaInoutChart(param[0], param[1], param[2]);
+            inoutChart.setOption(inoutOption);
+        }
+    });
+}
+
+function get_icon_words(wea){
+    if(wea=="晴") return '&#xe8bc;';
+    else if(wea=="阴") return '&#xe625;';
+    else if(wea=="多云") return '&#xe646;';
+    else if(wea=="阵雨") return '&#xe615;';
+    else if(wea=="小雨") return '&#xe60c;';
+    else if(wea=="中雨") return '&#xe669;';
+    else if(wea=="大雨") return '&#xe64c;';
+    else if(wea=="暴雨") return '&#xe64f;';
+}
+
+//响应控件事件
+layui.use('form', function(){
+    var form = layui.form;
+    
+    //各种基于事件的操作，下面会有进一步介绍
+    form.on('radio', function(data){
+        // console.log(data.value); //被点击的radio的value值
+        // console.log(n_date);
+    
+        var hourFlowUrl;
+        var type;
+        if (data.value == "0") {
+            hourFlowUrl = '/history/in_hour_flow';
+            type = "入站";
+        }
+        else if (data.value == "1"){
+            hourFlowUrl = '/history/out_hour_flow';
+            type = "出站";
+        }
+        else {
+            console.log('error');
+        }
+
+        $.ajax({
+            type: "POST",
+            data: n_date,
+            url: hourFlowUrl,
+            dataType: 'json',
+            async: true,
+            success: function (result) {
+                //更新数据
+                var res = getHourFlowData(result, stations);
+                var hourFlowData = res['hourFlow']
+                var alertStations = res['alertStations'];
+
+                //更新图表
+                setGraphOptions(graphOption, hourFlowData, alertStations, type);
+                graphChart.setOption(graphOption);
+            }
+        });
+        
+    }); 
+    
+    form.on('select', function(data){
+        // console.log(data.value); //得到被选中的值
+        // console.log(n_date);
+        //切换线路代码写这儿
+        $.ajax({
+            type: 'POST',
+            url: '/history/split_flow/' + data.value,
+            async: true,
+            data: n_date,
+            datatype: 'json',
+            success: function (result) {
+                splitFlow = result;
+
+                uplineFlow = [];
+                downlineFlow = [];
+                splitNames = Object.keys(splitFlow);
+                for (let index = 0; index < splitNames.length; index++){
+                    var split = splitFlow[splitNames[index]];
+                    uplineFlow.push(split.up);
+                    downlineFlow.push(split.down);
+                }
+
+                setBarOption(barOption, uplineFlow, downlineFlow, splitNames, data.value);
+                splitChart.setOption(barOption);
+            }
+        });
+    }); 
+});
+
 layui.use('laydate', function(){
     var laydate = layui.laydate;
     
@@ -84,508 +396,11 @@ layui.use('laydate', function(){
         ,max: '2020-07-16'
         ,ready: function(date){//初始化
             n_date = '2020-01-01';
-            //console.log(date); //得到初始的日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
-            // $(
-            //     function(){
-            value = '2020-01-01';
-            month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
-            // console.log(value);
-            $.ajax({
-                type: 'POST',
-                data: value,
-                async: true,
-                url: 'history/day_flow/line',
-                dataType: 'json',
-                success: function (result) {
-                    month_chart.setOption(result);
-                }
-            });
-    
-            week_chart = echarts.init(document.getElementById('curr_week_line'), 'white', {renderer: 'canvas'});
-            $.ajax({
-                type: "POST",
-                data: value,
-                async: true,
-                url: "/history/curr_week_flow/line",
-                dataType: 'json',
-                success: function (result) {
-                    week_chart.setOption(result);
-                }
-            });
-    
-            var weather_info = document.getElementById('weather');
-            var is_hoilday = document.getElementById('is_hoilday');
-            var day_flow = document.getElementById('day_flow');
-            var day_cmp = document.getElementById('day_cmp');
-            var month_cmp = document.getElementById('month_cmp');
-            var year_cmp = document.getElementById('year_cmp');
-            var am_peak_flow = document.getElementById('am_peak_flow');
-            var pm_peak_flow = document.getElementById('pm_peak_flow');
-            $.ajax({
-                type: 'POST',
-                data: value,
-                async: true,
-                url: '/history/thisday_info',
-                dataType: 'json',
-                success: function (result) {
-                    weather_info.innerHTML = result.weather;
-                    is_hoilday.innerHTML = result.is_hoilday;
-                    day_flow.innerHTML = result.day_flow;
-                    day_cmp.innerHTML = result.day_cmp + '%';
-                    month_cmp.innerHTML = result.month_cmp + '%';
-                    year_cmp.innerHTML = result.year_cmp + '%';
-                    am_peak_flow.innerHTML = result.am_peak_flow;
-                    pm_peak_flow.innerHTML = result.pm_peak_flow;
-                }
-            });
-    
-            $.ajax({
-                type: 'POST',
-                data: value,
-                async: true,
-                url: '/history/sta_rank',
-                dataType: 'json',
-                success: function (result) {
-                    for (let i = 1; i <= 25; i++){
-    
-                        var rank = document.getElementById(i+"");
-                        var sta_name = document.getElementById('Sta' + i+"");
-                        var line = document.getElementById('line' + i+"");
-                        var flow = document.getElementById('flow' + i+"");
-        
-                        rank.innerHTML = i;
-                        sta_name.innerHTML = result[i-1][0];
-                        line.innerHTML = result[i-1][1];
-                        flow.innerHTML = result[i-1][2];
-                    }
-                }
-            });
-    
-            line_pie = echarts.init(document.getElementById('line_percent'));
-            $.ajax({
-                type: "POST",
-                data: value,
-                async: true,
-                url: "/history/line/pie",
-                dataType: 'json',
-                success: function (result) {
-                    line_pie.setOption(result);
-                }
-            });
-    
-            
-            //线路关系图
-            graphChart = echarts.init(document.getElementById('line_graph'));
-
-            graphChart.on('click', function (param) {
-                var reg = /Sta[1-9][0-9][0-9]/;
-                if(reg.test(param.data.name)){
-                    location.href = '/station/' + param.data.name;
-                }
-            });
-
-
-            $.ajax({
-                type: "POST",
-                data: value,
-                url: '/history/out_hour_flow',
-                dataType: 'json',
-                async: true,
-                success: function (result) {
-                    var hourFlow = result;
-                    var res = getHourFlowData(hourFlow, stations);
-
-                    var hourFlowData = res['hourFlow'];
-                    var alertStations = res['alertStations'];
-                    setGraphOptions(graphOption, hourFlowData, alertStations);
-                    graphChart.setOption(graphOption);
-                }
-            });
-            
-            
-            // 线路断面图
-            splitChart = echarts.init(document.getElementById('split_bar'));
-
-            $.ajax({
-                type: 'POST',
-                url: '/history/split_flow/1',
-                async: true,
-                data: value,
-                datatype: 'json',
-                success: function (result) {
-                    var splitFlow = result;
-
-                    var uplineFlow  = [];
-                    var downlineFlow = [];
-                    var splitNames = Object.keys(splitFlow);
-                    for (let index = 0; index < splitNames.length; index++){
-                        var split = splitFlow[splitNames[index]];
-                        uplineFlow.push(split.up);
-                        downlineFlow.push(split.down);
-                    }
-
-                    setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
-                    splitChart.setOption(barOption);
-                }
-            });
-            
-
-            //od关系图
-            ODChart = echarts.init(document.getElementById('od_graph'));            var ODFlow;
-            $.ajax({
-                type: 'POST',
-                url: '/history/od_flow',
-                data: value,
-                dataType: 'json',
-                async: true,
-                success: function (result) {
-                    var ODLinks = [];
-                    var ODstations = [];
-                    var stationNames = Object.keys(result);
-                    
-                    getODFlowData(result, ODLinks, ODstations, stationNames);
-                    setODOption(ODOption, ODstations, ODLinks);
-                     ODChart.setOption(ODOption);
-                }
-            });
-
-            //单站点入点出图表
-            inoutChart = echarts.init(document.getElementById('area_inout'));
-
-            $.ajax({
-                type: "POST",
-                url: '/history/area/inout_flow',
-                data: value,
-                dataType: 'json',
-                async: true,
-                success: function (param) {
-                    setAreaInoutChart(param[0], param[1], param[2]);
-                    inoutChart.setOption(inoutOption);
-                }
-            });
-
-            
-            //响应控件事件
-            layui.use('form', function(){
-                var form = layui.form;
-                
-                //各种基于事件的操作，下面会有进一步介绍
-                form.on('radio', function(data){
-                    console.log(data.value); //被点击的radio的value值
-                    console.log(n_date);
-                
-                    var hourFlowUrl;
-                    var type;
-                    if (data.value == "0") {
-                        hourFlowUrl = '/history/in_hour_flow';
-                        type = "入站";
-                    }
-                    else if (data.value == "1"){
-                        hourFlowUrl = '/history/out_hour_flow';
-                        type = "出站";
-                    }
-                    else {
-                        console.log('error');
-                    }
-
-                    $.ajax({
-                        type: "POST",
-                        data: value,
-                        url: hourFlowUrl,
-                        dataType: 'json',
-                        async: true,
-                        success: function (result) {
-                            //更新数据
-                            var res = getHourFlowData(result, stations);
-                            var hourFlowData = res['hourFlow']
-                            var alertStations = res['alertStations'];
-
-                            //更新图表
-                            setGraphOptions(graphOption, hourFlowData, alertStations, type);
-                            graphChart.setOption(graphOption);
-                        }
-                    });
-                    
-                }); 
-                
-                form.on('select', function(data){
-                    console.log(data.value); //得到被选中的值
-                    console.log(n_date);
-                    //切换线路代码写这儿
-                    $.ajax({
-                        type: 'POST',
-                        url: '/history/split_flow/' + data.value,
-                        async: true,
-                        data: value,
-                        datatype: 'json',
-                        success: function (result) {
-                            splitFlow = result;
-
-                            uplineFlow = [];
-                            downlineFlow = [];
-                            splitNames = Object.keys(splitFlow);
-                            for (let index = 0; index < splitNames.length; index++){
-                                var split = splitFlow[splitNames[index]];
-                                uplineFlow.push(split.up);
-                                downlineFlow.push(split.down);
-                            }
-
-                            setBarOption(barOption, uplineFlow, downlineFlow, splitNames, data.value);
-                            splitChart.setOption(barOption);
-                        }
-                    });
-                }); 
-            });
-
+            change();
         }
         ,change: function(value, date){ //改变日期后
             n_date = value;
-            var month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
-            $.ajax({
-                type: 'POST',
-                data: value,
-                async: true,
-                url: 'history/day_flow/line',
-                dataType: 'json',
-                success: function (result) {
-                    month_chart.setOption(result);
-                }
-            });
-        
-            var week_chart = echarts.init(document.getElementById('curr_week_line'), 'white', {renderer: 'canvas'});
-            $.ajax({
-                type: "POST",
-                data: value,
-                async: true,
-                url: "/history/curr_week_flow/line",
-                dataType: 'json',
-                success: function (result) {
-                    week_chart.setOption(result);
-                }
-            });
-            
-            var weather_info = document.getElementById('weather');
-            var is_hoilday = document.getElementById('is_hoilday');
-            var day_flow = document.getElementById('day_flow');
-            var day_cmp = document.getElementById('day_cmp');
-            var month_cmp = document.getElementById('month_cmp');
-            var year_cmp = document.getElementById('year_cmp');
-            var am_peak_flow = document.getElementById('am_peak_flow');
-            var pm_peak_flow = document.getElementById('pm_peak_flow');
-            $.ajax({
-                type: 'POST',
-                data: value,
-                async: true,
-                url: '/history/thisday_info',
-                dataType: 'json',
-                success: function (result) {
-                    weather_info.innerHTML = result.weather;
-                    is_hoilday.innerHTML = result.is_hoilday;
-                    day_flow.innerHTML = result.day_flow;
-                    day_cmp.innerHTML = result.day_cmp + '%';
-                    month_cmp.innerHTML = result.month_cmp + '%';
-                    year_cmp.innerHTML = result.year_cmp + '%';
-                    am_peak_flow.innerHTML = result.am_peak_flow;
-                    pm_peak_flow.innerHTML = result.pm_peak_flow;
-                }
-            });
-            $.ajax({
-                type: 'POST',
-                data: value,
-                async: true,
-                url: '/history/sta_rank',
-                dataType: 'json',
-                success: function (result) {
-                    // console.log(result);
-                    for (let i = 1; i <= 25; i++){
-                        
-                        var rank = document.getElementById(i+"");
-                        var sta_name = document.getElementById('Sta' + i+"");
-                        var line = document.getElementById('line' + i+"");
-                        var flow = document.getElementById('flow' + i+"");
-                        
-                        rank.innerHTML = i;
-                        sta_name.innerHTML = result[i-1][0];
-                        line.innerHTML = result[i-1][1];
-                        flow.innerHTML = result[i-1][2];
-                    }
-                }
-            });
-        
-            var line_pie = echarts.init(document.getElementById('line_percent'));
-            $.ajax({
-                type: "POST",
-                data: value,
-                async: true,
-                url: "/history/line/pie",
-                dataType: 'json',
-                success: function (result) {
-                    line_pie.setOption(result);
-                }
-            });
-        
-            //线路关系图
-            graphChart = echarts.init(document.getElementById('line_graph'));
-
-            graphChart.on('click', function (param) {
-                var reg = /Sta[1-9][0-9][0-9]/;
-                if(reg.test(param.data.name)){
-                    location.href = '/station/' + param.data.name;
-                }
-            });
-
-
-            $.ajax({
-                type: "POST",
-                data: value,
-                url: '/history/out_hour_flow',
-                dataType: 'json',
-                async: true,
-                success: function (result) {
-                    var hourFlow = result;
-                    var res = getHourFlowData(hourFlow, stations);
-
-                    var hourFlowData = res['hourFlow'];
-                    var alertStations = res['alertStations'];
-                    setGraphOptions(graphOption, hourFlowData, alertStations);
-                    graphChart.setOption(graphOption);
-                }
-            });
-            
-            
-            // 线路断面图
-            splitChart = echarts.init(document.getElementById('split_bar'));
-
-            $.ajax({
-                type: 'POST',
-                url: '/history/split_flow/1',
-                async: true,
-                data: value,
-                datatype: 'json',
-                success: function (result) {
-                    var splitFlow = result;
-
-                    var uplineFlow  = [];
-                    var downlineFlow = [];
-                    var splitNames = Object.keys(splitFlow);
-                    for (let index = 0; index < splitNames.length; index++){
-                        var split = splitFlow[splitNames[index]];
-                        uplineFlow.push(split.up);
-                        downlineFlow.push(split.down);
-                    }
-
-                    setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
-                    splitChart.setOption(barOption);
-                }
-            });
-            
-
-            //od关系图
-            ODChart = echarts.init(document.getElementById('od_graph'));
-
-            $.ajax({
-                type: 'POST',
-                url: '/history/od_flow',
-                async: true,
-                data: value,
-                dataType: 'json',
-                success: function (result) {
-                    var ODLinks = [];
-                    var ODstations = [];
-                    var stationNames = Object.keys(result);
-                    
-                    getODFlowData(result, ODLinks, ODstations, stationNames);
-                    setODOption(ODOption, ODstations, ODLinks);
-                    ODChart.setOption(ODOption);
-                }
-            });
-
-            //单站点入点出图表
-            inoutChart = echarts.init(document.getElementById('area_inout'));
-
-            $.ajax({
-                type: "POST",
-                url: '/history/area/inout_flow',
-                data: value,
-                dataType: 'json',
-                success: function (param) {
-                    setAreaInoutChart(param[0], param[1], param[2]);
-                    inoutChart.setOption(inoutOption);
-                }
-            });
-
-            //响应控件事件
-            layui.use('form', function(){
-                var form = layui.form;
-                
-                //各种基于事件的操作，下面会有进一步介绍
-                form.on('radio', function(data){
-                    console.log(data.value); //被点击的radio的value值
-                    console.log(n_date);
-                
-                    var hourFlowUrl;
-                    var type;
-                    if (data.value == "0") {
-                        hourFlowUrl = '/history/in_hour_flow';
-                        type = "入站";
-                    }
-                    else if (data.value == "1"){
-                        hourFlowUrl = '/history/out_hour_flow';
-                        type = "出站";
-                    }
-                    else {
-                        console.log('error');
-                    }
-
-                    $.ajax({
-                        type: "POST",
-                        data: value,
-                        url: hourFlowUrl,
-                        dataType: 'json',
-                        async: true,
-                        success: function (result) {
-                            //更新数据
-                            var res = getHourFlowData(result, stations);
-                            var hourFlowData = res['hourFlow']
-                            var alertStations = res['alertStations'];
-
-                            //更新图表
-                            setGraphOptions(graphOption, hourFlowData, alertStations, type);
-                            graphChart.setOption(graphOption);
-                        }
-                    });
-                    
-                }); 
-                
-                form.on('select', function(data){
-                    console.log(data.value); //得到被选中的值
-                    console.log(n_date);
-                    //切换线路代码写这儿
-                    $.ajax({
-                        type: 'POST',
-                        url: '/history/split_flow/' + data.value,
-                        async: true,
-                        data: value,
-                        datatype: 'json',
-                        success: function (result) {
-                            splitFlow = result;
-
-                            uplineFlow = [];
-                            downlineFlow = [];
-                            splitNames = Object.keys(splitFlow);
-                            for (let index = 0; index < splitNames.length; index++){
-                                var split = splitFlow[splitNames[index]];
-                                uplineFlow.push(split.up);
-                                downlineFlow.push(split.down);
-                            }
-
-                            setBarOption(barOption, uplineFlow, downlineFlow, splitNames, data.value);
-                            splitChart.setOption(barOption);
-                        }
-                    });
-                }); 
-            });
-
+            change();
         }
     });
 })

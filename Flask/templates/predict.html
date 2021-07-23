@@ -175,43 +175,43 @@
                 <div class="preinfo">
                     <div class="info1">
                         <p>今日客流总量预测</p>
-                        <div class="tolcnt">
+                        <div class="tolcnt" id='day_flow'>
                             5523
                         </div>
                     </div>
                     <div class="info2">
                         <div class="addyes">
                             较昨日&nbsp;&nbsp;&nbsp;
-                            <i>&#xe608;</i>
-                            <span>18%</span>
+                            <i id='yesstate'>&#xe608;</i>
+                            <span id='yesper'>18%</span>
                         </div>
                         <div class="addmonth">
                             较月平均
-                            <i>&#xe607;</i>
-                            <span>28%</span>
+                            <i id='monthstate'>&#xe607;</i>
+                            <span id='monthper'>28%</span>
                         </div>
                         <div class="addyear">
                             较年平均
-                            <i>&#xe607;</i>
-                            <span>31%</span>
+                            <i id='yearstate'>&#xe607;</i>
+                            <span id='yearper'>31%</span>
                         </div>
                     </div>
                     <div class="info3">
                         <p>高峰客流预测</p>
                         <div class="morning">
                             早高峰<i>&#xe69b;</i>
-                            <span>896</span>
+                            <span id='am_peak'>896</span>
                         </div>
                         <div class="evening">
                             晚高峰<i>&#xe69c;</i>
-                            <span>1103</span>
+                            <span id='pm_peak'>1103</span>
                         </div>
                     </div>
                     <div class="info4">
                         <p>高峰时段占比</p>
-                        <div class="words">20%</div>
-                        <div class="layui-progress per" lay-showpercent="true">
-                            <div class="layui-progress-bar layui-bg-red" lay-percent="20%"></div>
+                        <div class="words" id='peakper'>11.1</div>
+                        <div class="layui-progress per" lay-showpercent="true" lay-filter="peakrate">
+                            <div class="layui-progress-bar layui-bg-red" lay-percent="11.1%"></div>
                         </div>
                     </div>
                 </div>

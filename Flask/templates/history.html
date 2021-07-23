@@ -17,7 +17,15 @@
 	<script type="text/javascript" src="{{ url_for('static',filename ='js/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/lodash.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename ='js/echarts.min.js') }}"></script>
+    <script src="at.alicdn.com/t/font_2411818_8d2qir8xzn.js"></script>
     <style>
+        .icon {
+       width: 1em; height: 1em;
+       vertical-align: -0.15em;
+       fill: currentColor;
+       overflow: hidden;
+    }
+
         .layui-laydate, .layui-laydate-hint {
     box-shadow: none !important;
     border: none !important;
@@ -92,22 +100,57 @@
                 </div>
                 <div class="maininfo">
                     <div class="wea">
-
+                        <div class="left">
+                            <div class="weaimg" id="today_weather">&#xe60c;</div>
+                            <div class="weawords" id="today_wea_txt">多云</div>
+                        </div>
+                        <div class="right">
+                            <div class="wind" id = "today_wind">无持续风向1~2级</div>
+                            <div class="temp" id="today_temp">33℃/24℃</div>
+                            <div class="rest" id="rest">休息日</div>
+                        </div>
                     </div>
                     <div class="info13">
                         <div class="part1">
-
+                            <p>今日客流总量</p>
+                            <div class="tolcnt" id='day_flow'>
+                                5523
+                            </div>
                         </div>
                         <div class="part3">
-
+                            <p>高峰客流</p>
+                            <div class="morning">
+                                早高峰<i>&#xe69b;</i>
+                                <span id='am_peak'>896</span>
+                            </div>
+                            <div class="evening">
+                                晚高峰<i>&#xe69c;</i>
+                                </svg>
+                                <span id='pm_peak'>1103</span>
+                            </div>
                         </div>
                     </div>
                     <div class="info24">
                         <div class="part2">
-
+                            <div class="addyes">
+                                较昨日&nbsp;&nbsp;&nbsp;
+                                <i id='yesstate'>&#xe608;</i>
+                                <span id='yesper'>18%</span>
+                            </div>
+                            <div class="addmonth">
+                                较月平均
+                                <i id='monthstate'>&#xe607;</i>
+                                <span id='monthper'>28%</span>
+                            </div>
+                            <div class="addyear">
+                                较年平均
+                                <i id='yearstate'>&#xe607;</i>
+                                <span id='yearper'>31%</span>
+                            </div>
                         </div>
                         <div class="part4">
-
+                            <div class="tolclient">今日出行人数</div>
+                            <div class="cnt" id='tolpersoncnt'>453</div>
                         </div>
                     </div>
                 </div>
