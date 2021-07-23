@@ -44,20 +44,20 @@ def create_app():
     app.register_blueprint(user_bp)
 
     # 路由拦截及重定向
-    @app.before_request
-    def my_before_request():
-        url_head = request.path.split('/')[1]
-        if url_head == 'history' and request.path.split('/')[-1] != url_head:
-            return
-        if url_head in require_login_path:
-            utype = session.get('utype', None)
-            if utype:
-                if utype != 'admin' and (url_head not in ['client']):
-                    flash("很抱歉！您没有权限访问")
-                    return redirect(url_for('user_bp.client'))
-            else:
-                flash("您还没有登录账号！")
-                return redirect(url_for('index_bp.login'))
+    # @app.before_request
+    # def my_before_request():
+    #     url_head = request.path.split('/')[1]
+    #     if url_head == 'history' and request.path.split('/')[-1] != url_head:
+    #         return
+    #     if url_head in require_login_path:
+    #         utype = session.get('utype', None)
+    #         if utype:
+    #             if utype != 'admin' and (url_head not in ['client']):
+    #                 flash("很抱歉！您没有权限访问")
+    #                 return redirect(url_for('index_bp.client'))
+    #         else:
+    #             flash("您还没有登录账号！")
+    #             return redirect(url_for('index_bp.login'))
 
     return app
 

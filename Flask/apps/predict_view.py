@@ -30,6 +30,7 @@ def pred_day_info():
 
     return jsonify(day_info)
 
+
 ################Pyecharts
 @predict_bp.route('/month/line', methods=['POST', 'GET'])
 def pred_month_line():

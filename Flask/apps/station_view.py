@@ -26,7 +26,7 @@ def sta_thisday_info():
     station = param_dict['sta']
     date = param_dict['date']
 
-    day_flow_info = api.get_sta_flow_info(station, date)
+    day_flow_info = api.get_sta_flow_info(date, station)
 
     info_dict = {
         'day_cmp': day_flow_info['day_cmp'],

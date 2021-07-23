@@ -22,11 +22,10 @@ function change_data()
     inout_s();
     //更新天气数据
     $.ajax({
-        url:"/api/weather_info",
+        url:"/api/weather_info/day",
         type:"POST",
         data:data_b['c_date'],
         success: function(data){
-            // console.log(data);
             var today = document.querySelector("#today");
             today.innerText = data[0].date;
             var today_weather = document.querySelector("#today_weather");
@@ -83,7 +82,6 @@ function change_data()
         data: s_data,
         dataType: 'json',
         success: function (result) {
-            console.log(s_data);
             var day_flow = document.getElementById('day_flow');
             var cmp_day = document.getElementById('cmp_day');
             var cmp_month = document.getElementById('cmp_month');

@@ -20,7 +20,7 @@ class PredictApi(object):
         self.pred_arima_day_df = SQLOS.get_pred_day('arima')
         self.pre_holtwinters_day_df = SQLOS.get_pred_day('holtwinters')
         self.weather_list = ["多云", "晴", "阴", "阵雨", "小雨", "中雨", "大雨", "暴雨"]
-
+        self.line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
     @staticmethod
     def get_station_pred_flow():
         '''
@@ -244,13 +244,16 @@ class PredictApi(object):
             am_peak_flow = int(day_flow * 0.206)
             pm_peak_flow = int(day_flow * 0.234)
 
+        peek_hour_rate = round(self.get_peek_hour(date) / 18 * 100, 1)
+
         info_dict = {
             'day_flow': day_flow,
             'cmp_day': cmp_day,
             'cmp_month': cmp_month,
             'cmp_year': cmp_year,
             'am_peak_flow': am_peak_flow,
-            'pm_peak_flow': pm_peak_flow
+            'pm_peak_flow': pm_peak_flow,
+            'peak_hour_rate': peek_hour_rate
         }
         return info_dict
 
@@ -376,8 +379,203 @@ class PredictApi(object):
 
         self.pred_day_df = predict_df
 
+
+    def get_peek_hour(self, date):
+        """
+        获取每日的高峰时间
+        返回持续时间 /时
+        """
+        try:
+            hour_flow = self.get_hour_flow(date,'all')
+            hour_flow_sort = sorted(hour_flow)
+            list_len = hour_flow.__len__()
+            peek_flow = hour_flow_sort[int(list_len*0.7)-1]
+            peek_hour=  0
+            for i in range(0,list_len-2):
+                if hour_flow[i] >= peek_flow and hour_flow[i+1] >= peek_flow and hour_flow[i+2] >= peek_flow:
+                    peek_hour += 1
+            return peek_hour
+        except Exception as e:
+            print('Error:', e)
+
+    def get_peek_time(self, date):
+        """
+        获取每日的高峰时间段
+        """
+        try:
+            hour_flow = self.get_hour_flow(date,'all')
+            hour_flow_sort = sorted(hour_flow)
+            list_len = len(hour_flow)
+            peek_flow = hour_flow_sort[int(list_len*0.8)-1]
+            peek_time = []
+            for i in range(0,list_len-1):
+                if hour_flow[i] >= peek_flow and hour_flow[i+1] >= peek_flow:
+                    peek_time.append(i)
+            return peek_time
+        except Exception as e:
+            print('Error:', e)
+
+    def get_uneven_flow(self, date):
+        """
+        客流的不均衡系数
+        """
+        day_sta_flow = self.get_day_sta_flow(date)
+        sta_flow= [i for i in day_sta_flow.values()]
+
+        top, low = sum(sta_flow[0:5]), sum(sta_flow[-5:])
+
+        return top / (low * 168)
+
+    def get_flow_congestion(self, date):
+        """
+        交通拥挤度
+        """
+        line_list = self.line_list.copy()
+        line_dict = {line: self.get_hour_flow(date, 'all', line) for line in line_list}
+
+        full = 100
+        count = [0] * len(line_list)
+        temp_list = count.copy()
+
+        index = 0
+        for line in line_list:
+            for each in line_dict[line]:
+                if each >= 100:
+                    temp_list[index] += each
+                    count[index] += 1
+            index += 1
+
+        ratio, num = 0, 0
+        for i in range(0, len(temp_list)):
+            if count[i] != 0:
+                ratio += temp_list[i] / (100 * count[i])
+                num += 1
+        ratio /= num
+
+        return ratio
+
+    def get_peek_flow_congestion(self, date):
+        """
+        高峰拥堵指数
+        """
+        peek_time = self.get_peek_time(date)
+        line_list = self.line_list.copy()
+        line_dict = {line: self.get_hour_flow(date, 'all', line) for line in line_list}
+
+        temp_list = [0] * len(line_list)
+
+        index = 0
+        for line in line_list:
+            for i in range(0, len(line_dict[line])):
+                if i in peek_time:
+                    temp_list[index] += line_dict[line][i]
+            index += 1
+
+        full = 100 * len(peek_time)
+        ratio = sum(temp_list) / (full * len(peek_time))
+
+        return ratio
+
+    def get_line_capacity_ratio(self, date):
+        """
+        线路满载率
+        """
+        line_list = self.line_list.copy()
+        line_dict = {line: self.get_hour_flow(date, 'all', line) for line in line_list}
+        
+        full, index = 1600, 0
+
+        line_value = [0] * len(line_dict)
+        
+        for line in line_list:
+            for i in line_dict[line]:
+                line_value[index] += i
+            index += 1
+
+        ratio = sum(line_value) / (full * 8)
+
+        return ratio
+
+    def get_normalized_eval(self, date):
+        """
+        获取归一化的五个指标
+        返回一个字典
+        """
+        func_list = [
+            # self.get_peek_hour,
+            self.get_uneven_flow,
+            self.get_flow_congestion,
+            self.get_peek_flow_congestion,
+            self.get_line_capacity_ratio
+        ]
+
+        eval_name = ['peek_hour', 'uneven_flow', 'flow_congestion', 
+                'peek_flow_congestion', 'line_capacity_ratio']
+
+
+        one_day = datetime.timedelta(days=1)
+
+        day_list = [date]
+        cur_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+        for i in range(6):
+            cur_date = cur_date + one_day
+            day_list.append(cur_date.strftime('%Y-%m-%d'))
+
+        temp_list = []
+        for func in func_list:
+            eval_list = []
+            for each in day_list:
+                eval_list.append(func(each))
+
+            eval_list = np.array(eval_list)
+            _range = np.max(eval_list) - np.min(eval_list)
+            res = (eval_list - np.min(eval_list)) / _range
+
+            temp_list.append(res)
+
+        day_dict = dict.fromkeys(day_list, 0)
+        i = 0
+        for day in day_list:
+            res_list = [self.get_peek_hour(day) * 0.2]
+
+            for j in range(len(func_list)):
+                res_list.append(temp_list[j][i])
+            
+            day_dict[day] = dict(zip(eval_name, res_list))
+            i += 1
+
+        # day_df = pd.DataFrame(index = day_list, 
+        #     data = np.zeros((len(day_list), len(eval_name))), columns=eval_name)
+
+        # i = 0
+        # for day in day_list:
+        #     res_list = [self.get_peek_hour(day) * 0.2]
+
+            
+        #     for func in func_list:
+        #         eval_list = []
+        #         for each in day_list:
+        #             eval_list.append(func(each))
+
+
+        #         eval_list = np.array(eval_list)
+        #         _range = np.max(eval_list) - np.min(eval_list)
+        #         res = (eval_list - np.min(eval_list)) / _range
+
+        #         res_list.append(res[i])
+            
+        #     day_df.loc[day] = res_list
+        #     i += 1
+
+        # day_df.to_csv('./eval.csv', encoding = 'gb18030')
+
+        return day_dict 
+
+
 if __name__ == '__main__':
     pred_api = PredictApi()
+    res = pred_api.get_normalized_eval('2020-07-17')
+    print(res)
     # res = pred_api.get_day_sta_flow('2020-07-21')
     # print(res)
     # ml = MLPredictor()

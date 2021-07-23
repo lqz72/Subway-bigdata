@@ -20,14 +20,19 @@ def get_link_json() -> json:
     with open(abs_path + '/json_data/links.json', 'r', encoding='utf-8') as f:
         return f.read()
 
-@api_bp.route('/weather_info', methods=['POST', 'GET'])
-def weather_info():
-    """获取近7天的天气信息
+@api_bp.route('/weather_info/<_type>', methods=['POST', 'GET'])
+def weather_info(_type):
+    """
+    获取天气信息
+    type: 类型 可选day或week
     """
     curr_date = request.get_data().decode('utf-8')
-    curr_weather = api.get_recent_weather(curr_date)
 
-    return jsonify(curr_weather)
+    if _type == 'day':
+        weather = api.get_recent_weather(curr_date, 1)
+    elif _type == 'week':  
+        weather = api.get_recent_weather(curr_date)
 
+    return jsonify(weather)
 
 

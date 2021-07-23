@@ -18,12 +18,14 @@ def thisday_info() -> json:
     weather = SQLOS.get_weather_info(curr_date)
     is_hoilday = SQLOS.get_hoilday_info(curr_date)
     day_flow = api.month_dict[month][day]
+    day_pass_num = SQLOS.get_day_pass_num(curr_date)
     day_flow_info = api.get_day_flow_info(curr_date)
 
     info_dict = {
         'weather': weather[0][0],
         'is_hoilday': ('是' if is_hoilday[0][0] == '1' else '否'),
         'day_flow': int(day_flow),
+        'day_pass_num': int(day_pass_num),
         'day_cmp': day_flow_info['day_cmp'],
         'month_cmp': day_flow_info['month_cmp'],
         'year_cmp': day_flow_info['year_cmp'],

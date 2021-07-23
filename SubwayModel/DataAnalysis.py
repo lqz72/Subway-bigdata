@@ -276,7 +276,7 @@ class DataApi(object):
         """
         sta_df = SQLOS.get_df_data('station')
         sta_df = sta_df[sta_df['sta_name'] == station] 
-
+        
         sta_dict = {
                 'line': sta_df['line'].tolist()[0],
                 'area': sta_df['area'].tolist()[0][4:]
@@ -653,15 +653,15 @@ class DataApi(object):
             print(e, in_sta, out_sta)
         return od_dict
 
-    def get_recent_weather(self, date):
-        """获取近7天的完整天气信息
+    def get_recent_weather(self, date, days=7):
+        """获取近days天的完整天气信息
         """
         weather_info = SQLOS.get_df_data('weather_info')
 
         end_time = datetime.datetime.strptime(date, "%Y-%m-%d")  
         one_day = datetime.timedelta(days=1)
         date_list = [date,]
-        for i in range(6):      
+        for i in range(days - 1):      
             end_time += one_day
             date_list.append(end_time.strftime("%Y-%m-%d"))
         
