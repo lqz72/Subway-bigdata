@@ -15,8 +15,19 @@ function change_data()
     //转换成字符串的对象
     s_data = JSON.stringify(data_b);
     //评分图
-    var markgraph = echarts.init(document.querySelector("#markpre"));            
-    markgraph.setOption(option_markpre);
+    var markgraph = echarts.init(document.querySelector("#markpre"));   
+    $.ajax({
+        url: '/pred/day/eval',
+        type: 'POST',
+        data: s_data,
+        dataType: 'json',
+        async: true,
+        success: function (data) {
+            markpreOption.series[0].data[0].value = data['eval'];
+            markgraph.setOption(markpreOption);
+        }
+    });   
+    
 
     //更新进出站图表信息
     inout_s();
@@ -59,7 +70,7 @@ function change_data()
         type: 'POST',
         data: s_data,
         dataType: 'json',
-        async: false,
+        async: true,
         success: function (data) {
             console.log(data);
             change_dayinfomation(data);
@@ -73,7 +84,7 @@ function change_data()
         type: 'POST',
         data: s_data,
         dataType: 'json',
-        async: false,
+        async: true,
         success: function (option) {
             monthLine.setOption(option);
         }
@@ -195,7 +206,7 @@ function inout_s()
         data: s_data,
         url: 'pred/hour_flow',
         dataType: 'json',
-        async: false,
+        async: true,
         success: function (result) {
             var hourFlow = result;
            // console.log(result);
@@ -309,7 +320,7 @@ function get_icon_words(wea){
 }
 
 //评分图设置项
-var option_markpre = {
+var markpreOption = {
     series: [{
         type: 'gauge',
         axisLine: {
@@ -359,7 +370,6 @@ var option_markpre = {
         }]
     }]
 };
-
 
 var stations = getJsonData('/api/sta/json');
 var links = getJsonData('/api/link/json');

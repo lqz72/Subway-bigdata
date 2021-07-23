@@ -8,7 +8,6 @@ from pyecharts.charts import Grid
 from DataAnalysis import DataApi
 from PredictResult import PredictApi
 
-
 class ChartApi(object):
     '''
     数据分析图表接口
@@ -466,18 +465,18 @@ class ChartApi(object):
 
         return grid
 
-    def eval_radar() -> Radar:
-        data = [{"value": [0.8, 0.6, 0.9, 0.5, 0.7], "name": "交通拥堵系数"}]
+    def eval_radar(eval_value) -> Radar:
+        data = [{"value": eval_value, "name": "交通拥堵系数"}]
 
         radar = (
             Radar(init_opts=opts.InitOpts(width="1280px", height="720px", bg_color="#fff"))
             .add_schema(
                 schema=[
-                    opts.RadarIndicatorItem(name="高峰拥堵指数", max_=1),
-                    opts.RadarIndicatorItem(name="高峰客流占比", max_=1),
                     opts.RadarIndicatorItem(name="高峰时间占比", max_=1),
-                    opts.RadarIndicatorItem(name="不均衡系数", max_=1),
-                    opts.RadarIndicatorItem(name="满载率", max_=1),
+                    opts.RadarIndicatorItem(name="客流不均衡系数", max_=1),
+                    opts.RadarIndicatorItem(name="客流拥堵指数", max_=1),
+                    opts.RadarIndicatorItem(name="高峰拥堵指数", max_=1),
+                    opts.RadarIndicatorItem(name="线网满载率", max_=1),
                 ],
                 splitarea_opt=opts.SplitAreaOpts(
                     is_show=True, areastyle_opts=opts.AreaStyleOpts(opacity=1)

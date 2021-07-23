@@ -345,10 +345,10 @@ class DataApi(object):
      
         info_dict = {
             'day_cmp':  '+{}'.format(day_cmp) if day_cmp > 0 else '{}'.format(day_cmp),
-             'month_cmp': '+{}'.format(month_cmp) if month_cmp > 0 else '{}'.format(month_cmp),
-             'year_cmp': '+{}'.format(year_cmp) if year_cmp > 0 else '{}'.format(year_cmp),
-             'am_peak_flow': am_peak_flow,
-             'pm_peak_flow': pm_peak_flow
+            'month_cmp': '+{}'.format(month_cmp) if month_cmp > 0 else '{}'.format(month_cmp),
+            'year_cmp': '+{}'.format(year_cmp) if year_cmp > 0 else '{}'.format(year_cmp),
+            'am_peak_flow': am_peak_flow,
+            'pm_peak_flow': pm_peak_flow
         }
 
         return info_dict

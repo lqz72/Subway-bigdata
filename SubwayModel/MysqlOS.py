@@ -77,6 +77,7 @@ class SQLOS(object):
             # 'pred_out_hour': txt_path + '/predict/pred_out_hour.txt',
             # 'pred_arima_day': txt_path + '/predict/pred_arima_day.txt',
             # 'pred_holtwinters_day': txt_path + '/predict/pred_holtwinters_day.txt'
+            'pred_eval': txt_path + '/predict/pred_eval.txt'
         }
 
         try:
@@ -440,9 +441,32 @@ class SQLOS(object):
             sql = 'SELECT user_num from day_pass_num WHERE `day` = "%s"' % date
             cursor = conn.cursor()
             cursor.execute(sql)
-            data = cursor.fetchall()
+            data = cursor.fetchone()
             conn.close()
-            return data[0][0]
+            return data[0]
+
+        except Exception as e:
+            print('error:', e)
+            conn.rollback()
+            conn.close()
+
+        return 'UnKnow'
+
+    def get_eval_factor(date):
+        """
+        获取当日交通评价指标
+        返回一个列表
+        """
+        conn = SQLOS.connect_to_db()
+
+        try:
+            sql = 'SELECT * from pred_eval WHERE `day` = "%s"' % date
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            data = cursor.fetchone()
+            eval_value = list(data[1:])
+            conn.close()
+            return eval_value
 
         except Exception as e:
             print('error:', e)

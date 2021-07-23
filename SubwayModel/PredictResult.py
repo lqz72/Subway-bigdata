@@ -21,6 +21,7 @@ class PredictApi(object):
         self.pre_holtwinters_day_df = SQLOS.get_pred_day('holtwinters')
         self.weather_list = ["多云", "晴", "阴", "阵雨", "小雨", "中雨", "大雨", "暴雨"]
         self.line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
+    
     @staticmethod
     def get_station_pred_flow():
         '''
@@ -219,8 +220,8 @@ class PredictApi(object):
         pre_day = (std_date - one_day).strftime('%Y-%m-%d')
         month = date[5:7].lstrip('0')
 
-        day_flow = int(predict_df.loc[date, 'y'])
-        pre_day_flow = int(predict_df.loc[pre_day, 'y'])
+        day_flow = int(predict_df.loc[date].y) 
+        pre_day_flow = int(predict_df.loc[pre_day].y)
         month_mean = int(predict_df[predict_df['month'] == month].y.mean())
         year_mean = int(predict_df.y.mean())
 
@@ -388,7 +389,7 @@ class PredictApi(object):
         try:
             hour_flow = self.get_hour_flow(date,'all')
             hour_flow_sort = sorted(hour_flow)
-            list_len = hour_flow.__len__()
+            list_len = len(hour_flow)
             peek_flow = hour_flow_sort[int(list_len*0.7)-1]
             peek_hour=  0
             for i in range(0,list_len-2):
@@ -496,9 +497,9 @@ class PredictApi(object):
 
         return ratio
 
-    def get_normalized_eval(self, date):
+    def cal_normalized_eval(self, date):
         """
-        获取归一化的五个指标
+        计算归一化的五个指标
         返回一个字典
         """
         func_list = [
@@ -521,55 +522,55 @@ class PredictApi(object):
             cur_date = cur_date + one_day
             day_list.append(cur_date.strftime('%Y-%m-%d'))
 
-        temp_list = []
-        for func in func_list:
-            eval_list = []
-            for each in day_list:
-                eval_list.append(func(each))
+        # temp_list = []
+        # for func in func_list:
+        #     eval_list = []
+        #     for each in day_list:
+        #         eval_list.append(func(each))
 
-            eval_list = np.array(eval_list)
-            _range = np.max(eval_list) - np.min(eval_list)
-            res = (eval_list - np.min(eval_list)) / _range
+        #     eval_list = np.array(eval_list)
+        #     _range = np.max(eval_list) - np.min(eval_list)
+        #     res = (eval_list - np.min(eval_list)) / _range
 
-            temp_list.append(res)
+        #     temp_list.append(res)
 
-        day_dict = dict.fromkeys(day_list, 0)
-        i = 0
-        for day in day_list:
-            res_list = [self.get_peek_hour(day) * 0.2]
-
-            for j in range(len(func_list)):
-                res_list.append(temp_list[j][i])
-            
-            day_dict[day] = dict(zip(eval_name, res_list))
-            i += 1
-
-        # day_df = pd.DataFrame(index = day_list, 
-        #     data = np.zeros((len(day_list), len(eval_name))), columns=eval_name)
-
+        # day_dict = dict.fromkeys(day_list, 0)
         # i = 0
         # for day in day_list:
         #     res_list = [self.get_peek_hour(day) * 0.2]
 
+        #     for j in range(len(func_list)):
+        #         res_list.append(temp_list[j][i])
             
-        #     for func in func_list:
-        #         eval_list = []
-        #         for each in day_list:
-        #             eval_list.append(func(each))
-
-
-        #         eval_list = np.array(eval_list)
-        #         _range = np.max(eval_list) - np.min(eval_list)
-        #         res = (eval_list - np.min(eval_list)) / _range
-
-        #         res_list.append(res[i])
-            
-        #     day_df.loc[day] = res_list
+        #     day_dict[day] = dict(zip(eval_name, res_list))
         #     i += 1
 
-        # day_df.to_csv('./eval.csv', encoding = 'gb18030')
+        day_df = pd.DataFrame(index = day_list, 
+            data = np.zeros((len(day_list), len(eval_name))), columns=eval_name)
 
-        return day_dict 
+        i = 0
+        for day in day_list:
+            res_list = [self.get_peek_hour(day) * 0.2]
+
+            
+            for func in func_list:
+                eval_list = []
+                for each in day_list:
+                    eval_list.append(func(each))
+
+
+                eval_list = np.array(eval_list)
+                _range = np.max(eval_list) - np.min(eval_list)
+                res = (eval_list - np.min(eval_list)) / _range
+
+                res_list.append(res[i])
+            
+            day_df.loc[day] = res_list
+            i += 1
+
+        day_df.to_csv('./eval.csv', encoding = 'gb18030')
+
+        return day_df
 
 
 if __name__ == '__main__':

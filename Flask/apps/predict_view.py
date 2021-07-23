@@ -2,6 +2,7 @@ from flask import request
 from flask import jsonify, json
 from flask import Blueprint
 
+from SubwayModel.MysqlOS import SQLOS
 from MakeChart import ChartApi
 from apps import api, pred_api
 
@@ -30,6 +31,18 @@ def pred_day_info():
 
     return jsonify(day_info)
 
+@predict_bp.route('/day/eval', methods=['POST', 'GET'])
+def pred_day_eval():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+    date = param_dict['c_date']
+
+    eval_value = SQLOS.get_eval_factor(date)
+    weight = [0.016745, 0.249164, 0.247595, 0.276281, 0.210215]
+    result =  sum(map(lambda x, y: x * y, eval_value, weight))
+
+    return jsonify({'eval': int(result * 100)})
+
 
 ################Pyecharts
 @predict_bp.route('/month/line', methods=['POST', 'GET'])
@@ -38,7 +51,6 @@ def pred_month_line():
     param_dict = json.loads(param_str)
     curr_date = param_dict['c_date']
 
-    print(param_dict)
     month = curr_date.split('-')[1].lstrip('0')
     month_dict = pred_api.get_curr_month_flow(month, **param_dict)
     line = ChartApi.pred_month_line(month_dict, int(curr_date.split('-')[1]))
@@ -49,8 +61,9 @@ def pred_month_line():
 def pred_week_line():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
+    
     curr_date = param_dict['c_date']
-    alg = int(param_dict['alg'])
+    alg = int(param_dict.get('alg', 0))
 
     week_dict = pred_api.get_curr_week_flow(curr_date, alg)
     line = ChartApi.pred_week_line(week_dict)
@@ -87,6 +100,7 @@ def pred_eval_radar():
     param_dict = json.loads(param_str)
     curr_date = param_dict['c_date']
 
-    radar = ChartApi.eval_radar()
+    eval_value = SQLOS.get_eval_factor(curr_date)
+    radar = ChartApi.eval_radar(eval_value)
 
     return radar.dump_options_with_quotes()

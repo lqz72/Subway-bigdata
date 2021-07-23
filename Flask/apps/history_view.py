@@ -29,8 +29,8 @@ def thisday_info() -> json:
         'day_cmp': day_flow_info['day_cmp'],
         'month_cmp': day_flow_info['month_cmp'],
         'year_cmp': day_flow_info['year_cmp'],
-        'am_peak_flow': day_flow_info['am_peak_flow'],
-        'pm_peak_flow': day_flow_info['pm_peak_flow']
+        'am_peak_flow': int(day_flow_info['am_peak_flow']),
+        'pm_peak_flow': int(day_flow_info['pm_peak_flow'])
     }
 
     return jsonify(info_dict)

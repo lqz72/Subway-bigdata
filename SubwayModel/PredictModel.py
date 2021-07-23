@@ -438,7 +438,13 @@ class MLPredictor(BaseModel):
         weight_lgb = mape_lgb / (mape_xgb + mape_lgb)
 
         prediction = (y_xgb ** weight_xgb) * (y_lgb ** weight_lgb)
-        df['2020-07-17':].y = prediction
+        
+        datetime.datetime.strptime
+        start_time =datetime.datetime.strptime('2020-07-17', '%Y-%m-%d')
+        end_time = start_time + datetime.timedelta(days=n_steps-1)
+        str_time = end_time.strftime('%Y-%m-%d')
+
+        df['2020-07-17': str_time].y = prediction
 
         return df
 
@@ -479,7 +485,10 @@ class MLPredictor(BaseModel):
             try:
                 with open(error_file_path, 'r+', encoding='utf-8') as f:
                     error_dict = json.load(f)
-                    error_dict[model_name][file_name] = mape
+                    if error_dict[model_name].get(file_name, 0) == 0:
+                         error_dict[model_name].update({file_name: mape})
+                    else:
+                        error_dict[model_name][file_name] = mape
                     f.seek(0)
                     f.truncate()
                     json.dump(error_dict, f)
