@@ -67,6 +67,19 @@ class PredictApi(object):
         in_df.to_csv('./in.csv', encoding='gb18030', index=0)
         out_df.to_csv('./out.csv', encoding='gb18030', index=0)
 
+    def time_map(self, date):
+        """
+        日期映射 
+        """
+        end = datetime.datetime.strptime(date, '%Y-%m-%d')
+        start = datetime.datetime.strptime('2020-07-17', '%Y-%m-%d')
+        steps = int((end - start) / pd.Timedelta(1, 'D'))
+
+        date = start + pd.Timedelta(steps % 7, 'D')
+        date = date.strftime('%Y-%m-%d')
+
+        return date
+
     def get_month_flow(self):
         """
         单月整体的客流波动分析
@@ -245,6 +258,7 @@ class PredictApi(object):
             am_peak_flow = int(day_flow * 0.206)
             pm_peak_flow = int(day_flow * 0.234)
 
+        date = self.time_map(date)
         peek_hour_rate = round(self.get_peek_hour(date) / 18 * 100, 1)
 
         info_dict = {
@@ -575,8 +589,8 @@ class PredictApi(object):
 
 if __name__ == '__main__':
     pred_api = PredictApi()
-    res = pred_api.get_normalized_eval('2020-07-17')
-    print(res)
+    res = pred_api.get_sta_hour_flow('2020-08-25')
+    # print(res)
     # res = pred_api.get_day_sta_flow('2020-07-21')
     # print(res)
     # ml = MLPredictor()

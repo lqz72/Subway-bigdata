@@ -15,6 +15,9 @@ def pred_out_hour_flow():
 
     date = param_dict['c_date']
     type_ = param_dict['inout_s']
+
+    date = pred_api.time_map(date)
+
     flow_dict = pred_api.get_sta_hour_flow(date, type_)
 
     return jsonify(flow_dict)
@@ -37,9 +40,11 @@ def pred_day_eval():
     param_dict = json.loads(param_str)
     date = param_dict['c_date']
 
+    date = pred_api.time_map(date)
+
     eval_value = SQLOS.get_eval_factor(date)
     weight = [0.016745, 0.249164, 0.247595, 0.276281, 0.210215]
-    result =  sum(map(lambda x, y: x * y, eval_value, weight))
+    result =  sum(list(map(lambda x, y: x * y, eval_value, weight)))
 
     return jsonify({'eval': int(result * 100)})
 
@@ -87,6 +92,8 @@ def pred_hour_line():
     param_dict = json.loads(param_str)
     curr_date = param_dict['c_date']
 
+    curr_date = pred_api.time_map(curr_date)
+
     hour_list = [str(i) for i in range(6, 22, 1)]
     in_flow = pred_api.get_hour_flow(curr_date, 'in')
 
@@ -99,6 +106,8 @@ def pred_eval_radar():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
     curr_date = param_dict['c_date']
+
+    curr_date = pred_api.time_map(curr_date)
 
     eval_value = SQLOS.get_eval_factor(curr_date)
     radar = ChartApi.eval_radar(eval_value)
