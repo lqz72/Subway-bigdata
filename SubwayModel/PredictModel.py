@@ -42,6 +42,9 @@ class BaseModel(object):
 
         self.feature_day = SQLOS.get_df_data('feature_day')
 
+        # self.feature_up_section = SQLOS.get_df_data('feature_up_section')
+        # self.feature_down_section = SQLOS.get_df_data('feature_down_section')
+
         # self.feature_in_hour = SQLOS.get_df_data('feature_in_hour')
         # self.feature_out_hour = SQLOS.get_df_data('feature_out_hour')
 
@@ -209,6 +212,26 @@ class MLPredictor(BaseModel):
             feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']].astype('int')
         # feature_df['MA'] = feature_df['MA'].astype('float')
 
+        feature_df = self.feature_coding(feature_df)
+
+        return feature_df
+
+    def get_section_feature(self, section, hour, _type='up'):
+        """获取断面特征集
+
+        Returns
+        --------
+        Dataframe: 特征集
+        """
+        feature_df = self.feature_up_section.copy() if _type == 'up' else self.feature_down_section.copy()
+        feature_df = feature_df[feature_df.section.isin([section]) & feature_df.hour.isin([hour])]
+
+        feature_df.drop(['section', 'hour'], axis=1, inplace=True)
+        feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']] = \
+            feature_df[['weekday', 'month', 'is_hoilday', 'y', 'mean_temp']].astype('int')
+
+        feature_df.day = pd.to_datetime(feature_df.day)
+        feature_df.set_index('day', inplace=True)
         feature_df = self.feature_coding(feature_df)
 
         return feature_df
@@ -582,6 +605,50 @@ class MLPredictor(BaseModel):
         predict_df = predict_df[['weekday', 'month', 'y']]
 
         return predict_df, np.array(predict_list), mape
+
+    def forecast_section_flow(self, feature_df, file_name, n_steps=7):
+        """对每天的高峰时期进行断面预测
+
+        Parameters
+        ----------
+        model_name: 模型名称
+        feature_df: dataframe格式的特征集
+        file_name: 文件名称
+        n_steps:   预测步长
+
+        Returns
+        --------
+        DataFrame index = 'day' columns = ['weekday', 'month', 'y'] 
+        """
+        #获取模型路径
+        model_path = self.abs_path + '/xgb_model/' +  file_name + '.pkl'
+
+        #如果模型不存在 获取训练数据拟合模型
+        if os.path.exists(model_path) is False:
+            #训练集只是特征集的子集 所以直接取切片即可
+            train_df = feature_df[:'2020-07-16']
+            xgb_model = XGBRegressor(**self.xgb_best_params)
+            model = self.fit_model(xgb_model, train_df, 0.8, model_path)
+
+        #调取训练模型
+        model = joblib.load(model_path)
+
+        #取7月17日之后的特征集
+        feature_df = feature_df['2020-07-17':]
+
+        predict_list = []
+        for i in range(n_steps):
+            df = feature_df[i:i + 1]
+            X, y = df.drop(['y'], axis=1), df.y
+          
+            prediction = model.predict(X)[0]
+            feature_df.y[i:i + 1] = int(prediction)
+            predict_list.append(prediction)
+
+        predict_df = feature_df.iloc[:]
+        predict_df = predict_df[['weekday', 'month', 'y']]
+
+        return predict_df
 
     def forecast_by_factor(self, **params):
         """
@@ -958,10 +1025,22 @@ class ArimaModel(BaseModel):
 
 if __name__ == '__main__':
     ml = MLPredictor()
-    feature_df = ml.get_day_feature()
-    print(feature_df)
-    df = ml.model_ensemble(feature_df, 'day')
-    print(df)
+
+    #######断面客流预测
+    # up_feature = ml.feature_up_section
+    # down_feature = ml.feature_down_section
+    # df = pd.DataFrame({'day':[], 'weekday':[],'month': [], 'y':[], 'section':[], 'hour':[]})
+    # section_list = down_feature.section.unique()
+    # for hour in ['7', '16']:
+    #     for section in section_list:
+    #         feature_df = ml.get_section_feature(section, hour, 'down')
+    #         predict_df = ml.forecast_section_flow(feature_df, 'downline/{}/{}'.format(hour, section))
+    #         predict_df.reset_index(level='day', inplace =True)
+    #         predict_df['section'] = section
+    #         predict_df['hour'] = hour
+    #         df = pd.concat([df, predict_df])
+    # df.to_csv('./pred_down_section.csv', encoding='gb18030', index=False)
+
     # ml.forecast_by_factor('2020-07-17', choose_wea = '阴', choose_temp = '22')
     # j = 0
 

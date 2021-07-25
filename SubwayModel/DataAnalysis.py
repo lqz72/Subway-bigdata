@@ -564,7 +564,7 @@ class DataApi(object):
 
     def get_line_split(self, line, flag='up'):
         """
-        获取线路断面字典 格式: {split:0,}
+        获取线路断面列表
         """
         try:
             with open(self.abs_path + '/json/{}line.json'.format(flag), 'r', encoding  = 'utf-8') as f:
@@ -623,6 +623,95 @@ class DataApi(object):
                         line_split_dict[path[i + 1] + '-' + path[i]]['down'] += 1               
         
         return line_split_dict
+
+    def get_split_flow(self):
+        """
+        断面预测数据准备
+        """
+        sp = ShortestPath()
+
+        #列表数据
+        line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
+        #time_list = [['7', '8', '9'], ['10', '11', '12'], ['13', '14', '15'], ['16', '17', '18'], ['19', '20', '21']]
+        time_list = [[7, 8, 9], [16, 17, 18]]
+        day_list = []
+
+        cur_day = '2020-05-01'
+        one_day = datetime.timedelta(days=1)
+
+        while cur_day != '2020-07-17':
+            day_list.append(cur_day)
+            temp_day = datetime.datetime.strptime(cur_day, '%Y-%m-%d')
+            temp_day += one_day
+            cur_day = temp_day.strftime('%Y-%m-%d')
+
+        trips_df = self.trips_df.copy().drop('user_id', axis =1)
+        trips_df['hour'] = trips_df.in_time.dt.hour
+        trips_df['day'] =  trips_df.in_time.dt.normalize()
+        trips_df.set_index('day', inplace=True)
+        trips_df.drop(['in_time', 'out_time'], axis =1, inplace=True)
+
+        #获取所有站点到其他站点的最短路径
+        all_path = {}
+        for sta in self.sta_dict.keys():
+            try:
+                with open(self.abs_path + '/json/path/' + sta + '.json', 'r', encoding='utf-8') as f:
+                    all_path[sta] = json.load(f)
+            except Exception as e:
+                print('error', e)
+
+        for hours in time_list:
+            print('-----------', hours[0])
+            hours_df = trips_df[trips_df.hour.isin(hours)]
+            for day in day_list:
+                day_df = hours_df.loc[day]
+                print('**********', day)
+                res_df = pd.DataFrame(columns=['flow', 'line'])
+
+                for line in line_list:
+                    print('#############', line)
+                    #获取断面字典
+                    line_split_dict = dict.fromkeys(self.get_line_split(line, flag = 'down'), 0)
+
+                    #遍历当天的出行记录 
+                    for row in day_df.itertuples(index = False):
+                        start = getattr(row, 'in_sta_name')
+                        end = getattr(row, 'out_sta_name')
+                        
+                        #获取最短路径 对路径上的断面进行统计
+                        path = all_path[start].get(end, 0)
+                        if path != 0:
+                            for i in range(len(path) - 1):
+                                split = path[i] + '-' + path[i + 1]
+                                
+                                if split in line_split_dict:
+                                    line_split_dict[split] += 1
+
+                    temp_df = pd.DataFrame(index=line_split_dict.keys(), 
+                        data={'flow':line_split_dict.values(), 'line':[line]*len(line_split_dict.values())},)
+
+                    res_df = pd.concat([res_df, temp_df])
+                res_df.to_csv('./csv_data/downline/{}/{}.csv'.format(hours[0], day), encoding='gb18030')
+
+        #进一步处理csv 以断面为分类 分别提取时间序列信息
+        for hours in time_list:
+            ddf = pd.DataFrame({'section':[], 'flow':[], 'line': [], 'day': []}, dtype = 'int')
+
+            for day in day_list:
+                df = pd.read_csv('./csv_data/downline/{}/{}.csv'.format(hours[0], day), encoding='gb18030')
+                df.columns = ['section', 'flow', 'line']
+                df['day'] = day
+                ddf = pd.concat([ddf, df])
+
+            ddf.to_csv('./csv_data/downline/{}/train.csv'.format(hours[0]), encoding='gb18030', index=None)
+
+            ddf = pd.read_csv('./csv_data/downline/{}/train.csv'.format(hours[0]), encoding='gb18030')
+            split_list = ddf.section.unique()
+
+            for split in split_list:
+                sp_df = ddf[ddf.section.isin([split])]
+                sp_df.drop('section', axis =1, inplace=True)
+                sp_df.to_csv('./csv_data/downline/{}/{}.csv'.format(hours[0], split), encoding='gb18030', index=None)
 
     def get_od_flow(self, date):
         """
@@ -795,6 +884,31 @@ class DataApi(object):
      
         return hour_dict
     
+    def get_sta_hour_flow(self, date, station):
+        """
+        获取指定站点6-21点的客流量 
+        传入一个一个有效日期
+        返回值为一个字典 格式:{hour:flow,}
+        """
+        flow_df = self.flow_df.copy()
+
+        sta_df = flow_df[flow_df['sta'].isin([station]) & flow_df['day'].isin([date])]
+        sta_df['hour'] = sta_df.time.dt.hour
+        sta_df['flow'] = 1
+        sta_df.drop(['sta', 'weekday', 'month', 'time'], axis=1, inplace=True)
+
+
+        hour_list = [i for i in range(6,22)]
+        hour_dict = dict.fromkeys(hour_list, 0)
+
+        grouped = sta_df.groupby(by='hour')['flow'].sum()
+        
+        for hour in grouped.index:
+            if hour in hour_list:
+                hour_dict[hour] = int(grouped[hour])
+
+        return hour_dict
+
     def get_sta_age_structure(self, date, station):
         """
         获取出入本站的乘客年龄结构分布
@@ -861,9 +975,52 @@ class DataApi(object):
 
         return sta_list, in_flow_dict, out_flow_dict
 
+    def get_his_personnel_dispatch(self, date, station):
+        """
+        获取地铁人员调度信息
+        返回一个字典
+        """
+        sta_flow = self.get_sta_hour_flow(date,station)
+        hour_personnel = {}
+        for i in range(0,len(sta_flow)):
+            hour_personnel[i+6] = int(sta_flow[i+6]*2.5+2.02+0.06*15-0.125*9)
+
+        return hour_personnel
+
 if __name__ == '__main__':
     api = DataApi()
 
+    #####断面预测训练数据合并
+    # line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
+    # split_list = []
+    # for line in line_list:
+    #     split_list.extend(api.get_line_split(line, flag = 'down')) 
+    
+    # feature_df = pd.read_csv('./csv_data/feature/feature_day.csv', encoding='gb18030')
+    # feature_df.drop(['y', 'MA3'], axis = 1, inplace =True)
+    # feature_df.set_index('day', inplace =True)
+    # feature_df = feature_df.loc['2020-05-01':'2020-07-23']
+    # feature_df['y'] = 0
+
+    # ddf = pd.DataFrame({'day':[], 'weekday':[],'month': [],'is_hoilday': [],'weather':[], 
+    #     'mean_temp':[], 'y':[]})    
+    # ddf.set_index('day', inplace=True)
+
+    # for hours in ['7', '16']:
+    #     for split in split_list:
+    #         df = pd.read_csv('./csv_data/downline/{}/{}.csv'.format(hours, split), encoding='gb18030')
+    #         df.day = pd.to_datetime(df.day)
+    #         df.drop(['line'], axis=1, inplace =True)
+    #         temp_df = feature_df.copy()
+    #         temp_df.loc['2020-05-01': '2020-07-16'].y = df.flow.values
+    #         temp_df['section'] = split
+    #         temp_df['hours'] = hours  
+    #         ddf = pd.concat([ddf, temp_df])
+
+    # ddf.reset_index(level='day', inplace=True)
+    # ddf.to_csv('./csv_data/downline/feature_down_section.csv', encoding='gb18030', index=False)
+    
+    # api.get_split_flow()
     # begin = time.time()
     # api.get_area_in_out_flow('2020-07-01', '住宅区')
     # end = time.time()
@@ -874,4 +1031,3 @@ if __name__ == '__main__':
     #api.get_section_in_out_flow('out', api.get_out_hour_flow('2020-07-01', 7, 21))
     # api.get_sta_flow_info('Sta101', '2020-07-01')
     # print(api.get_sta_age_structure('2020-07-01', 'Sta101'))
-

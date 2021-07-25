@@ -1,5 +1,6 @@
 import re
 import json
+import datetime
 import random
 from flask import request, redirect
 from flask import jsonify
@@ -84,11 +85,17 @@ def sta_schedule_line():
     date = param_dict['date']
 
     hour_list = [str(i) for i in range(6,22,3)]
-    volunteer = [random.randint(-20, 40)  for i in range(6, 22,3) if i != 0]
-    worker = [str(i - abs(i) / i * random.randint(-10, 15)) for i in volunteer]
 
-    volunteer = list(map(lambda x: str(x), volunteer))
+    cur_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    base_time = datetime.datetime.strptime('2020-07-16', '%Y-%m-%d')
 
-    line = ChartApi.sta_schedule_line(hour_list, volunteer, worker)
+    if cur_date > base_time:
+        worker = pred_api.get_pre_personnel_dispatch(date, 'all', station)
+    else:
+        worker = api.get_his_personnel_dispatch(date, station)
+ 
+    worker = [str(i) for i in worker.values()]
+
+    line = ChartApi.sta_schedule_line(hour_list, worker)
 
     return line.dump_options_with_quotes()

@@ -70,14 +70,18 @@ class SQLOS(object):
             # 'day_pass_num':txt_path + 'day_pass_num.txt',
             # 'weather_info': txt_path + 'weather_info.txt',
             # 'feature_day':  txt_path + 'feature_day.txt',
-            # 'feature_in_hour': txt_path + '/feature/feature_in_hour.txt',
-            # 'feature_out_hour': txt_path + '/feature/feature_out_hour.txt',
-            # 'pred_day': txt_path + '/predict/pred_day.txt',
-            # 'pred_in_hour': txt_path + '/predict/pred_in_hour.txt',
-            # 'pred_out_hour': txt_path + '/predict/pred_out_hour.txt',
-            # 'pred_arima_day': txt_path + '/predict/pred_arima_day.txt',
-            # 'pred_holtwinters_day': txt_path + '/predict/pred_holtwinters_day.txt'
-            'pred_eval': txt_path + '/predict/pred_eval.txt'
+            # 'feature_in_hour': txt_path + 'feature/feature_in_hour.txt',
+            # 'feature_out_hour': txt_path + 'feature/feature_out_hour.txt',
+            # 'feature_up_section': txt_path + 'feature/feature_up_section.txt',
+            # 'feature_down_section': txt_path + 'feature/feature_down_section.txt',
+            # 'pred_day': txt_path + 'predict/pred_day.txt',
+            # 'pred_in_hour': txt_path + 'predict/pred_in_hour.txt',
+            # 'pred_out_hour': txt_path + 'predict/pred_out_hour.txt',
+            # 'pred_arima_day': txt_path + 'predict/pred_arima_day.txt',
+            # 'pred_holtwinters_day': txt_path + 'predict/pred_holtwinters_day.txt'
+            # 'pred_eval': txt_path + 'predict/pred_eval.txt'    
+            # 'pred_up_section': txt_path + 'predict/pred_up_section.txt',
+            # 'pred_down_section': txt_path + 'predict/pred_down_section.txt'
         }
 
         try:
@@ -237,7 +241,7 @@ class SQLOS(object):
         [1517815 rows x 5 columns]
         '''
         flow_df = SQLOS.get_df_data('flow')
-        flow_df.drop('id', axis=1, inplace=True)
+        # flow_df.drop('id', axis=1, inplace=True)
         flow_df.time = pd.to_datetime(flow_df.time)
         flow_df.day = pd.to_datetime(flow_df.day)
     
@@ -422,12 +426,20 @@ class SQLOS(object):
 
         return predict_df
 
-    def get_pred_hour(type_):
-        predict_df = SQLOS.get_df_data('pred_%s_hour' % type_)
+    def get_pred_hour(_type):
+        predict_df = SQLOS.get_df_data('pred_%s_hour' % _type)
         predict_df.time = pd.to_datetime(predict_df.time)
         predict_df['hour'] = predict_df.time.dt.hour
 
         predict_df.set_index('time', inplace=True)
+
+        return predict_df
+
+    def get_pred_section(_type):
+        predict_df = SQLOS.get_df_data('pred_%s_section' % _type)
+        predict_df.day = pd.to_datetime(predict_df.day)
+
+        predict_df.set_index('day', inplace=True)
 
         return predict_df
 
@@ -466,6 +478,7 @@ class SQLOS(object):
             data = cursor.fetchone()
             eval_value = list(data[1:])
             conn.close()
+
             return eval_value
 
         except Exception as e:

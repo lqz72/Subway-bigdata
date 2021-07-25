@@ -526,33 +526,34 @@ class ChartApi(object):
 
         return grid
 
-    def sta_schedule_line(hour_list, volunteer, worker) -> Line:
+    def sta_schedule_line(hour_list, worker) -> Line:
         line = (
             Line()
             .add_xaxis(xaxis_data=hour_list)
-            .add_yaxis(
-                series_name="志愿者",
-                y_axis=volunteer,
-                markpoint_opts=opts.MarkPointOpts(data=[
-                    opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color='#F8456B')),
-                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color='#F8456B'))
-                ]),
-                label_opts=opts.LabelOpts(is_show=False)
-            )
+            # .add_yaxis(
+            #     series_name="志愿者",
+            #     y_axis=volunteer,
+            #     markpoint_opts=opts.MarkPointOpts(data=[
+            #         opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color='#F8456B')),
+            #         opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color='#F8456B'))
+            #     ]),
+            #     label_opts=opts.LabelOpts(is_show=False)
+            # )
             .add_yaxis(
                 series_name="工作人员",
                 y_axis=worker,
                 markpoint_opts=opts.MarkPointOpts(data=[
                     opts.MarkPointItem(type_="min", itemstyle_opts=opts.ItemStyleOpts(color='#E271DE')),
-                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color='#E271DE'))
+                    opts.MarkPointItem(type_="max", itemstyle_opts=opts.ItemStyleOpts(color='#F8456B'))
                 ]),
-                label_opts=opts.LabelOpts(is_show=False)
+                label_opts=opts.LabelOpts(is_show=False),
+                # is_smooth=True
             )
             .set_colors(['#F8456B', '#E271DE'])
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="地铁人员调度比例", pos_left="center", pos_top="0%"),
+                title_opts=opts.TitleOpts(title="地铁人员调度", pos_left="center", pos_top="0%"),
                 yaxis_opts=opts.AxisOpts(
-                    name="百分比 %",
+                    name="工作人员/人",
                     type_="value",
                     splitline_opts=opts.SplitLineOpts(
                         is_show=True,
@@ -560,7 +561,7 @@ class ChartApi(object):
                     ),
                 ),
                 xaxis_opts=opts.AxisOpts(name="/时", type_="category", boundary_gap=False),
-                legend_opts=opts.LegendOpts(pos_top="10%")
+                legend_opts=opts.LegendOpts(pos_top="10%", pos_right="10%")
             )
             # .render("line_markpoint.html")
         )

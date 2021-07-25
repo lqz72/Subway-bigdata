@@ -18,7 +18,9 @@ class PredictApi(object):
         self.pred_in_hour_df = SQLOS.get_pred_hour('in')
         self.pred_out_hour_df = SQLOS.get_pred_hour('out')
         self.pred_arima_day_df = SQLOS.get_pred_day('arima')
-        self.pre_holtwinters_day_df = SQLOS.get_pred_day('holtwinters')
+        self.pred_holtwinters_day_df = SQLOS.get_pred_day('holtwinters')
+        self.pred_up_section_df = SQLOS.get_pred_section('up')
+        self.pred_down_section_df = SQLOS.get_pred_section('down')
         self.weather_list = ["多云", "晴", "阴", "阵雨", "小雨", "中雨", "大雨", "暴雨"]
         self.line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
     
@@ -348,27 +350,53 @@ class PredictApi(object):
 
         return hour_flow
 
-    def get_sta_hour_flow(self, date, _type='out'):
+    def get_sta_hour_flow(self, date, _type='out', station=None):
         """
-        获取各个站点6-21点的进站客流量 
-        传入一个一个有效日期 以及进出站标识
-        返回值为一个字典 格式:{station:{hour:flow,},}
+        获取各个站点或指定站点6-21点的进站客流量 
+
+        Parameters
+        ----------
+        date:    有效日期
+        _type:   类别 可选in, out, all
+        station: 站点名称 默认为None
+
+        Returns
+        -------
+        Dict:   字典 包含6-21小时对应的客流
         """
-        pred_df = self.pred_in_hour_df[date] if _type == 'in' else self.pred_in_hour_df[date]
         sta_list = SQLOS.get_station_dict().keys()
-
         sta_dict = dict.fromkeys(sta_list, 0)
-        for sta in sta_list:
-            sta_df = pred_df[pred_df['sta'].isin([sta])]
-            
-            hour_list = [i for i in range(6,22)]
-            hour_dict = dict.fromkeys(hour_list)
-            for hour in hour_list:
-                hour_dict[hour] = int(sta_df[sta_df.hour.isin([hour])].y.values[0])
-            sta_dict[sta] = hour_dict
- 
-        return sta_dict
 
+        if _type == 'all':
+            in_pred_df = self.pred_in_hour_df[date]
+            out_pred_df = self.pred_out_hour_df[date]
+            in_pred_df['type'] = 0
+            out_pred_df['type'] = 1
+            pred_df = pd.concat([in_pred_df, out_pred_df])
+        else:
+            pred_df = self.pred_in_hour_df[date] if _type == 'in' else self.pred_in_hour_df[date]
+
+        if station is None:
+            for sta in sta_list:
+                sta_df = pred_df[pred_df['sta'].isin([sta])]
+
+                hour_list = [i for i in range(6,22)]
+                hour_dict = dict.fromkeys(hour_list, 0)
+                for hour in hour_list:
+                    hour_dict[hour] = int(sta_df[sta_df.hour.isin([hour])].y.sum())
+                sta_dict[sta] = hour_dict
+
+            return sta_dict
+        else:
+            sta_df = pred_df[pred_df['sta'].isin([station])]
+
+            hour_list = [i for i in range(6,22)]
+            hour_dict = dict.fromkeys(hour_list, 0)
+            for hour in hour_list:
+                hour_dict[hour] = int(sta_df[sta_df.hour.isin([hour])].y.sum())
+
+            return hour_dict
+        
     def change_pred_result(self, predict_df, **param):
         """
         判断影响因子是否修改 并重新预测
@@ -393,7 +421,6 @@ class PredictApi(object):
             predict_df.loc[date, 'y'] = flow
 
         self.pred_day_df = predict_df
-
 
     def get_peek_hour(self, date):
         """
@@ -586,11 +613,42 @@ class PredictApi(object):
 
         return day_df
 
+    def get_pre_personnel_dispatch(self, date, _type='all', station=None):
+        """
+        获取地铁人员调度信息
+        返回一个字典
+        """
+        sta_flow = self.get_sta_hour_flow(date, _type, station)
+        hour_personnel = {}
+        for i in range(0,len(sta_flow)):
+            hour_personnel[i+6] = int(sta_flow[i+6]*2.5+2.02+0.06*15-0.125*9)
+
+        return hour_personnel
+
+    def get_section_flow(self, date, _type='up'):
+        """
+        获取断面预测客流
+        返回一个字典 格式: {hour:{section:flow,},}
+        """
+        section_df = self.pred_up_section_df if _type == 'up' else self.pred_down_section_df
+        day_df = section_df.loc[date]
+
+
+        hour_list = ['7', '16']
+        hour_dict = dict.fromkeys(hour_list, 0)
+        for hour in hour_list:
+            df = day_df[day_df.hour.isin([hour])]
+            section_list = df.section.tolist()
+            prediction = day_df.y.tolist()
+
+            hour_dict[hour] = dict(zip(section_list, prediction))
+
+        return hour_dict
 
 if __name__ == '__main__':
     pred_api = PredictApi()
-    res = pred_api.get_sta_hour_flow('2020-08-25')
-    # print(res)
+    res = pred_api.get_section_flow('2020-07-17')
+    print(res)
     # res = pred_api.get_day_sta_flow('2020-07-21')
     # print(res)
     # ml = MLPredictor()
