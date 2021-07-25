@@ -1,3 +1,14 @@
+var btn = document.querySelector("#btn");
+var idin = document.querySelector("#idin");
+console.log(1);
+console.log(test);
+btn.addEventListener('click',function()
+{
+    location.href = '/client';
+    userid = idin.value;
+    changedata();
+})
+
 layui.use('laypage', function(){
     var laypage = layui.laypage;
     

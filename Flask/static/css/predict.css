@@ -67,6 +67,7 @@
     float: left;
     position: relative;
     width: 313px;
+    padding-left: 30px;
     flex:1;
     height: 175px;
     /* margin-bottom: 10px; */
@@ -89,7 +90,7 @@
 }
 .weather .ctrl em {
     position: absolute;
-    left: 30px;
+    left: 60px;
     bottom: 13px;
     z-index: 99999;
 }

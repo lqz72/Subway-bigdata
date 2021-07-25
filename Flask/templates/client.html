@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>轨道交通智慧系统</title>
+    <link rel="Shortcut Icon" href="../static/images/title.png" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/date.css') }}">
@@ -40,7 +41,7 @@
               </div>
           </div>
             
-            <div class="addflex">
+            <div class="addflex mt55">
               <!-- 年龄结构图1 -->
               <div id = "age_bar" class="agegraph1">
               </div>
@@ -99,12 +100,31 @@
             </div>
             
             <div class="addflex">
+              <div class="otherdata">
+                
+              </div>
               <!-- 出行记录展示1 -->
               <div class="outshow1" id="outshow1">
                 
               </div>
-              <div class="otherdata">
-                
+            </div>
+            <div class="addflex clientwayinfo">
+              <div class="tag1">
+                <p>出发时间<span class='f1'>&#xe61d;</span></p>
+                <div class="data">07-15 14:21</div>
+              </div>
+              <div class="tag2">
+                <p>到达时间<span class='f2'>&#xe610;</span></p>
+                <div class="data">07-15 14:21</div>
+              </div>
+              <div class="tag3">
+                <p>出发站点<span class='f3'>&#xe64a;</span></p>
+                <div class="data">Sta1</div>
+              </div>
+              <div class="tag4">
+                <p>到达站点<span class='f4'>&#xe677;</span></p>
+                <!-- 考虑要不要改成途径站点和换乘次数 -->
+                <div class="data">Sta2</div>
               </div>
             </div>
             

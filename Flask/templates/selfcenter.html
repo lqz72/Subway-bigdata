@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="Shortcut Icon" href="../static/images/title.png" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/selfcenter.css') }}">
@@ -19,7 +20,7 @@
     a:hover {
     text-decoration:none;
     color: black;
-}
+    }
     body {
         font-size: 16px;
     }
@@ -41,7 +42,7 @@
       <!-- 右侧内容区域 -->
       <div class="content">
           <!-- 用户信息 -->
-          <div class="user">
+          <div class="user" style="font-size: 14px;">
               <div class="mytoggle">&#xe8b2;</div>
               <div class="loc">轨道交通智慧系统>个人中心</div>
               <div class="usr">
@@ -50,7 +51,7 @@
               </div>
           </div>
             
-            <div class="add">
+            <div class="add mt55">
                 <button class="addnew" data-toggle="modal" data-target="#myModal">+ 新增</button>
                 <!-- Modal -->
                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
@@ -84,11 +85,14 @@
                     </div>
                 </div>
             </div>
-            <div class="list">
-                <table id="adminlist">
-                    
-                </table>
+            <div class="addflex">
+              <div class="list">
+                  <table id="adminlist">
+                      
+                  </table>
+              </div>
             </div>
+            
             
 
         </div>

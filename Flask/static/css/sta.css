@@ -400,3 +400,230 @@ button {
     flex:1;
     height: 280px;
 }
+
+
+
+
+
+
+
+
+
+/* --------------------拓展6个功能------------------------------- */
+.top3 {
+    /* margin-right: 30px; */
+    height: 400px;
+}
+.bike {
+    flex:1;
+    position: relative;
+    margin-top: 10px;
+    margin-left: 20px;
+    margin-right: 10px;
+    /* padding-left: 20px;
+    padding-right: 20px; */
+    background-color: #fff;
+}
+.bike p {
+    margin-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 20px;
+}
+.bike p:hover {
+    cursor: pointer;
+}
+.bike .smallimg {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 50px;
+    height: 50px;
+
+}
+.bike .smallimg img {
+    width: 100%;
+    height: 100%;
+}
+.bike .tiao {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 40px;
+}
+.bike .bigimg {
+    margin-left: 15px;
+    /* margin-right: 15px; */
+    margin-top: 20px;
+    width: 377px;
+}
+.bike .bigimg img {
+    width: 100%;
+}
+
+.ad {
+    flex:1;
+    position: relative;
+    margin-top: 10px;
+    margin-right: 10px;
+    background-color: #fff;
+}
+.ad p {
+    margin-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 20px;
+}
+.ad .smallimg {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 50px;
+    height: 50px;
+
+}
+.ad .smallimg img {
+    width: 100%;
+    height: 100%;
+}
+.ad .tiao {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 40px;
+}
+.ad .bigimg {
+    margin-left: 15px;
+    /* margin-right: 15px; */
+    margin-top: 20px;
+    width: 377px;
+}
+.ad .bigimg img {
+    width: 100%;
+}
+
+
+.other {
+    flex:1;
+    position: relative;
+    margin-top: 10px;
+    margin-right: 30px;
+    background-color: #fff;
+}
+.other p {
+    margin-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 20px;
+}
+.other .smallimg {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    width: 50px;
+    height: 50px;
+
+}
+.other .smallimg img {
+    width: 100%;
+    height: 100%;
+}
+.other .tiao {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 40px;
+}
+.other .bigimg {
+    margin-left: 15px;
+    /* margin-right: 15px; */
+    margin-top: 20px;
+    width: 377px;
+}
+.other .bigimg img {
+    width: 100%;
+}
+
+
+
+.bot3 {
+    height: 400px;
+}
+.more1 {
+    flex:1;
+    margin-top: 10px;
+    margin-left: 20px;
+    margin-right: 10px;
+    background-color: #fff;
+}
+.more2 {
+    flex:1;
+    margin-top: 10px;
+    margin-right: 10px;
+    background-color: #fff;
+}
+.more3 {
+    flex:1;
+    margin-top: 10px;
+    margin-right: 30px;
+    background-color: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+/* 模态框部分css */
+/*模态框*/
+.modal {
+    display: none; /* 默认隐藏 */
+    position: fixed; /* 根据浏览器定位 */
+    z-index: 1; /* 放在顶部 */
+    left: 0;
+    top: 0;
+    width: 100%; /* 全宽 */
+    height: 100%; /* 全高 */
+    overflow: auto; /* 允许滚动 */
+    background-color: rgba(0,0,0,0.4); /* 背景色 */
+    }
+/*模态框内容*/
+.modal-content {
+    display: flex; /*采用flexbox布局*/
+    flex-direction: column; /*垂直排列*/
+    position: relative;
+    background-color: #fefefe;
+    margin: 15% auto; /*距顶部15% 水平居中*/
+    padding:0 20px;
+    border: 1px solid #888;
+    width: 80%;
+    animation: topDown 0.4s; /* 自定义动画，从模态框内容上到下出现 */
+}
+
+/* @keyframes topDown {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+} */
+
+/*模态框头部*/
+.modal-header {
+    display: flex; /*采用flexbox布局*/
+    flex-direction: row; /*水平布局*/
+    align-items: center; /*内容垂直居中*/
+    justify-content: space-between; 
+}
+
+/*关闭X 样式*/
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

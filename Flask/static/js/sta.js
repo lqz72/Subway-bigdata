@@ -1,3 +1,54 @@
+//收缩框
+var nav = document.querySelector(".nav");
+var content = document.querySelector(".content");
+var taggle = document.querySelector(".mytoggle");
+var tohid = document.querySelectorAll(".nav span");
+var aa = document.querySelectorAll(".nav ul li a");
+var des = document.querySelectorAll("[data-ctt]");
+taggle.addEventListener('click',function()
+{
+    if(!state){
+        nav.style.width = '55px';
+        content.style.marginLeft = '50px';
+        state = 1;
+        // console.log(tohid);
+        for(var i=0;i<6;i++)
+        {
+            tohid[i].style.display = 'none';
+        }
+        for(var i=0;i<5;i++)
+        {
+            aa[i].dataset.ctt = '';
+        }
+
+    }
+    else{
+        nav.style.width = '250px';
+        content.style.marginLeft = '250px';
+        content.style.width = '1286px';
+        state = 0;
+        for(var i=0;i<6;i++)
+        {
+            tohid[i].style.display = 'inline';
+        }
+        for(var i=0;i<5;i++)
+        {
+            aa[i].dataset.ctt = '>';
+        }
+    }
+    week_line.resize();
+    hour_line.resize();
+    age_pie.resize();
+    schedule_line.resize();
+    aixin_bar.resize();
+});
+var state = 0;//表示未折叠
+var week_line;
+var hour_line;
+var age_pie;
+var schedule_line;
+var aixin_bar;
+
 var c_date = '2020-01-01';
 var c_staname = document.getElementById('sta_name').innerText;
 function change_data()
@@ -6,8 +57,8 @@ function change_data()
     //评分图
     var markgraph = echarts.init(document.querySelector("#markpre"));
     markgraph.setOption(option_marksta);
-    console.log(s_date)
-    console.log(c_staname);
+    // console.log(s_date)
+    // console.log(c_staname);
     //向后端传取数据代码写这儿------------------------------------
     var day_cmp = document.getElementById('day_cmp');
     var month_cmp = document.getElementById('month_cmp');
@@ -28,8 +79,7 @@ function change_data()
         }
     });
 
-    var week_line = echarts.init(document.getElementById('week_flow'));
-
+    week_line = echarts.init(document.getElementById('week_flow'));
     $.ajax({
         type: 'POST',
         url: '/sta/curr_week_flow',
@@ -42,14 +92,13 @@ function change_data()
                 in_flow.push(parseInt(result[each][0]));
                 out_flow.push(parseInt(result[each][1]));
             }
-
             week_line_opts.series[0].data = in_flow;
             week_line_opts.series[1].data = out_flow;
             week_line.setOption(week_line_opts);
         }
     })
     
-    var hour_line = echarts.init(document.getElementById('hour_flow'));
+    hour_line = echarts.init(document.getElementById('hour_flow'));
     $.ajax({
         type: 'POST',
         url: '/sta/curr_day_flow',
@@ -72,19 +121,18 @@ function change_data()
         }
     })
     
-    var age_pie = echarts.init(document.getElementById('age_structure'));
+    age_pie = echarts.init(document.getElementById('age_structure'));
     $.ajax({
         type: 'POST',
         url: '/sta/age/pie',
         data:  JSON.stringify({date: c_date, sta: c_staname}),
         dataType: 'json',
         success: function (result) {
-            
             age_pie.setOption(result);
         }
     })
 
-    var schedule_line = echarts.init(document.getElementById('schedule'));
+    schedule_line = echarts.init(document.getElementById('schedule'));
     $.ajax({
         type: 'POST',
         url: '/sta/schedule/line',
@@ -95,7 +143,7 @@ function change_data()
         }
     })
 
-    var aixin_bar = echarts.init(document.getElementById('aixin'));
+    aixin_bar = echarts.init(document.getElementById('aixin'));
     aixin_bar.setOption(aixin_bar_opts);
 }
 
@@ -119,6 +167,11 @@ layui.use('laydate', function(){
         }
     });
 });
+
+//使用进度条
+layui.use('element', function(){
+    var element = layui.element;
+  });
 
 // ---------词云
 var chart = echarts.init(document.getElementById('wordclouds'));
@@ -684,3 +737,53 @@ var aixin_bar_opts = {
         // }
     ]
 };
+
+
+//-----------------------模态框部分代码----------------------
+(function() {
+    /*建立模态框对象*/
+    var modalBox = {};
+
+    /*获取模态框*/
+    modalBox.modal = document.getElementById("myModal");
+
+    /*获得trigger按钮*/
+    modalBox.triggerBtn = document.getElementById("triggerBtn");
+
+    /*获得关闭按钮*/
+    modalBox.closeBtn = document.getElementById("closeBtn");
+
+    /*模态框显示*/
+    modalBox.show = function() {
+        console.log(this.modal);
+        this.modal.style.display = "block";
+    }
+
+    /*模态框关闭*/
+    modalBox.close = function() {
+        this.modal.style.display = "none";
+    }
+
+    /*当用户点击模态框内容之外的区域，模态框也会关闭*/
+    modalBox.outsideClick = function() {
+        var modal = this.modal;
+        window.onclick = function(event) {
+            if(event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+    /*模态框初始化*/
+    modalBox.init = function() {
+        var that = this;
+        this.triggerBtn.onclick = function() {
+            that.show();
+        }
+        this.closeBtn.onclick = function() {
+            that.close();
+        }
+        this.outsideClick();
+    }
+    modalBox.init();
+})();

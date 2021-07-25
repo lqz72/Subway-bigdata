@@ -9,107 +9,127 @@
   <script src="../static/js/echarts-wordcloud.min.js"></script>
 </head>
 <style>
-  .test {
-    margin-top: 100px;
-    margin-left: 200px;
-    width: 200px;
-    height: 200px;
-    background-color: pink;
+    /*模态框*/
+    .modal {
+    display: none; /* 默认隐藏 */
+    position: fixed; /* 根据浏览器定位 */
+    z-index: 1; /* 放在顶部 */
+    left: 0;
+    top: 0;
+    width: 100%; /* 全宽 */
+    height: 100%; /* 全高 */
+    overflow: auto; /* 允许滚动 */
+    background-color: rgba(0,0,0,0.4); /* 背景色 */
+    }
+    /*模态框内容*/
+    .modal-content {
+      display: flex; /*采用flexbox布局*/
+      flex-direction: column; /*垂直排列*/
+      position: relative;
+      background-color: #fefefe;
+      margin: 15% auto; /*距顶部15% 水平居中*/
+      padding:0 20px;
+      border: 1px solid #888;
+      width: 80%;
+      animation: topDown 0.4s; /* 自定义动画，从模态框内容上到下出现 */
+    }
+
+  /* @keyframes topDown {
+      from {top: -300px; opacity: 0}
+      to {top: 0; opacity: 1}
+  } */
+
+  /*模态框头部*/
+  .modal-header {
+      display: flex; /*采用flexbox布局*/
+      flex-direction: row; /*水平布局*/
+      align-items: center; /*内容垂直居中*/
+      justify-content: space-between; 
+  }
+
+  /*关闭X 样式*/
+  .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+  }
+
+  .close:hover {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
   }
 </style>
 <body>
-  <style>
-      /* html, body, #main {
-          width: 100%;
-          height: 100%;
-          margin: 0;
-      } */
-      #main {
-        width: 200px;
-        height: 200px;
-        margin-left: 200px;
-        margin-top: 100px;
-      }
-  </style>
-  <div id='main'></div>
+  <!-- 触发按钮 -->
+  <button id="triggerBtn">模态框</button>
+    
+  <!-- 模态框 -->
+  <div id="myModal" class="modal">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h2>头部</h2>
+              <span id="closeBtn" class="close">&times;</span>
+          </div>
+          <div class="modal-body">
+              <p>这是一个模态框！</p>
+              <p>喜欢就点个赞吧！</p>
+          </div>
+          <div class="modal-footer">
+              <h3>尾部</h3>
+          </div>
+      </div>
+  </div>
   <script>
-      var chart = echarts.init(document.getElementById('main'));
+    (function() {
+      /*建立模态框对象*/
+      var modalBox = {};
 
-      var option = {
-          tooltip: {},
-          series: [ {
-              type: 'wordCloud',
-              gridSize: 2,
-              sizeRange: [6, 30],
-              // sizeRange: [12, 50],
-              rotationRange: [-90, 90],
-              shape: 'pentagon',
-              width: 200,
-              height: 200,
-              drawOutOfBound: true,
-              textStyle: {
-                  color: function () {
-                      return 'rgb(' + [
-                          Math.round(Math.random() * 160),
-                          Math.round(Math.random() * 160),
-                          Math.round(Math.random() * 160)
-                      ].join(',') + ')';
-                  }
-              },
-              emphasis: {
-                  textStyle: {
-                      shadowBlur: 10,
-                      shadowColor: '#333'
-                  }
-              },
-              data: [
-                  {
-                      name: '通勤乘客',
-                      value: 10000,
-                      textStyle: {
-                          color: 'black'
-                      },
-                      emphasis: {
-                          textStyle: {
-                              color: 'red'
-                          }
-                      }
-                  },
-                  {
-                    name:"剁手党",
-                    value: 9100
-                  },
-                  {
-                    name:"购物达人",
-                    value: 3200
-                  },
-                  {
-                    name:"驴友",
-                    value: 8100
-                  },
-                  {
-                    name:"学生党",
-                    value: 6000
-                  },
-                  {
-                    name:"远距通勤者",
-                    value: 5100
-                  },
-                  {
-                    name:"夜行人",
-                    value: 3100
-                  },
-                  {
-                    name:"行动不便者",
-                    value: 1200
-                  }
-              ]
-          } ]
-      };
+      /*获取模态框*/
+      modalBox.modal = document.getElementById("myModal");
 
-      chart.setOption(option);
+      /*获得trigger按钮*/
+      modalBox.triggerBtn = document.getElementById("triggerBtn");
 
-      // window.onresize = chart.resize;
+      /*获得关闭按钮*/
+      modalBox.closeBtn = document.getElementById("closeBtn");
+
+      /*模态框显示*/
+      modalBox.show = function() {
+          console.log(this.modal);
+          this.modal.style.display = "block";
+      }
+
+      /*模态框关闭*/
+      modalBox.close = function() {
+          this.modal.style.display = "none";
+      }
+
+      /*当用户点击模态框内容之外的区域，模态框也会关闭*/
+      modalBox.outsideClick = function() {
+          var modal = this.modal;
+          window.onclick = function(event) {
+              if(event.target == modal) {
+                  modal.style.display = "none";
+              }
+          }
+      }
+
+      /*模态框初始化*/
+      modalBox.init = function() {
+          var that = this;
+          this.triggerBtn.onclick = function() {
+              that.show();
+          }
+          this.closeBtn.onclick = function() {
+              that.close();
+          }
+          this.outsideClick();
+      }
+      modalBox.init();
+    })();
+      
   </script>
 </body>
 </html>

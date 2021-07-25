@@ -1,3 +1,52 @@
+//收缩框
+var nav = document.querySelector(".nav");
+var content = document.querySelector(".content");
+var taggle = document.querySelector(".mytoggle");
+var tohid = document.querySelectorAll(".nav span");
+var aa = document.querySelectorAll(".nav ul li a");
+var des = document.querySelectorAll("[data-ctt]");
+taggle.addEventListener('click',function()
+{
+    if(!state){
+        nav.style.width = '55px';
+        content.style.marginLeft = '50px';
+        state = 1;
+        // console.log(tohid);
+        for(var i=0;i<6;i++)
+        {
+            tohid[i].style.display = 'none';
+        }
+        for(var i=0;i<5;i++)
+        {
+            aa[i].dataset.ctt = '';
+        }
+
+    }
+    else{
+        nav.style.width = '250px';
+        content.style.marginLeft = '250px';
+        content.style.width = '1286px';
+        state = 0;
+        for(var i=0;i<6;i++)
+        {
+            tohid[i].style.display = 'inline';
+        }
+        for(var i=0;i<5;i++)
+        {
+            aa[i].dataset.ctt = '>';
+        }
+    }
+    user_flow_line.resize();
+    age_bar.resize();
+    age_pie.resize();
+    linesChart.resize();
+});
+var state = 0;//表示未折叠
+var user_flow_line;
+var age_bar;
+var age_pie;
+
+
 // 点击详细信息
 var btn1 = document.querySelector('#btn_show');
 btn1.addEventListener('click',
@@ -6,16 +55,14 @@ function()
     location.href = '/userinfo';
 })
 
-//点击搜索后
-var btn_search = document.getElementById('btn_search');
-var user_id = document.getElementById('user_search');
-var userRecord;
-btn_search.onclick = function () {
+var userid = 'd4ec5a712f2b24ce226970a8d315dfce'; //默认显示
+function changedata()
+{
     //更改三条基本信息
     $.ajax({
         url: '/user/info',
         type: 'POST',
-        data: user_id.value,
+        data: userid,
         dataType: 'json',
         success: function(result){
             var id = document.getElementById('id');
@@ -30,11 +77,11 @@ btn_search.onclick = function () {
     });
 
     //更改右侧出行信息图表
-    var user_flow_line = echarts.init(document.getElementById('monthout'));
+    user_flow_line = echarts.init(document.getElementById('monthout'));
     $.ajax({
         type: 'POST',
         url: '/history/user_flow/line',
-        data: user_id.value,
+        data: userid,
         dataType: 'json',
         success: function (result) {    
             user_flow_line.setOption(result);
@@ -45,7 +92,7 @@ btn_search.onclick = function () {
     $.ajax({
         type:'post',
         url:'/user/trip_record',
-        data: user_id.value,
+        data: userid,
         success: function(data)
         {
             userRecord = data.reverse();
@@ -55,9 +102,6 @@ btn_search.onclick = function () {
             
             var html = template('historyshow', test);
             document.getElementById('outshow1').innerHTML = html;
-
-            var html2 = template('historylist', test);
-            document.getElementById('outshow2').innerHTML = html2;
             
             linesOption.series[1].data = getLinesData(userRecord, stations);
             linesChart.setOption(linesOption);
@@ -65,24 +109,32 @@ btn_search.onclick = function () {
     });
 }
 
-//顶上俩表
-var age_bar = echarts.init(document.getElementById('age_bar'));
-var age_pie = echarts.init(document.getElementById('age_pie'));
+//点击搜索后
+var btn_search = document.getElementById('btn_search');
+var user_id = document.getElementById('user_search');
+var userRecord;
+btn_search.onclick = function () {
+    userid = user_id.value;
+    changedata();
+    user_id.value = '';
+}
 
+//顶上俩表
+age_bar = echarts.init(document.getElementById('age_bar'));
+age_pie = echarts.init(document.getElementById('age_pie'));
 $.ajax({
     type: 'POST',
     url: 'history/age/pie',
-
+    async: true,
     dataType: 'json',
     success: function (result) {
         age_pie.setOption(result);
     }
 });
-
 $.ajax({
     type: 'POST',
     url: 'history/age/bar',
-
+    async: true,
     dataType: 'json',
     success: function (result) {
         age_bar.setOption(result);
@@ -90,59 +142,7 @@ $.ajax({
 });
 
 //默认显示
-var init_id = "d4ec5a712f2b24ce226970a8d315dfce";
-$.ajax({
-    url: '/user/info',
-    type: 'POST',
-    data: init_id,
-    dataType: 'json',
-    success: function(result){
-        var id = document.getElementById('id');
-        var age = document.getElementById('age');
-        var trips_num = document.getElementById('trips_num');
-        var im = document.querySelector('#user_img');
-        im.innerHTML = getCate(result.category).img;
-        id.innerHTML = result.id;
-        age.innerHTML = result.age;
-        trips_num.innerHTML = getCate(result.category).name;
-    }
-});
-
-var user_flow_line = echarts.init(document.getElementById('monthout'));
-
-$.ajax({
-    type: 'POST',
-    url: '/history/user_flow/line',
-    data: init_id,
-    dataType: 'json',
-    success: function (result) {        
-        user_flow_line.setOption(result);
-    }
-});
-
-$.ajax({
-    type:'post',
-    url: '/user/trip_record',
-    async: false,
-    data: init_id,
-    success: function(data)
-    {
-        orgin_data = data;
-        userRecord = data.reverse();
-        test = {title:'用户记录'};
-        test['list'] = data;
-        test['length'] = data.length;
-        var html = template('historyshow', test);
-        document.getElementById('outshow1').innerHTML = html;
-
-        var html2 = template('historylist', test);
-        document.getElementById('outshow2').innerHTML = html2;
-        
-        linesOption.series[1].data = getLinesData(userRecord, stations);
-        linesChart.setOption(linesOption);
-        console.log('success');
-    }
-});
+changedata();
 
 function getJsonData(url){
     var jsData;
@@ -352,3 +352,5 @@ function getCate(x)
     }
     return inf;
 }
+
+var test = 5;

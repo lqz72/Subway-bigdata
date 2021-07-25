@@ -1,3 +1,56 @@
+//收缩框
+var nav = document.querySelector(".nav");
+var content = document.querySelector(".content");
+var taggle = document.querySelector(".mytoggle");
+var tohid = document.querySelectorAll(".nav span");
+var aa = document.querySelectorAll(".nav ul li a");
+var des = document.querySelectorAll("[data-ctt]");
+taggle.addEventListener('click',function()
+{
+    if(!state){
+        nav.style.width = '55px';
+        content.style.marginLeft = '50px';
+        state = 1;
+        // console.log(tohid);
+        for(var i=0;i<6;i++)
+        {
+            tohid[i].style.display = 'none';
+        }
+        for(var i=0;i<5;i++)
+        {
+            aa[i].dataset.ctt = '';
+        }
+
+    }
+    else{
+        nav.style.width = '250px';
+        content.style.marginLeft = '250px';
+        content.style.width = '1286px';
+        state = 0;
+        for(var i=0;i<6;i++)
+        {
+            tohid[i].style.display = 'inline';
+        }
+        for(var i=0;i<5;i++)
+        {
+            aa[i].dataset.ctt = '>';
+        }
+    }
+    monthLine.resize();
+    weekLine.resize();
+    linePie.resize();
+    hourLine.resize();
+    evalRadar.resize();
+    graphChart.resize();
+});
+var state = 0;//表示未折叠
+var monthLine;
+var weekLine;
+var linePie;
+var hourLine;
+var evalRadar;
+var graphChart;
+
 var data_b = {};
 data_b['alg'] = 1;
 data_b['choose_wea'] = 3;
@@ -8,6 +61,7 @@ data_b['inout_s'] = 1;
 var alg; //选择的算法
 var choose_wea; //选择的天气
 var choose_temp; //选择的温度
+var flag = 0;//表示未选择温度,用于解决之前的bug
 
 //向后端传取数据代码写这儿,对象时s_data 为一个字符串（对象转化而来）
 function change_data()
@@ -15,7 +69,8 @@ function change_data()
     //转换成字符串的对象
     s_data = JSON.stringify(data_b);
     //评分图
-    var markgraph = echarts.init(document.querySelector("#markpre"));   
+    var markgraph = echarts.init(document.querySelector("#markpre"));            
+    //markgraph.setOption(option_markpre);
     $.ajax({
         url: '/pred/day/eval',
         type: 'POST',
@@ -26,8 +81,7 @@ function change_data()
             markpreOption.series[0].data[0].value = data['eval'];
             markgraph.setOption(markpreOption);
         }
-    });   
-    
+    });
 
     //更新进出站图表信息
     inout_s();
@@ -35,6 +89,7 @@ function change_data()
     $.ajax({
         url:"/api/weather_info/week",
         type:"POST",
+        async: true,
         data:data_b['c_date'],
         success: function(data){
             // console.log(data);
@@ -60,7 +115,10 @@ function change_data()
                 }
             }
             var t = parseInt(data[0].temp.substr(0,2));
-            temp_slider.setValue(t+5);
+            if(!flag){
+                temp_slider.setValue(t+5);
+            }
+            else flag = 0;
         }
     });
 
@@ -72,13 +130,13 @@ function change_data()
         dataType: 'json',
         async: true,
         success: function (data) {
-            console.log(data);
+            // console.log(data);
             change_dayinfomation(data);
         }
     })
 
     /*------------------pyecharts 图表------------------*/
-    var monthLine = echarts.init(document.getElementById('month_line'));
+    monthLine = echarts.init(document.getElementById('month_line'));
     $.ajax({
         url: '/pred/month/line',
         type: 'POST',
@@ -90,10 +148,11 @@ function change_data()
         }
     })
 
-    var weekLine = echarts.init(document.getElementById('week_line'));
+    weekLine = echarts.init(document.getElementById('week_line'));
     $.ajax({
         url: '/pred/week/line',
         type: 'POST',
+        async: true,
         data: s_data,
         dataType: 'json',
         success: function (option) {
@@ -101,10 +160,11 @@ function change_data()
         }
     })
 
-    var linePie = echarts.init(document.getElementById('line_pie'));
+    linePie = echarts.init(document.getElementById('line_pie'));
     $.ajax({
         url: '/pred/line/pie',
         type: 'POST',
+        async: true,
         data: s_data,
         dataType: 'json',
         success: function (option) {
@@ -112,10 +172,11 @@ function change_data()
         }
     })
 
-    var hourLine = echarts.init(document.getElementById('hour_line'));
+    hourLine = echarts.init(document.getElementById('hour_line'));
     $.ajax({
         url: '/pred/hour/line',
         type: 'POST',
+        async: true,
         data: s_data,
         dataType: 'json',
         success: function (option) {
@@ -123,10 +184,11 @@ function change_data()
         }
     })
 
-    var evalRadar = echarts.init(document.getElementById('eval_radar'));
+    evalRadar = echarts.init(document.getElementById('eval_radar'));
     $.ajax({
         url: '/pred/eval/radar',
         type: 'POST',
+        async: true,
         data: s_data,
         dataType: 'json',
         success: function (option) {
@@ -200,7 +262,7 @@ function inout_s()
 
     /*------------------echarts-----------------------*/
     //初始化图表
-    var graphChart = echarts.init(document.getElementById('graph'));
+    graphChart = echarts.init(document.getElementById('graph'));
     $.ajax({
         type: "POST",
         data: s_data,
@@ -210,6 +272,7 @@ function inout_s()
         success: function (result) {
             var hourFlow = result;
            // console.log(result);
+            stations = getJsonData('/api/sta/json')
             var hourFlowData = getHourFlowData(hourFlow, stations);
             graphOption = setGraphOptions(graphOption, hourFlowData);
             graphChart.setOption(graphOption);
@@ -230,6 +293,7 @@ apply.addEventListener('click',function(){
     data_b['choose_temp'] = choose_temp;
     
     change_data();
+    flag = 1;
 })
 //获取select值
 layui.use('form', function(){
@@ -266,6 +330,7 @@ layui.use('slider', function(){
         // console.log(value) //动态获取滑块数值
         //do something
         choose_temp = value;
+        // flag = 1;
       }
     });
   });
@@ -371,7 +436,8 @@ var markpreOption = {
     }]
 };
 
-var stations = getJsonData('/api/sta/json');
+
+var stations;
 var links = getJsonData('/api/link/json');
     
 //获取线路名称列表

@@ -10,7 +10,7 @@ taggle.addEventListener('click',function()
         nav.style.width = '55px';
         content.style.marginLeft = '50px';
         state = 1;
-        console.log(tohid);
+        // console.log(tohid);
         for(var i=0;i<6;i++)
         {
             tohid[i].style.display = 'none';
@@ -24,6 +24,7 @@ taggle.addEventListener('click',function()
     else{
         nav.style.width = '250px';
         content.style.marginLeft = '250px';
+        content.style.width = '1286px';
         state = 0;
         for(var i=0;i<6;i++)
         {
@@ -39,6 +40,7 @@ taggle.addEventListener('click',function()
     week_chart.resize();
     line_pie.resize();
     graphChart.resize();
+    inoutChart.resize();
     splitChart.resize();
     ODChart.resize();
 });
@@ -84,7 +86,7 @@ function updateinfo(data)
     else {
         yesstate.innerHTML = '&#xe608';
         yesstate.style.color = '#1296DB';
-        yesper.innerHTML = data.day_cmp + '%';
+        yesper.innerHTML = parseFloat(data.day_cmp) + '%';
     }
 
     if(data.month_cmp<0) {
@@ -95,7 +97,7 @@ function updateinfo(data)
     else {
         monthstate.innerHTML = '&#xe608';
         monthstate.style.color = '#1296DB';
-        monthper.innerHTML = data.month_cmp + '%';
+        monthper.innerHTML = parseFloat(data.month_cmp) + '%';
     }
 
     if(data.year_cmp<0) {
@@ -106,7 +108,7 @@ function updateinfo(data)
     else {
         yearstate.innerHTML = '&#xe608';
         yearstate.style.color = '#1296DB';
-        yearper.innerHTML = data.year_cmp + '%';
+        yearper.innerHTML = parseFloat(data.year_cmp) + '%';
     }
     
     var am_peak = document.querySelector("#am_peak");
@@ -150,7 +152,7 @@ function change()
         }
     });
 
-    var month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
+    month_chart = echarts.init(document.getElementById('month_line'), 'white', {renderer: 'canvas'});
     $.ajax({
         type: 'POST',
         data: value,
@@ -162,7 +164,7 @@ function change()
         }
     });
 
-    var week_chart = echarts.init(document.getElementById('curr_week_line'), 'white', {renderer: 'canvas'});
+    week_chart = echarts.init(document.getElementById('curr_week_line'), 'white', {renderer: 'canvas'});
     $.ajax({
         type: "POST",
         data: value,
@@ -197,7 +199,7 @@ function change()
         }
     });
 
-    var line_pie = echarts.init(document.getElementById('line_percent'));
+    line_pie = echarts.init(document.getElementById('line_percent'));
     $.ajax({
         type: "POST",
         data: value,

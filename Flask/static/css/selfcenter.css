@@ -41,11 +41,12 @@
 }
 .list {
     margin-left: 20px;
-    margin-right: 10px;
+    margin-right: 20px;
     margin-top: 20px;
     height: 570px;
     width: 100%;
     background-color: #fff;
+    flex:1;
     /* overflow: scroll; */
     /* border-collapse: collapse; */
     /* border-left: 1px solid #E9E9E9;

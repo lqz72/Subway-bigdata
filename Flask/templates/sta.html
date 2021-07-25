@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>轨道交通智慧系统</title>
+    <link rel="Shortcut Icon" href="../static/images/title.png" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/common.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename ='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename ='layui/css/layui.css') }}" media="all">
@@ -45,7 +46,7 @@
                 </div>
             </div>
 
-            <div class="addflex">
+            <div class="addflex mt55">
                 <!-- 搜索框 -->
                 <div class="searchsta" >
                     <form method = 'POST' action = '/sta/search'>
@@ -58,7 +59,7 @@
             
             <div class="addflex">
                 <div class="stainfo">
-                    <div class="sta_name" id = "sta_name">
+                    <div class="sta_name" id = "sta_name" style="font-size: 30px;">
                         {{sta_name}}
                     </div>
                     <div class="addflex">
@@ -136,15 +137,56 @@
                 </div>
             </div>
             
-            <div class="addflex">
-                
-            </div>
-
-            <div class="addflex">
-                <div class="itemadvice">
-                    <img src="../static/images/sta.png" alt="">
+            <div class="addflex top3">
+                <div class="bike">
+                    <p id='triggerBtn'>共享单车投放策略</p>
+                    <div class="smallimg">
+                        <img src="../static/images/bikesmall.png" alt="">
+                    </div>
+                    <div class="layui-progress tiao">
+                        <div class="layui-progress-bar  layui-bg-blue" lay-percent="85%" ></div>
+                    </div>
+                    <div class="bigimg">
+                        <img src="../static/images/bikebig_03.png" alt="">
+                    </div>
+                </div>
+                <div class="ad">
+                    <p>广告投放策略</p>
+                    <div class="smallimg">
+                        <img src="../static/images/adsmall2.png" alt="">
+                    </div>
+                    <div class="layui-progress tiao">
+                        <div class="layui-progress-bar layui-bg-red" lay-percent="75%" ></div>
+                    </div>
+                    <div class="bigimg">
+                        <img src="../static/images/adbig_03.png" alt="">
+                    </div>
+                </div>
+                <div class="other">
+                    <p>其它辅助规划建议</p>
+                    <div class="smallimg">
+                        <img src="../static/images/othersmall.png" alt="">
+                    </div>
+                    <div class="layui-progress tiao">
+                        <div class="layui-progress-bar" lay-percent="75%" ></div>
+                    </div>
+                    <div class="bigimg">
+                        <img src="../static/images/otherbig_03.png" alt="">
+                    </div>
                 </div>
             </div>
+            <div class="addflex bot3">
+                <div class="more1">
+
+                </div>
+                <div class="more2">
+
+                </div>
+                <div class="more3">
+                    
+                </div>
+            </div>
+
             
             <div class="addflex">
                 <div class="agestructure" id ="age_structure">
@@ -160,6 +202,24 @@
 
 
  
+        </div>
+    </div>
+
+
+    <!-- 模态框 -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>头部</h2>
+                <span id="closeBtn" class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>这是一个模态框！</p>
+                <p>喜欢就点个赞吧！</p>
+            </div>
+            <div class="modal-footer">
+                <h3>尾部</h3>
+            </div>
         </div>
     </div>
     
