@@ -73,7 +73,7 @@ function change_data()
     var markgraph = echarts.init(document.querySelector("#markpre"));            
     //markgraph.setOption(option_markpre);
     $.ajax({
-        url: '/pred/day_eval',
+        url: '/pred/day/eval',
         type: 'POST',
         data: s_data,
         dataType: 'json',
@@ -125,7 +125,7 @@ function change_data()
 
     //更新当日总体预测信息
     $.ajax({
-        url: '/pred/day_info',
+        url: '/pred/day/info',
         type: 'POST',
         data: s_data,
         dataType: 'json',
@@ -255,7 +255,7 @@ function change_dayinfomation(data)
     element.progress('peakrate', rate);
 }
 
-//进出站和上行下行改变的代码写这儿
+//进出站改变的代码写这儿
 function inout_s()
 {
     s_data = JSON.stringify(data_b);
@@ -267,29 +267,22 @@ function inout_s()
     $.ajax({
         type: "POST",
         data: s_data,
-        url: 'pred/route_map',
+        url: 'pred/hour_flow',
         dataType: 'json',
         async: true,
-        success: function (result) {  
-            stations = getJsonData('/api/sta/json');
-
-            if(data_b['graphtaggle'] == 0){
-                var hourFlowData = getHourFlowData(result, stations);
-                graphOption = setGraphOptions(graphOption, hourFlowData);
-                graphChart.setOption(graphOption);
-            }
-            else{
-                var sectionFlowData = getSectionGraphData(stations, links, result);
-                sectionGraphOption = setSectionGraphOptions(sectionGraphOption, sectionFlowData);
-                graphChart.setOption(sectionGraphOption);
-            }
-            
+        success: function (result) {
+            var hourFlow = result;
+            console.log(result);
+            stations = getJsonData('/api/sta/json')
+            var hourFlowData = getHourFlowData(hourFlow, stations);
+            graphOption = setGraphOptions(graphOption, hourFlowData);
+            graphChart.setOption(graphOption);
         }
     });
     /*------------------------------------------------*/
 }
 
-//用户选择控件tailai
+//用户选择控件
 var apply = document.querySelector("#apply");
 apply.addEventListener('click',function(){
     data_b['alg'] = alg;
@@ -703,181 +696,4 @@ function getHourFlowData(hourFlow, stations) {
         alertStations.push(hourAlertList);
     }
     return hourFlowList;
-}
-
-//断面客流图表
-var sectionGraphOption = {
-    timeline: {
-        axisType: 'category',
-        show: true,
-        autoPlay: false,
-        playInterval: 1000,
-        padding: [0, 150, 0, 150],
-        data: ['7-9时段', '16-18时段']
-    },
-    title: {
-        text: '早晚时段断面客流'
-    },
-    color: ['#0000FF', '#EE1822', '#F39C12', '#FF00FF', '#800080', '#00FF00', '#00FFFF', '#FFFF00'], 
-    backgroundColor: '#fff',
-    coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
-    xAxis: {
-        show: false,
-        min: 50,
-        max: 2300,
-        axisPointer: {
-            show: true
-        },
-    },
-    yAxis: {
-        show: false,
-        min: 0,
-        max: 2000,
-        axisPointer: {
-            show: true
-        },
-    },
-    tooltip: {
-        trigger: 'item',
-        formatter: function (param) {
-            console.log(param);
-            let label = "";
-            if (param.dataType == 'edge') {
-                label = `线路断面: ${param.name} <br> 断面客流: ${param.value}人次`;
-            }
-            else if(param.dataType == 'node'){
-                label = `站点名称: ${param.name}`;
-            }
-
-            return label;
-        }
-    },
-    // legend: legend,
-    series: [
-        // 用关系图实现地铁地图
-        {
-            type: "graph",
-            zlevel: 5,
-            draggable: false,
-            coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
-            categories :categories,
-            edgeSymbolSize: [0, 8], //边两端的标记大小，可以是一个数组分别指定两端，也可以是单个统一指定
-            edgeLabel: {
-              normal: {
-                textStyle: {
-                  fontSize: 60
-                }
-              }
-            },
-            symbol: "rect",
-            symbolOffset: ["15%", 0],
-            label: {
-                normal: {
-                    show: false,
-                }
-            },
-            lineStyle: {
-                normal: {
-                    opacity: 0.7, //线条透明度
-                    curveness: 0, //站点间连线曲度，0表示直线
-                    width: 4, //线条宽度
-                }
-            }
-        },
-    ],
-    options: []
-}
-
-//配置图表属性
-function setSectionGraphOptions(option, sectionFlowData) {
-    option.options = [];
-    var text_list = ['7:00-10:00时间段', '16:00-17:00时间段'];
-    for (let i = 0; i <= 1; i++){ 
-        option.options.push({
-            title: {
-                text: text_list[i] + '断面客流分布情况',
-                textStyle: {
-                    color: 'black',
-                    fontSize: 20
-                },
-                x: 'center',
-                top: 10
-            },
-            series: [{
-                    type: "graph",
-                    data: sectionFlowData['station'][i].staList,
-                    links: sectionFlowData['section'][i].linkList,
-                },
-            ]
-        },
-        
-        )    
-    }
-    return option;
-}
-
-function getSectionGraphData(stations, links, sectionFlow) {
-    var hourList = ['7', '16'];
-    var staHourList = [];
-
-    for (let i = 0; i <= 1; i++) {
-        var hourObj = {};
-        hourObj.staList = [];
-        stations.forEach(function (station) {
-            var staName = station.name;
-            var sta = JSON.parse(JSON.stringify(station));
-
-            if (lineNames.indexOf(sta.name) == -1) {
-                sta.label.show = false 
-                sta.itemStyle.color = '#fff';
-                sta.itemStyle.borderColor = '#fff';
-                sta.itemStyle.show=false;
-                sta.symbolSize = [2, 2];  
-            } 
-            hourObj.staList.push(sta);
-        });
-        staHourList.push(hourObj);
-    }
-    
-    var sectionHourList = [{}, {}];
-    for(let j = 0; j <= 1; j++){
-        sectionHourList[j].linkList = [];
-        links.forEach(function (link){
-            var sectionItem =JSON.parse(JSON.stringify(link));;
-            var target = sectionItem.target;
-            var source = sectionItem.source;
-            var section = source + '-' + target;
-            var revsection = target + '-' + source;
-            
-            var flow = 0;
-            if(sectionFlow[hourList[j]][section]){
-                flow = sectionFlow[hourList[j]][section];
-            }
-            else if(sectionFlow[hourList[j]][revsection]){
-                flow = sectionFlow[hourList[j]][revsection];
-            }
-
-            sectionItem.value = flow;
-            if(flow >= 0 && flow < 50){
-                sectionItem.lineStyle.normal.color = '#23c768';
-            }
-            else if(flow >= 50 && flow < 100){
-                sectionItem.lineStyle.normal.color = '#99ff4d';
-            }
-            else if(flow >= 100 && flow < 150){
-                sectionItem.lineStyle.normal.color = '#FDD56A';
-            }
-            else if(flow >= 150 && flow < 200){
-                sectionItem.lineStyle.normal.color = '#ff7e00';
-            }
-            else if(flow >= 200){
-                sectionItem.lineStyle.normal.color = '#fe0000';
-            }
-       
-            sectionHourList[j].linkList.push(sectionItem);
-        })
-    } 
-
-    return {'station': staHourList, 'section': sectionHourList};
-
 }
