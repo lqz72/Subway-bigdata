@@ -131,15 +131,76 @@ $.ajax({
         age_pie.setOption(result);
     }
 });
+//柱状图
 $.ajax({
     type: 'POST',
     url: 'history/age/bar',
     async: true,
     dataType: 'json',
     success: function (result) {
-        age_bar.setOption(result);
+        console.log(result);
+        option_agebar.series[0].data = result.series[0].data;
+        age_bar.setOption(option_agebar);
     }
 });
+
+// 用户年龄结构柱状图选项
+option_agebar = {
+    title:{
+        text:'用户年龄结构柱状图',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: ['0-20岁', '21-30岁', '31-40岁', '41-50岁', '51-60岁'],
+            axisTick: {
+                show: false,
+                alignWithLabel: true
+            },
+            axisLine: {
+                show:true,
+                symbol:['none', 'arrow'],
+                symbolSize:[5,10]
+            }
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+            name: '占比(%)',
+            axisLine: {
+                show:true,
+                symbol:['none', 'arrow'],
+                symbolSize:[5,10]
+            }
+        }
+    ],
+    series: [
+        {
+            name: '',
+            type: 'bar',
+            barWidth: '40%',
+            data: [10, 52, 200, 334, 390]
+        }
+    ]
+};
+
 
 //默认显示
 changedata();
@@ -301,8 +362,6 @@ function getLinesData(userRecord, stations) {
     return coordsList;
 }
 
-linesOption.series[1].data = getLinesData(userRecord, stations);
-linesChart.setOption(linesOption);
 
 linesChart.on('click', function(param){
     let linesData = {

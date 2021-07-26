@@ -64,15 +64,12 @@
                     </div>
                     <div class="addflex">
                         <div class="locinfo">
-                            <div class="graph">
-                                站点位置
-                                <div class="instance">
-                                    <img src="{{ url_for('static', filename = 'images/line' + sta_info.line[:-2] + '.png') }}" alt="">
-                                </div>
+                            <p id = 'area'>所属区域：<span>{{sta_info.area}}</span></p>
+                            <p id = 'line'>所属线路：<span>{{sta_info.line}}</span></p>
+                            <p id = 'dict'>所属功能区域：<span>开发区</span> </p>
+                            <div class="img">
+                                <img src="../static/images/zhuzhaiqu.jpg" alt="">
                             </div>
-                            <p id = 'area'>所属区域：{{sta_info.area}}</p>
-                            <p id = 'line'>所属线路：{{sta_info.line}}</p>
-                            <p id = 'dict'>所属功能区域：居住区</p>
                         </div>
                         <div class="datainfo">
                             <p>客流量对比</p>
@@ -139,7 +136,7 @@
             
             <div class="addflex top3">
                 <div class="bike">
-                    <p id='triggerBtn'>共享单车投放策略</p>
+                    <p id='triggerBtn'>公交接驳</p>
                     <div class="smallimg">
                         <img src="../static/images/bikesmall.png" alt="">
                     </div>
@@ -151,7 +148,7 @@
                     </div>
                 </div>
                 <div class="ad">
-                    <p>广告投放策略</p>
+                    <p>广告投放</p>
                     <div class="smallimg">
                         <img src="../static/images/adsmall2.png" alt="">
                     </div>
@@ -163,7 +160,7 @@
                     </div>
                 </div>
                 <div class="other">
-                    <p>其它辅助规划建议</p>
+                    <p>列车运行图调整</p>
                     <div class="smallimg">
                         <img src="../static/images/othersmall.png" alt="">
                     </div>
@@ -175,7 +172,7 @@
                     </div>
                 </div>
             </div>
-            <div class="addflex bot3">
+            <!-- <div class="addflex bot3">
                 <div class="more1">
 
                 </div>
@@ -185,7 +182,7 @@
                 <div class="more3">
                     
                 </div>
-            </div>
+            </div> -->
 
             
             <div class="addflex">

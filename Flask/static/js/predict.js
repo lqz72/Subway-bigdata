@@ -56,7 +56,8 @@ data_b['alg'] = 1;
 data_b['choose_wea'] = 3;
 data_b['choose_temp'] = 28;
 data_b['c_date'] = "2020-07-17";
-data_b['inout_s'] = 1;
+data_b['inout_s'] = 0;
+data_b['graphtaggle'] = 0; //切换进出/断面,0表示进出
 
 var alg; //选择的算法
 var choose_wea; //选择的天气
@@ -258,7 +259,7 @@ function change_dayinfomation(data)
 function inout_s()
 {
     s_data = JSON.stringify(data_b);
-    // console.log(s_data);
+    console.log(s_data);
 
     /*------------------echarts-----------------------*/
     //初始化图表
@@ -271,7 +272,7 @@ function inout_s()
         async: true,
         success: function (result) {
             var hourFlow = result;
-           // console.log(result);
+            console.log(result);
             stations = getJsonData('/api/sta/json')
             var hourFlowData = getHourFlowData(hourFlow, stations);
             graphOption = setGraphOptions(graphOption, hourFlowData);
@@ -335,15 +336,73 @@ layui.use('slider', function(){
     });
   });
 
-layui.use('form', function(){
-    var form = layui.form;
-    //各种基于事件的操作，下面会有进一步介绍
-    form.on('radio', function(data){
-        data_b['inout_s'] = data.value;
-        // console.log(data_b);
+// layui.use('form', function(){
+//     var form = layui.form;
+//     //各种基于事件的操作，下面会有进一步介绍
+//     form.on('radio', function(data){
+//         data_b['inout_s'] = data.value;
+//         // console.log(data_b);
+//         inout_s();
+//     }); 
+// });
+// <!-- <div class="layui-form-item bug1">
+//                         <!-- <label class="layui-form-label">客流方向</label> -->
+//                         <!-- <div class="layui-input-block m-radio bug2">
+//                         <input type="radio" name="sex" value="0" title='入站' id='btnin'>
+//                         <input type="radio" name="sex" value="1" title="出站" id='btnout' checked>
+//                         </div>
+//                     </div>
+//                     --> -->
+
+//获取自定义tab
+var tabsta = document.querySelector("#tabsta");
+var tabcut = document.querySelector("#tabcut");
+
+var tabin = document.querySelector("#tabin");
+var tabout = document.querySelector("#tabout");
+tabsta.addEventListener('click',function()
+{
+    if(data_b['graphtaggle']==1)
+    {
+        data_b['graphtaggle'] = 0;
+        tabsta.style.backgroundColor = '#6EBACC';
+        tabcut.style.backgroundColor = '#fff';
+        tabin.innerHTML = '入站';
+        tabout.innerHTML = '出站';
+    }
+})
+tabcut.addEventListener('click',function()
+{
+    if(data_b['graphtaggle']==0)
+    {
+        data_b['graphtaggle'] = 1;
+        tabsta.style.backgroundColor = '#fff';
+        tabcut.style.backgroundColor = '#6EBACC';
+        tabin.innerHTML = '上行';
+        tabout.innerHTML = '下行';
+    }
+})
+
+tabin.addEventListener('click',function()
+{
+    if(data_b['inout_s']==1)
+    {
+        data_b['inout_s']=0;
+        tabin.style.backgroundColor = '#5FB878';
+        tabout.style.backgroundColor = '#fff';
         inout_s();
-    }); 
-});
+    }
+})
+tabout.addEventListener('click',function()
+{
+    if(data_b['inout_s']==0)
+    {
+        data_b['inout_s']=1;
+        tabin.style.backgroundColor = '#fff';
+        tabout.style.backgroundColor = '#5FB878';
+        inout_s();
+    }
+})
 
 
 //日历控件

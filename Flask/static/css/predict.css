@@ -8,8 +8,6 @@
     background-color: #ffffff;
 }
 .weather .todayweatherpre {
-    float: left;
-    width: 313px;
     display: flex;
     flex:1;
     height: 175px;
@@ -37,7 +35,7 @@
     height: 173px;
     /* border: solid 1px black; */
     background-color: #fff;
-    padding-right: 30px;
+    /* padding-right: 30px; */
     /* padding-left: 30px; */
 }
 .weather .todayweatherpre>.description p {
@@ -66,8 +64,7 @@
 .weather .ctrl {
     float: left;
     position: relative;
-    width: 313px;
-    padding-left: 30px;
+    padding-left: 0px;
     flex:1;
     height: 175px;
     /* margin-bottom: 10px; */
@@ -90,7 +87,7 @@
 }
 .weather .ctrl em {
     position: absolute;
-    left: 60px;
+    left: 30px;
     bottom: 13px;
     z-index: 99999;
 }
@@ -105,6 +102,26 @@
     top: 7px;
     z-index: 99999;
 }
+.weather .tips {
+    width: 250px;
+    /* background-color: pink; */
+    height: 175px;
+    border-bottom: 2px solid #e2e0e0;
+}
+.weather .tips .advice {
+    border: 1px solid pink;
+    border-radius: 8px;
+    box-shadow: 1px 1px 1px 1px rgba(0,0,0,0.1);
+    margin-top: 62px;
+    margin-left: 60px;
+    text-align: center;
+    width: 130px;
+    height: 60px;
+    line-height: 30px;
+}
+
+
+
 .weather .nextdayspre {
     float: left;
     width: 626px;
@@ -163,10 +180,9 @@
     height: 100px;
     line-height: 100px;
     margin-bottom: 10px;
-    font-size: 50px;
-    color: transparent;
-    -webkit-text-stroke: 1px red;
-    letter-spacing: 0.04em;
+    font-size: 60px;
+    color: red;
+    font-family: 'electronicFont';
 }
 .info2 {
     flex:1;
@@ -193,6 +209,7 @@
 .info2 .addyes span {
     color: #000;
     font-size: 30px;
+    font-family: 'electronicFont';
     vertical-align: middle;
 }
 .info2 .addmonth {
@@ -210,6 +227,7 @@
 .info2 .addmonth span {
     color: #000;
     font-size: 30px;
+    font-family: 'electronicFont';
     vertical-align: middle;
 }
 .info2 .addyear {
@@ -227,6 +245,7 @@
 .info2 .addyear span {
     color: #000;
     font-size: 30px;
+    font-family: 'electronicFont';
     vertical-align: middle;
 }
 .info3 {
@@ -258,7 +277,8 @@
 }
 .info3 .morning span {
     margin-left: 50px;
-    font-size: 30px;
+    font-size: 40px;
+    font-family: 'electronicFont';
     color:#000;
 }
 .info3 .evening {
@@ -278,7 +298,8 @@
 }
 .info3 .evening span {
     margin-left: 50px;
-    font-size: 30px;
+    font-size: 40px;
+    font-family: 'electronicFont';
     color:#000;
 }
 .info4 {
@@ -294,6 +315,7 @@
 .info4 .words {
     margin-top: 20px;
     font-size: 30px;
+    font-family: 'electronicFont';
     text-align: center;
 }
 .info4 .per {
@@ -434,10 +456,60 @@
 .graphpre {
     float: left;
     flex:1;
+    position: relative;
     width: 910px;
     height: 700px;
     margin: 10px 30px 0 20px;
     background-color: #ffffff;
+}
+.graphpre .mytab {
+    position: absolute;
+    display: flex;
+    z-index: 99999;
+    height: 40px;
+    width: 100px;
+    left: 30px;
+    top: 30px;
+}
+.graphpre .mytab li {
+    flex:1;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border : 1px solid #E3E3E3;
+    /* visibility: hidden; */
+}
+.graphpre .mytab li:hover {
+    cursor: pointer;
+}
+.graphpre .mytab .left {
+    background-color: #6EBACC;
+    border-right: none;
+}
+
+.graphpre .selfinout {
+    position: absolute;
+    display: flex;
+    z-index: 99999;
+    height: 40px;
+    width: 100px;
+    right: 25px;
+    top: 80px;
+}
+.graphpre .selfinout li {
+    flex:1;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border : 1px solid #E3E3E3;
+    /* visibility: hidden; */
+}
+.graphpre .selfinout li:hover {
+    cursor: pointer;
+}
+.graphpre .selfinout .left {
+    background-color: #5FB878;
+    border-right: none;
 }
 
 
@@ -494,8 +566,9 @@
 }
 .m-radio {
     position: absolute;
-    left: 70%;
+    right: 10%;
     top: 10%;
+    /* display: 'none'; */
 }
 .graphpre {
     position: relative;
