@@ -201,7 +201,6 @@ option_agebar = {
     ]
 };
 
-
 //默认显示
 changedata();
 
@@ -357,6 +356,8 @@ function getLinesData(userRecord, stations) {
         }
         data['source'] = source;
         data['target'] = target;
+        data['beginTime'] = userRecord[i][1];
+        data['arrivedTime'] = userRecord[i][3];
         coordsList.push(data);
     }
     return coordsList;
@@ -364,21 +365,18 @@ function getLinesData(userRecord, stations) {
 
 
 linesChart.on('click', function(param){
+    console.log(param);
+
     let linesData = {
         'source': param.data.source,
         'target': param.data.target,
-        'coords': param.data.coords
+        'beginTime': param.data.beginTime,
+        'arrivedTime': param.data.arrivedTime,
     };
-    console.log(linesData);
-    $.ajax({
-        url:'',
-        type: 'POST',
-        data: linesData,
-        dataType: 'json',
-        success: function (){
-
-        }
-    });
+    document.getElementById('source').innerHTML = param.data.source;
+    document.getElementById('target').innerHTML = param.data.target;
+    document.getElementById('beginTime').innerHTML = param.data.beginTime;
+    document.getElementById('arrivedTime').innerHTML = param.data.arrivedTime;
 });
 
 //获取分类信息 

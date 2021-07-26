@@ -56,7 +56,19 @@ function change_data()
     var s_date = JSON.stringify(c_date);//得到的字符串
     //评分图
     var markgraph = echarts.init(document.querySelector("#markpre"));
-    markgraph.setOption(option_marksta);
+    markgraph.setOption(markOption);
+
+    $.ajax({
+        url: '/sta/curr_day_eval',
+        type: 'POST',
+        data: JSON.stringify({date: c_date, sta: c_staname}),
+        dataType: 'json',
+        async: true,
+        success: function (data) {
+            markOption.series[0].data[0].value = data['score'];
+            markgraph.setOption(markOption);
+        }
+    });
     // console.log(s_date)
     // console.log(c_staname);
     //向后端传取数据代码写这儿------------------------------------
@@ -271,7 +283,7 @@ chart.setOption(option);
 //选项和函数全部写这儿------------------------------------
 
 //评分选项
-var option_marksta = {
+var markOption = {
     series: [{
         type: 'gauge',
         axisLine: {
@@ -719,22 +731,6 @@ var aixin_bar_opts = {
             },
             color:['#73ACFF']
         },
-        // {
-        //     name: '降水量',
-        //     type: 'bar',
-        //     data: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3],
-        //     markPoint: {
-        //         data: [
-        //             {name: '年最高', value: 182.2, xAxis: 7, yAxis: 183},
-        //             {name: '年最低', value: 2.3, xAxis: 11, yAxis: 3}
-        //         ]
-        //     },
-        //     markLine: {
-        //         data: [
-        //             {type: 'average', name: '平均值'}
-        //         ]
-        //     }
-        // }
     ]
 };
 

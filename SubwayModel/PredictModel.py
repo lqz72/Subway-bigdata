@@ -42,8 +42,8 @@ class BaseModel(object):
 
         self.feature_day = SQLOS.get_df_data('feature_day')
 
-        # self.feature_up_section = SQLOS.get_df_data('feature_up_section')
-        # self.feature_down_section = SQLOS.get_df_data('feature_down_section')
+        self.feature_up_section = SQLOS.get_df_data('feature_up_section')
+        self.feature_down_section = SQLOS.get_df_data('feature_down_section')
 
         # self.feature_in_hour = SQLOS.get_df_data('feature_in_hour')
         # self.feature_out_hour = SQLOS.get_df_data('feature_out_hour')
@@ -224,6 +224,7 @@ class MLPredictor(BaseModel):
         Dataframe: 特征集
         """
         feature_df = self.feature_up_section.copy() if _type == 'up' else self.feature_down_section.copy()
+
         feature_df = feature_df[feature_df.section.isin([section]) & feature_df.hour.isin([hour])]
 
         feature_df.drop(['section', 'hour'], axis=1, inplace=True)
@@ -233,7 +234,7 @@ class MLPredictor(BaseModel):
         feature_df.day = pd.to_datetime(feature_df.day)
         feature_df.set_index('day', inplace=True)
         feature_df = self.feature_coding(feature_df)
-
+        
         return feature_df
 
     def feature_coding(self, feature_df):
@@ -1026,20 +1027,22 @@ class ArimaModel(BaseModel):
 if __name__ == '__main__':
     ml = MLPredictor()
 
-    #######断面客流预测
+    #####断面客流预测
     # up_feature = ml.feature_up_section
     # down_feature = ml.feature_down_section
+
     # df = pd.DataFrame({'day':[], 'weekday':[],'month': [], 'y':[], 'section':[], 'hour':[]})
-    # section_list = down_feature.section.unique()
+    # section_list = up_feature.section.unique()
     # for hour in ['7', '16']:
     #     for section in section_list:
-    #         feature_df = ml.get_section_feature(section, hour, 'down')
-    #         predict_df = ml.forecast_section_flow(feature_df, 'downline/{}/{}'.format(hour, section))
+    #         print('------', section)
+    #         feature_df = ml.get_section_feature(section, hour, 'up')
+    #         predict_df = ml.forecast_section_flow(feature_df, 'upline/{}/{}'.format(hour, section))
     #         predict_df.reset_index(level='day', inplace =True)
     #         predict_df['section'] = section
     #         predict_df['hour'] = hour
     #         df = pd.concat([df, predict_df])
-    # df.to_csv('./pred_down_section.csv', encoding='gb18030', index=False)
+    # df.to_csv('./pred_up_section.csv', encoding='gb18030', index=False)
 
     # ml.forecast_by_factor('2020-07-17', choose_wea = '阴', choose_temp = '22')
     # j = 0

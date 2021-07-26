@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import datetime
 import warnings
+import math
 import json
 import os
 warnings.filterwarnings('ignore')
@@ -279,7 +280,8 @@ class DataApi(object):
         
         sta_dict = {
                 'line': sta_df['line'].tolist()[0],
-                'area': sta_df['area'].tolist()[0][4:]
+                'area': sta_df['area'].tolist()[0][4:],
+                'category': sta_df['category'].tolist()[0]
         }
         return sta_dict
 
@@ -987,14 +989,30 @@ class DataApi(object):
 
         return hour_personnel
 
+    def get_his_sta_score(self, date, station):
+        """
+        求历史的站点评分
+        """
+        sta_flow = self.get_sta_hour_flow(date, station)
+
+        flow = 0
+        for i in range(0, len(sta_flow)):
+            flow += sta_flow[i + 6]
+        score = 0.712 - 0.436 * math.log(flow)
+
+        return score
+
 if __name__ == '__main__':
     api = DataApi()
+    # api.get_split_flow()
 
+    # res= api.get_line_split('1号线')
+    # print(res)
     #####断面预测训练数据合并
     # line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
     # split_list = []
     # for line in line_list:
-    #     split_list.extend(api.get_line_split(line, flag = 'down')) 
+    #     split_list.extend(api.get_line_split(line, flag = 'up')) 
     
     # feature_df = pd.read_csv('./csv_data/feature/feature_day.csv', encoding='gb18030')
     # feature_df.drop(['y', 'MA3'], axis = 1, inplace =True)
@@ -1008,7 +1026,7 @@ if __name__ == '__main__':
 
     # for hours in ['7', '16']:
     #     for split in split_list:
-    #         df = pd.read_csv('./csv_data/downline/{}/{}.csv'.format(hours, split), encoding='gb18030')
+    #         df = pd.read_csv('./csv_data/upline/{}/{}.csv'.format(hours, split), encoding='gb18030')
     #         df.day = pd.to_datetime(df.day)
     #         df.drop(['line'], axis=1, inplace =True)
     #         temp_df = feature_df.copy()
@@ -1018,7 +1036,7 @@ if __name__ == '__main__':
     #         ddf = pd.concat([ddf, temp_df])
 
     # ddf.reset_index(level='day', inplace=True)
-    # ddf.to_csv('./csv_data/downline/feature_down_section.csv', encoding='gb18030', index=False)
+    # ddf.to_csv('./csv_data/upline/feature_up_section.csv', encoding='gb18030', index=False)
     
     # api.get_split_flow()
     # begin = time.time()

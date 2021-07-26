@@ -2,13 +2,15 @@ import re
 import json
 import datetime
 import random
+import numpy as np
 from flask import request, redirect
 from flask import jsonify
 from flask import Blueprint
 
 from MakeChart import ChartApi
+from apps import pred_api
 from apps import api
-
+ 
 station_bp = Blueprint('station_bp', __name__, url_prefix='/sta')
 
 @station_bp.route('/search', methods=['POST', 'GET'])
@@ -23,7 +25,7 @@ def sta_search():
 def sta_thisday_info():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
-
+    
     station = param_dict['sta']
     date = param_dict['date']
 
@@ -62,6 +64,47 @@ def sta_curr_day_flow():
     flow_dict = api.get_sta_curr_day_flow(date, station)
 
     return jsonify(flow_dict)
+
+@station_bp.route('/curr_day_eval', methods=['POST', 'GET'])
+def sta_curr_day_eval():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    station = param_dict['sta']
+    date = param_dict['date']
+
+    cur_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    end_time = datetime.datetime.strptime('2020-07-16', '%Y-%m-%d')
+    
+    one_day = datetime.timedelta(days=1)
+
+    index = 0
+    score_list = []
+    if cur_date > end_time:
+        day_list = ['2020-07-17', '2020-07-18', '2020-07-19', '2020-07-20', 
+                '2020-07-21', '2020-07-22', '2020-07-23']
+
+        date = pred_api.time_map(date)
+        index = day_list.index(date)
+
+        for day in day_list:
+            score_list.append(pred_api.get_pre_sta_score(day, station))
+    else:
+        score_list = [api.get_his_sta_score(date, station)]
+        for i in range(6):
+            cur_date += one_day
+            date = cur_date.strftime('%Y-%m-%d')
+            if cur_date > end_time:
+                score_list.append(pred_api.get_pre_sta_score(date, station))
+            else:
+                score_list.append(api.get_his_sta_score(date, station))
+
+    score_list = np.array(score_list)
+    _range = np.max(score_list) - np.min(score_list)
+    res = (score_list - np.min(score_list)) / _range
+
+    return jsonify({'score': int(res[index] * 100)})
+
 
 @station_bp.route('/age/pie', methods=['POST', 'GET'])
 def sta_age_pie():

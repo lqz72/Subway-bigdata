@@ -4,6 +4,7 @@ from DataAnalysis import DataApi
 from PredictModel import *
 from MysqlOS import SQLOS
 import datetime
+import math
 import os
 
 class PredictApi(object):
@@ -638,17 +639,32 @@ class PredictApi(object):
         hour_dict = dict.fromkeys(hour_list, 0)
         for hour in hour_list:
             df = day_df[day_df.hour.isin([hour])]
+            
             section_list = df.section.tolist()
-            prediction = day_df.y.tolist()
+            prediction = df.y.tolist()
 
             hour_dict[hour] = dict(zip(section_list, prediction))
 
         return hour_dict
 
+    def get_pre_sta_score(self, date, station):
+        """
+        求未来的站点评分
+        """
+        sta_all_flow = self.get_sta_hour_flow(date, 'all')
+        sta_flow = sta_all_flow[station]
+
+        flow = 0
+        for i in range(0, len(sta_flow)):
+            flow += sta_flow[i + 6]
+        score = 0.712 - 0.436 * math.log(flow)
+
+        return score
+
 if __name__ == '__main__':
     pred_api = PredictApi()
-    res = pred_api.get_section_flow('2020-07-17')
-    print(res)
+    # res = pred_api.get_section_flow('2020-07-17')
+    # print(res)
     # res = pred_api.get_day_sta_flow('2020-07-21')
     # print(res)
     # ml = MLPredictor()

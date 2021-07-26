@@ -9,20 +9,20 @@ from apps import api, pred_api
 predict_bp = Blueprint('predict_view', __name__, url_prefix='/pred')
 
 @predict_bp.route('/hour_flow', methods=['POST', 'GET'])
-def pred_out_hour_flow():
+def pred_in_out_hour_flow():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
 
     date = param_dict['c_date']
-    type_ = param_dict['inout_s']
+    _type = param_dict['inout_s']
 
     date = pred_api.time_map(date)
 
-    flow_dict = pred_api.get_sta_hour_flow(date, type_)
+    flow_dict = pred_api.get_sta_hour_flow(date, _type)
 
     return jsonify(flow_dict)
 
-@predict_bp.route('/day/info', methods=['POST', 'GET'])
+@predict_bp.route('/day_info', methods=['POST', 'GET'])
 def pred_day_info():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -34,7 +34,7 @@ def pred_day_info():
 
     return jsonify(day_info)
 
-@predict_bp.route('/day/eval', methods=['POST', 'GET'])
+@predict_bp.route('/day_eval', methods=['POST', 'GET'])
 def pred_day_eval():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
@@ -48,6 +48,36 @@ def pred_day_eval():
 
     return jsonify({'eval': int(result * 100)})
 
+@predict_bp.route('/section_flow', methods=['POST', 'GET'])
+def pred_section_flow():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+    date = param_dict['c_date']
+
+    date = pred_api.time_map(date)
+    
+    section_flow = pred_api.get_section_flow(date, 'up')
+
+    return jsonify(section_flow)
+
+@predict_bp.route('/route_map', methods=['POST', 'GET'])
+def pred_route_map_data():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    date = param_dict['c_date']
+    graph_type = param_dict['graphtaggle']
+    print(param_dict)
+    date = pred_api.time_map(date)
+    
+    if graph_type == 1:
+        show_type = 'down' if param_dict['inout_s'] else 'up'
+        flow_data = pred_api.get_section_flow(date, show_type)
+    else:
+        show_type = 'out' if param_dict['inout_s'] else 'in'
+        flow_data = pred_api.get_sta_hour_flow(date, show_type)
+
+    return jsonify(flow_data)
 
 ################Pyecharts
 @predict_bp.route('/month/line', methods=['POST', 'GET'])
