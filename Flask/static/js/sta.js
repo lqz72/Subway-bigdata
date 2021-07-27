@@ -56,8 +56,7 @@ function change_data()
     var s_date = JSON.stringify(c_date);//得到的字符串
     //评分图
     var markgraph = echarts.init(document.querySelector("#markpre"));
-    markgraph.setOption(markOption);
-
+    // markgraph.setOption(option_marksta);
     $.ajax({
         url: '/sta/curr_day_eval',
         type: 'POST',
@@ -68,7 +67,8 @@ function change_data()
             markOption.series[0].data[0].value = data['score'];
             markgraph.setOption(markOption);
         }
-    });
+    })
+
     // console.log(s_date)
     // console.log(c_staname);
     //向后端传取数据代码写这儿------------------------------------
@@ -80,6 +80,7 @@ function change_data()
     $.ajax({
         type: 'POST',
         data: JSON.stringify({date: c_date, sta: c_staname}),
+        async: true,
         url: '/sta/thisday_info',
         dataType: 'json',
         success: function (result) {
@@ -96,6 +97,7 @@ function change_data()
         type: 'POST',
         url: '/sta/curr_week_flow',
         data:  JSON.stringify({date: c_date, sta: c_staname}),
+        async: true,
         dataType: 'json',
         success: function (result) {
             var in_flow = [];
@@ -115,6 +117,7 @@ function change_data()
         type: 'POST',
         url: '/sta/curr_day_flow',
         data:  JSON.stringify({date: c_date, sta: c_staname}),
+        async: true,
         dataType: 'json',
         success: function (result) {
             console.log(result);
@@ -137,9 +140,17 @@ function change_data()
     $.ajax({
         type: 'POST',
         url: '/sta/age/pie',
+        async: true,
         data:  JSON.stringify({date: c_date, sta: c_staname}),
         dataType: 'json',
         success: function (result) {
+            result.title= {
+                text: '用户年龄结构分布',
+                left: 'center',
+                textStyle: {
+                    fontWeight: 400
+                }
+            };
             age_pie.setOption(result);
         }
     })
@@ -149,9 +160,13 @@ function change_data()
         type: 'POST',
         url: '/sta/schedule/line',
         data:  JSON.stringify({date: c_date, sta: c_staname}),
+        async: true,
         dataType: 'json',
         success: function (result) {
-            schedule_line.setOption(result);
+            // schedule_line.setOption(result);
+            option_scheline.xAxis.data = result.xAxis.data;
+            option_scheline.series[0].data = result.series[0].data;
+            schedule_line.setOption(option_scheline);
         }
     })
 
@@ -184,6 +199,88 @@ layui.use('laydate', function(){
 layui.use('element', function(){
     var element = layui.element;
   });
+
+//scheduleline option
+option_scheline = {
+    title: {
+        text: '地铁人员调度',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    grid: {
+        left: '2%',
+        right: '8%',
+        bottom: '3%',
+        containLabel: true
+    //     show: true,// 显示边框
+    //   borderColor: '#012f4a',// 边框颜色
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        axisTick: {
+            show: false,
+            alignWithLabel: true
+        },
+        name: '时',
+        data: [],
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    yAxis: {
+        type: 'value',
+        name: '人数',
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    series: [
+        {
+            type: 'line',
+            data: [10, 11, 13, 11, 12, 12, 9],
+            markLine: {
+                symbol: 'none',
+                data: [
+                    {
+                        type: 'average', 
+                        name: '平均值'
+                
+                    }
+                ],
+                label: {
+                    show:true,
+                    formatter: '平均值:{c}',
+                    position:'insideEndBottom'
+                }
+            },
+            smooth: true,
+            // 设置拐点 小圆点
+            symbol: "circle",
+            // 拐点大小
+            symbolSize: 8,
+            // 设置拐点颜色以及边框
+            itemStyle: {
+                // color: "#0184d5",
+                borderColor: "rgba(221, 220, 107, .4)",
+                borderWidth: 12
+            },
+            // 开始不显示拐点， 鼠标经过显示
+            showSymbol: false,
+            // 填充区域
+            // areaStyle: { }
+        }
+    ]
+};
 
 // ---------词云
 var chart = echarts.init(document.getElementById('wordclouds'));
@@ -340,12 +437,18 @@ var week_line_opts =  {
     title: {
         text: '本周进出站客流分布',
         left: "center",
-        // textStyle: {
-        //     color: '#999',
-        //     fontSize: 14
-        // }
+        textStyle: {
+            fontWeight: 400
+        }
     },
-    grid: [{bottom: "10%"}],
+    grid: {
+        left: '2%',
+        right: '3%',
+        bottom: '3%',
+        containLabel: true
+    //     show: true,// 显示边框
+    //   borderColor: '#012f4a',// 边框颜色
+    },
     legend: {
         show: true,
         icon: 'circle',
@@ -360,7 +463,11 @@ var week_line_opts =  {
     xAxis: [{
         type: 'category',
         data:  ['周一', '周二', '周三', '周四', '周五', '周六', '周末'],
-        boundaryGap: false
+        boundaryGap: false,
+        axisTick: {
+            show: false,
+            alignWithLabel: true
+        },
     }],
     yAxis: [{
         name: '客流/人次',
@@ -494,7 +601,9 @@ var hour_line_opts = {
     title: {
         text: '本站小时客流分布',
         left: 'center',
-        // top: '5%'
+        textStyle: {
+            fontWeight: 400
+        }
     },
     legend: {
         icon: 'circle',
@@ -695,7 +804,10 @@ var hour_line_opts = {
 var aixin_bar_opts = {
     title: {
         text: '爱心专座比例调整',
-        left: 'center'
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
     },
     grid:[{bottom:"10%"}],
     tooltip: {
@@ -731,6 +843,22 @@ var aixin_bar_opts = {
             },
             color:['#73ACFF']
         },
+        // {
+        //     name: '降水量',
+        //     type: 'bar',
+        //     data: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3],
+        //     markPoint: {
+        //         data: [
+        //             {name: '年最高', value: 182.2, xAxis: 7, yAxis: 183},
+        //             {name: '年最低', value: 2.3, xAxis: 11, yAxis: 3}
+        //         ]
+        //     },
+        //     markLine: {
+        //         data: [
+        //             {type: 'average', name: '平均值'}
+        //         ]
+        //     }
+        // }
     ]
 };
 
@@ -748,6 +876,101 @@ var aixin_bar_opts = {
 
     /*获得关闭按钮*/
     modalBox.closeBtn = document.getElementById("closeBtn");
+
+    /*模态框显示*/
+    modalBox.show = function() {
+        console.log(this.modal);
+        this.modal.style.display = "block";
+    }
+
+    /*模态框关闭*/
+    modalBox.close = function() {
+        this.modal.style.display = "none";
+    }
+
+    /*当用户点击模态框内容之外的区域，模态框也会关闭*/
+    modalBox.outsideClick = function() {
+        var modal = this.modal;
+        window.onclick = function(event) {
+            if(event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+    /*模态框初始化*/
+    modalBox.init = function() {
+        var that = this;
+        this.triggerBtn.onclick = function() {
+            that.show();
+        }
+        this.closeBtn.onclick = function() {
+            that.close();
+        }
+        this.outsideClick();
+    }
+    modalBox.init();
+})();
+(function() {
+    /*建立模态框对象*/
+    var modalBox = {};
+
+    /*获取模态框*/
+    modalBox.modal = document.getElementById("myModal2");
+
+    /*获得trigger按钮*/
+    modalBox.triggerBtn = document.getElementById("triggerBtn2");
+
+    /*获得关闭按钮*/
+    modalBox.closeBtn = document.getElementById("closeBtn2");
+
+    /*模态框显示*/
+    modalBox.show = function() {
+        console.log(this.modal);
+        this.modal.style.display = "block";
+    }
+
+    /*模态框关闭*/
+    modalBox.close = function() {
+        this.modal.style.display = "none";
+    }
+
+    /*当用户点击模态框内容之外的区域，模态框也会关闭*/
+    modalBox.outsideClick = function() {
+        var modal = this.modal;
+        window.onclick = function(event) {
+            if(event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+    /*模态框初始化*/
+    modalBox.init = function() {
+        var that = this;
+        this.triggerBtn.onclick = function() {
+            that.show();
+        }
+        this.closeBtn.onclick = function() {
+            that.close();
+        }
+        this.outsideClick();
+    }
+    modalBox.init();
+})();
+
+(function() {
+    /*建立模态框对象*/
+    var modalBox = {};
+
+    /*获取模态框*/
+    modalBox.modal = document.getElementById("myModal3");
+
+    /*获得trigger按钮*/
+    modalBox.triggerBtn = document.getElementById("triggerBtn3");
+
+    /*获得关闭按钮*/
+    modalBox.closeBtn = document.getElementById("closeBtn3");
 
     /*模态框显示*/
     modalBox.show = function() {

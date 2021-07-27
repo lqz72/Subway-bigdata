@@ -144,8 +144,11 @@ function change_data()
         data: s_data,
         dataType: 'json',
         async: true,
-        success: function (option) {
-            monthLine.setOption(option);
+        success: function (result) {
+            // monthLine.setOption(option);
+            option_monthline.xAxis.data = result.xAxis.data;
+            option_monthline.series[0].data = result.series[0].data;
+            monthLine.setOption(option_monthline);
         }
     })
 
@@ -156,8 +159,11 @@ function change_data()
         async: true,
         data: s_data,
         dataType: 'json',
-        success: function (option) {
-            weekLine.setOption(option);
+        success: function (result) {
+            // weekLine.setOption(option);
+            option_weekbar.xAxis[0].data = result.xAxis[0].data;
+            option_weekbar.series[0].data = result.series[0].data;
+            weekLine.setOption(option_weekbar);
         }
     })
 
@@ -169,6 +175,13 @@ function change_data()
         data: s_data,
         dataType: 'json',
         success: function (option) {
+            option.title = {
+                text: '线路流量占比',
+                left: 'center',
+                textStyle: {
+                    fontWeight: 400
+                }
+            };
             linePie.setOption(option);
         }
     })
@@ -180,8 +193,11 @@ function change_data()
         async: true,
         data: s_data,
         dataType: 'json',
-        success: function (option) {
-            hourLine.setOption(option);
+        success: function (result) {
+            // hourLine.setOption(option);
+            option_hourline.xAxis.data = result.xAxis.data;
+            option_hourline.series[0].data = result.series[0].data;
+            hourLine.setOption(option_hourline);
         }
     })
 
@@ -276,11 +292,25 @@ function inout_s()
             if(data_b['graphtaggle'] == 0){
                 var hourFlowData = getHourFlowData(result, stations);
                 graphOption = setGraphOptions(graphOption, hourFlowData);
+                graphOption.title = {
+                    text: '用户出行轨迹',
+                    left: 'left',
+                    textStyle: {
+                        fontWeight: 400
+                    }
+                };
                 graphChart.setOption(graphOption);
             }
             else{
                 var sectionFlowData = getSectionGraphData(stations, links, result);
                 sectionGraphOption = setSectionGraphOptions(sectionGraphOption, sectionFlowData);
+                sectionGraphOption.title = {
+                    text: '用户出行轨迹',
+                    left: 'left',
+                    textStyle: {
+                        fontWeight: 400
+                    }
+                };
                 graphChart.setOption(sectionGraphOption);
             }
             
@@ -881,3 +911,233 @@ function getSectionGraphData(stations, links, sectionFlow) {
     return {'station': staHourList, 'section': sectionHourList};
 
 }
+
+
+//单月客流选项
+var option_monthline = {
+    title: {
+        text: '本月客流波动预测',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    color: '#5873C7',
+    tooltip: {
+        trigger: 'axis'
+    },    
+    grid: {
+        left: '2%',
+        right: '9%',
+        bottom: '3%',
+        containLabel: true
+    //     show: true,// 显示边框
+    //   borderColor: '#012f4a',// 边框颜色
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        axisTick: {
+            show: false,
+            alignWithLabel: true
+        },
+        name: '日期',
+        
+        data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    },
+    yAxis: {
+        type: 'value',
+        name: '客流量(人次)',
+        // axisLine: {
+        //     show:true,
+        //     symbol:['none', 'arrow'],
+        //     symbolSize:[5,10]
+        // }
+    },
+    series: [
+        {
+            type: 'line',
+            data: [10, 11, 13, 11, 12, 12, 9],
+            // markPoint: {
+            //     data: [
+            //         {type: 'max', name: '最大值'}
+            //     ]
+            // },
+            // markLine: {
+            //     symbol: 'none',
+            //     data: [
+            //         {
+            //             type: 'average', 
+            //             name: '平均值'
+                
+            //         }
+            //     ],
+            //     label: {
+            //         show:true,
+            //         formatter: '平均值:{c}',
+            //         position:'insideEndTop'
+            //     }
+            // },
+            // smooth: true,
+            // 设置拐点 小圆点
+            symbol: "circle",
+            // 拐点大小
+            symbolSize: 8,
+            // 设置拐点颜色以及边框
+            itemStyle: {
+                // color: "#0184d5",
+                borderColor: "rgba(221, 220, 107, .4)",
+                borderWidth: 12
+            },
+            // 开始不显示拐点， 鼠标经过显示
+            showSymbol: false,
+            // 填充区域
+            areaStyle: { }
+        }
+    ]
+};
+
+//本周客流柱形图option
+var option_weekbar = {
+    color:'#37A2DA',
+    title:{
+        text:'本周客流柱形图',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: [
+        {
+            type: 'category',
+            data: [],
+            axisTick: {
+                show: false,
+                alignWithLabel: true
+            },
+            axisLine: {
+                show:true,
+                symbol:['none', 'arrow'],
+                symbolSize:[5,10]
+            }
+        }
+    ],
+    yAxis: [
+        {
+            type: 'value',
+            name: '客流量(人次)',
+            axisLine: {
+                show:true,
+                symbol:['none', 'arrow'],
+                symbolSize:[5,10]
+            }
+        }
+    ],
+    series: [
+        {
+            name: '',
+            type: 'bar',
+            barWidth: '40%',
+            data: [10, 52, 200, 334, 390]
+        }
+    ]
+};
+
+//小时客流分布预测选项
+option_hourline = {
+    title: {
+        text: '当日小时客流变化预测',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    grid: {
+        left: '2%',
+        right: '5%',
+        bottom: '3%',
+        containLabel: true
+    //     show: true,// 显示边框
+    //   borderColor: '#012f4a',// 边框颜色
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        axisTick: {
+            show: false,
+            alignWithLabel: true
+        },
+        name: '时',
+        data: [],
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    yAxis: {
+        type: 'value',
+        name: '客流量(人次)',
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    series: [
+        {
+            type: 'line',
+            data: [10, 11, 13, 11, 12, 12, 9],
+            markPoint: {
+                data: [
+                    {type: 'max', name: '最大值'}
+                ]
+            },
+            markLine: {
+                symbol: 'none',
+                data: [
+                    {
+                        type: 'average', 
+                        name: '平均值'
+                
+                    }
+                ],
+                label: {
+                    show:true,
+                    formatter: '平均值:{c}',
+                    position:'insideEndTop'
+                }
+            },
+            smooth: true,
+            // 设置拐点 小圆点
+            symbol: "circle",
+            // 拐点大小
+            symbolSize: 8,
+            // 设置拐点颜色以及边框
+            itemStyle: {
+                // color: "#0184d5",
+                borderColor: "rgba(221, 220, 107, .4)",
+                borderWidth: 12
+            },
+            // 开始不显示拐点， 鼠标经过显示
+            showSymbol: false,
+            // 填充区域
+            // areaStyle: { }
+        }
+    ]
+};

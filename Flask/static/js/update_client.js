@@ -84,7 +84,10 @@ function changedata()
         data: userid,
         dataType: 'json',
         success: function (result) {    
-            user_flow_line.setOption(result);
+            // user_flow_line.setOption(result);
+            option_outline.xAxis.data = result.xAxis.data;
+            option_outline.series[0].data = result.series[0].data;
+            user_flow_line.setOption(option_outline);
         }
     });
 
@@ -128,6 +131,14 @@ $.ajax({
     async: true,
     dataType: 'json',
     success: function (result) {
+        result.color =  ['#006cff', '#60cda0', '#ed8884', '#ff9f7f', '#0096ff', '#9fe6b8', '#32c5e9', '#1d9dff'];
+        result.title = {
+            text: '用户年龄结构分布',
+            left: 'center',
+            textStyle: {
+                fontWeight: 400
+            }
+        }
         age_pie.setOption(result);
     }
 });
@@ -153,6 +164,7 @@ option_agebar = {
             fontWeight: 400
         }
     },
+    
     tooltip: {
         trigger: 'axis',
         axisPointer: {            // 坐标轴指示器，坐标轴触发有效
@@ -240,8 +252,12 @@ var legend = [{ data: lineNames, orient: 'vertical', top: '20%', right: '2%'  }]
 var categories = lineNames.map(lineName => { return { name: lineName } });
 
 var linesOption = {
-    title: {
-        text: '用户出行轨迹'
+    title : {
+        text: '用户出行轨迹',
+        left: 'left',
+        textStyle: {
+            fontWeight: 400
+        }
     },
     backgroundColor: '#fff',
     coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
@@ -409,5 +425,72 @@ function getCate(x)
     }
     return inf;
 }
+
+option_outline = {
+    title: {
+        text: '每月出行次数变化',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    grid: {
+        left: '5%',
+        right: '8%',
+        bottom: '3%',
+        containLabel: true
+    //     show: true,// 显示边框
+    //   borderColor: '#012f4a',// 边框颜色
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        axisTick: {
+            show: false,
+            alignWithLabel: true
+        },
+        name: '月',
+        data: [],
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    yAxis: {
+        type: 'value',
+        name: '出行次数',
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    series: [
+        {
+            type: 'line',
+            data: [10, 11, 13, 11, 12, 12, 9],
+            smooth: true,
+            // 设置拐点 小圆点
+            symbol: "circle",
+            // 拐点大小
+            symbolSize: 8,
+            // 设置拐点颜色以及边框
+            itemStyle: {
+                // color: "#0184d5",
+                borderColor: "rgba(221, 220, 107, .4)",
+                borderWidth: 12
+            },
+            // 开始不显示拐点， 鼠标经过显示
+            showSymbol: false,
+            // 填充区域
+            // areaStyle: { }
+        }
+    ]
+};
+
 
 var test = 5;

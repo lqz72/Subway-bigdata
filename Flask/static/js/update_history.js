@@ -215,6 +215,13 @@ function change()
         url: "/history/line/pie",
         dataType: 'json',
         success: function (result) {
+            result.title = {
+                text: '线路流量占比',
+                left: 'center',
+                textStyle: {
+                    fontWeight: 400
+                }
+            };
             line_pie.setOption(result);
         }
     });
@@ -243,6 +250,13 @@ function change()
             var hourFlowData = res['hourFlow'];
             var alertStations = res['alertStations'];
             setGraphOptions(graphOption, hourFlowData, alertStations);
+            graphOption.title = {
+                text: '线路流量占比',
+                left: 'center',
+                textStyle: {
+                    fontWeight: 400
+                }
+            };
             graphChart.setOption(graphOption);
         }
     });
@@ -270,6 +284,13 @@ function change()
             }
 
             setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
+            barOption.title = {
+                text: '线路流量占比',
+                left: 'center',
+                textStyle: {
+                    fontWeight: 400
+                }
+            };
             splitChart.setOption(barOption);
         }
     });
@@ -290,7 +311,15 @@ function change()
             var stationNames = Object.keys(result);
             
             getODFlowData(result, ODLinks, ODstations, stationNames);
+            
             setODOption(ODOption, ODstations, ODLinks);
+            ODOption.title = {
+                text: '线路流量占比',
+                left: 'center',
+                textStyle: {
+                    fontWeight: 400
+                }
+            };
             ODChart.setOption(ODOption);
         }
     });
@@ -305,6 +334,13 @@ function change()
         dataType: 'json',
         success: function (param) {
             setAreaInoutChart(param[0], param[1], param[2]);
+            inoutOption.title = {
+                text: '线路流量占比',
+                left: 'center',
+                textStyle: {
+                    fontWeight: 400
+                }
+            };
             inoutChart.setOption(inoutOption);
         }
     });

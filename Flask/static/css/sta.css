@@ -159,7 +159,7 @@ button {
     font-size: 20px;
 }
 .stainfo .cloud .yun {
-    height: 220px;
+    height: 205px;
     width: 100%;
     /* background-color: pink; */
 }
@@ -455,6 +455,8 @@ button {
 }
 .bike p:hover {
     cursor: pointer;
+    /* color:#1E9FFF; */
+    color: #6EBACC;
 }
 .bike .smallimg {
     position: absolute;
@@ -496,6 +498,11 @@ button {
     padding-right: 20px;
     font-size: 20px;
 }
+.ad p:hover {
+    cursor: pointer;
+    /* color: #FF5722; */
+    color: #6EBACC;
+}
 .ad .smallimg {
     position: absolute;
     right: 20px;
@@ -536,6 +543,10 @@ button {
     padding-left: 20px;
     padding-right: 20px;
     font-size: 20px;
+}
+.other p:hover {
+    cursor: pointer;
+    color: #6EBACC;
 }
 .other .smallimg {
     position: absolute;
@@ -603,24 +614,23 @@ button {
 .modal {
     display: none; /* 默认隐藏 */
     position: fixed; /* 根据浏览器定位 */
-    z-index: 1; /* 放在顶部 */
+    z-index: 99999; /* 放在顶部 */
     left: 0;
     top: 0;
     width: 100%; /* 全宽 */
     height: 100%; /* 全高 */
-    overflow: auto; /* 允许滚动 */
+     /*overflow: auto; 允许滚动 */
     background-color: rgba(0,0,0,0.4); /* 背景色 */
     }
 /*模态框内容*/
 .modal-content {
-    display: flex; /*采用flexbox布局*/
-    flex-direction: column; /*垂直排列*/
     position: relative;
     background-color: #fefefe;
-    margin: 15% auto; /*距顶部15% 水平居中*/
-    padding:0 20px;
+    margin: 0 auto; /*距顶部15% 水平居中*/
+    margin-top: 50px;
+    padding:20px;
     border: 1px solid #888;
-    width: 80%;
+    width: 60%;
     animation: topDown 0.4s; /* 自定义动画，从模态框内容上到下出现 */
 }
 
@@ -628,13 +638,18 @@ button {
     from {top: -300px; opacity: 0}
     to {top: 0; opacity: 1}
 } */
+.close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+}
 
 /*模态框头部*/
 .modal-header {
-    display: flex; /*采用flexbox布局*/
-    flex-direction: row; /*水平布局*/
-    align-items: center; /*内容垂直居中*/
-    justify-content: space-between; 
+   
+}
+.modal-header h2 {
+    text-align: center;
 }
 
 /*关闭X 样式*/
@@ -649,4 +664,43 @@ button {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+/* 第一个模态框 */
+.tolbike {
+    margin-top: 20px;
+    margin-left: 20px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 18px;
+}
+.tolbike span {
+    font-family: electronicFont;
+    margin-left: 50px;
+    font-size: 40px;
+}
+.bikegraph {
+    flex:1;
+    margin-left: 80px;
+    margin-right: 80px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    background-color: pink;
+    height: 400px;
+}
+.bus {
+    margin-left: 20px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 18px;
+}
+.bus span {
+    font-family: electronicFont;
+    margin-left: 50px;
+    margin-right: 10px;
+    font-size: 40px;
+}
+.bus span em {
+    margin-left: 10px;
+    font-size: 18px;
 }
