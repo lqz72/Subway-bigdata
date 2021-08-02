@@ -105,6 +105,96 @@ def sta_curr_day_eval():
 
     return jsonify({'score': int(res[index] * 100)})
 
+@station_bp.route('/curr_day/bicycle_num', methods=['POST', 'GET'])
+def sta_curr_day_bicycle_num():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    station = param_dict['sta']
+    date = param_dict['date']
+
+    cur_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    end_time = datetime.datetime.strptime('2020-07-16', '%Y-%m-%d')
+
+    if cur_date > end_time:
+        date = pred_api.time_map(date)
+        res = pred_api.get_pre_bicycles_num(date, station)
+    else:
+        res = api.get_his_bicycles_num(date, station)
+
+    hour_list = [str(i) for i in range(6, 22)]
+
+    return jsonify((hour_list, res))
+
+@station_bp.route('/curr_day/bus_interval', methods=['POST', 'GET'])
+def sta_curr_day_bus_interval():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    station = param_dict['sta']
+    date = param_dict['date']
+
+    cur_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    end_time = datetime.datetime.strptime('2020-07-16', '%Y-%m-%d')
+
+    if cur_date > end_time:
+        date = pred_api.time_map(date)
+        res = pred_api.get_pre_bus_interval(date, station)
+    else:
+        res = api.get_his_bus_interval(date, station)
+
+    hour_list = [str(i) for i in range(6, 22)]
+
+    return jsonify((hour_list, res))
+
+@station_bp.route('/curr_day/adver_ratio', methods=['POST', 'GET'])
+def sta_curr_day_adver_ratio():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    station = param_dict['sta']
+    date = param_dict['date']
+
+    cur_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    end_time = datetime.datetime.strptime('2020-07-16', '%Y-%m-%d')
+
+    if cur_date > end_time:
+        day_delta = end_time - cur_date
+        after_date = cur_date - day_delta
+        date = after_date.strftime('%Y-%m-%d')
+        res = api.get_his_adver_ratio(date, station)
+    else:
+        res = api.get_his_adver_ratio(date, station)
+
+    ad_list = ["数码", "运动", "男装", "美妆", "母婴", "女装"]
+
+    return jsonify((ad_list, res))
+
+@station_bp.route('/curr_day/run_info/<int:subway_num>', methods=['POST', 'GET'])
+def sta_curr_day_run_info(subway_num):
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    station = param_dict['sta']
+    date = param_dict['date']
+
+    cur_date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    end_time = datetime.datetime.strptime('2020-07-16', '%Y-%m-%d')
+
+    if cur_date > end_time:
+        date = pred_api.time_map(date)
+        res = pred_api.get_pre_subway_run(date, station)
+    else:
+        res = api.get_his_subway_run(date, station)
+
+    x_axis, y_axis = res[1], res[2]
+    axis_pair = [(x_axis, y_axis)]
+    if subway_num > 1:
+        for i in range(0, subway_num - 1):
+            x_axis = list(map(lambda x : x + res[0], x_axis)) 
+            axis_pair.append((x_axis, y_axis))
+            
+    return jsonify(axis_pair)
 
 @station_bp.route('/age/pie', methods=['POST', 'GET'])
 def sta_age_pie():

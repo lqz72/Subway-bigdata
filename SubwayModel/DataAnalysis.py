@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-from ShortestPath import *
-from MysqlOS import SQLOS
 import pandas as pd
 import numpy as np
 import datetime
-import warnings
-import math
+import math, random
 import json
 import os
+import warnings
 warnings.filterwarnings('ignore')
+
+from ShortestPath import *
+from MysqlOS import SQLOS
 
 class DataApi(object):
     """提供数据分析结果接口
@@ -948,6 +949,32 @@ class DataApi(object):
 
         return label, percent
 
+    def get_sta_sex_ratio(self, date, station):
+        """
+        获取出入本站的乘客性别比例
+        返回一个元组 分别为男性和女性的占比
+        """
+        in_df, out_df = self.in_df.loc[date], self.out_df.loc[date]
+        user_df = self.user_df.copy().set_index('user_id')
+       
+        sta_in_df = in_df[in_df['in_sta_name'].isin([station])]
+        sta_out_df = out_df[out_df['out_sta_name'].isin([station])]
+
+        sta_df = sta_in_df.append(sta_out_df)
+
+        user_list = sta_df['user_id'].unique()
+
+        user_df = self.user_df.copy()
+        user_df = user_df[user_df.user_id.isin(user_list)]
+
+        female_num = user_df.sex.astype('int').sum()
+        male_num = user_df.shape[0] - female_num
+        
+        male_ratio = round(male_num / user_df.shape[0], 2)
+        female_ratio = round(female_num / user_df.shape[0], 2)
+
+        return male_ratio, female_ratio
+
     def get_area_in_out_flow(self, date, category):
         """
         获取城市分区的点入和点出
@@ -984,8 +1011,8 @@ class DataApi(object):
         """
         sta_flow = self.get_sta_hour_flow(date,station)
         hour_personnel = {}
-        for i in range(0,len(sta_flow)):
-            hour_personnel[i+6] = int(sta_flow[i+6]*2.5+2.02+0.06*15-0.125*9)
+        for i in range(0, len(sta_flow)):
+            hour_personnel[i + 6] = int(sta_flow[i + 6] * 2.5 + 2.02 + 0.06 * 15 - 0.125 * 9)
 
         return hour_personnel
 
@@ -1002,12 +1029,137 @@ class DataApi(object):
 
         return score
 
+    def get_his_bicycles_num(self, date, station):
+        """
+        获取历史的单车投放数目
+        """
+        sta_flow = self.get_sta_hour_flow(date, station)
+        bic_num = []
+        for i in range(0, len(sta_flow)):
+            if sta_flow[i + 6] <= 5:
+                bic_num.append(int(sta_flow[i + 6] * 3) + random.randint(0, 1) + 5)
+            elif sta_flow[i + 6] <= 10 and sta_flow[i + 6] > 5:
+                bic_num.append(int(sta_flow[i + 6] * 2.7))
+            elif sta_flow[i + 6] <= 18 and sta_flow[i + 6] > 10:
+                bic_num.append(int(sta_flow[i + 6] * 2.3))
+            elif sta_flow[i + 6] <= 25 and sta_flow[i + 6] > 18:
+                bic_num.append(int(sta_flow[i + 6] * 2.1))
+            elif sta_flow[i + 6] > 25:
+                bic_num.append(int(sta_flow[i + 6] * 1.9))
+
+        return bic_num
+
+    def get_his_bus_interval(self, date, station):
+        """
+        获取历史公交的间隔时间
+        返回一个列表
+        """
+        sta_flow = self.get_sta_hour_flow(date, station)
+        bus_interval = []
+        for i in range(0, len(sta_flow)):
+            if sta_flow[i + 6] <= 5:
+                bus_interval.append(15 + random.randint(1, 2))
+            elif sta_flow[i + 6] <= 10 and sta_flow[i + 6] > 5:
+                bus_interval.append(9 + random.randint(1, 2))
+            elif sta_flow[i + 6] <= 18 and sta_flow[i + 6] > 10:
+                bus_interval.append(6 + random.randint(1, 2))
+            elif sta_flow[i + 6] <= 25 and sta_flow[i + 6] > 18:
+                bus_interval.append(4 + random.randint(1, 2))
+            elif sta_flow[i + 6] > 25:
+                bus_interval.append(2 + random.randint(1, 2))
+
+        return bus_interval
+
+    def get_his_adver_ratio(self, date, station):
+        """
+        男性广告比例和女性广告比例就是男（女）性占比
+        数码，运动，男装，美妆，母婴，女装
+        返回一个列表,各类广告的比重[数码，运动，男装，美妆，母婴，女装]
+        """
+        male, female = self.get_sta_sex_ratio(date, station)
+        
+        ad_list=[]
+        ad_list.append(round(male * 0.2 * 100, 1))
+        ad_list.append(round(male * 0.3 * 100, 1))
+        ad_list.append(round(male * 0.5 * 100, 1))
+        ad_list.append(round(female * 0.4 * 100, 1))
+        ad_list.append(round(female * 0.3 * 100, 1))
+        ad_list.append(round(female * 0.3 * 100, 1))
+
+        return ad_list
+
+    def get_his_subway_run(self, date, station):
+        """
+        获取历史列车运行图
+        返回一个元组 分别为发车周期 横坐标列表 纵坐标列表 
+        """
+        sta_hour_flow = self.get_sta_hour_flow(date, station)
+        sta_flow = 0
+        for i in range(0, len(sta_hour_flow)):
+            sta_flow += sta_hour_flow[i + 6]
+
+        tempt = 10 - (sta_flow % 10)
+        if tempt < 5:
+            t = tempt + 5
+        else :
+            t = tempt
+
+        T = 2 * t   
+        x, y = [], []
+        interval = math.pi / t
+        temp = -math.pi / 2
+        for i in range(0, T + 1):
+            x.append(temp)
+            temp += interval
+        for i in range(0, len(x)):
+            y.append(math.sin(x[i]))
+
+        flag = 0
+        for i in range(1, len(x) - 1):
+            if flag == 0 :
+                flag = 1 
+                if y[i] != 1:
+                    if y[i - 1] > y[i] and y[i] < y[i + 1]:
+                        j = min(y[i - 1] - y[i], y[i + 1] - y[i]) - 0.05
+                        if j >= 0:
+                            y[i] += random.uniform(0, j)
+                    elif y[i - 1] > y[i] and y[i] > y[i + 1]:
+                        j = y[i - 1] - y[i] - 0.05
+                        if j >= 0:
+                            y[i] += random.uniform(0, j)         
+                    elif y[i - 1] < y[i] and y[i] < y[i + 1] :
+                        j = y[i + 1] - y[i] - 0.05
+                        if j>= 0 :
+                            y[i] += random.uniform(0, j)
+                    elif y[i - 1] < y[i] and y[i] > y[i + 1] :
+                        y[i] += random.uniform(0, 0.5)  
+            else:
+                flag = 0
+                if y[i] != 1:
+                    if y[i - 1] > y[i] and y[i] < y[i + 1]:
+                        y[i] -= random.uniform(0, 0.5)
+                    elif y[i - 1] > y[i] and y[i] > y[i + 1]:
+                        j = y[i] - y[i + 1] - 0.05
+                        if j >= 0 :
+                            y[i] -= random.uniform(0, j)         
+                    elif y[i - 1] < y[i] and y[i] < y[i + 1] :
+                        j = y[i] - y[i - 1] - 0.05 
+                        if j >=0 :
+                            y[i] -= random.uniform(0, j)
+                    elif y[i - 1] < y[i] and y[i] > y[i + 1] :
+                        j = min(y[i] - y[i - 1], y[i] - y[i + 1]) - 0.05
+                        if j >= 0 :
+                            y[i] -= random.uniform(0, j)   
+
+        x = list(map(lambda y : y + math.pi / 2, x))       
+
+        return tempt, x, y
+
 if __name__ == '__main__':
     api = DataApi()
-    # api.get_split_flow()
+    res =api.get_his_adver_ratio('2020-07-01', 'Sta65')
+    print(res)
 
-    # res= api.get_line_split('1号线')
-    # print(res)
     #####断面预测训练数据合并
     # line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
     # split_list = []

@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import pandas as pd
+import datetime
+import random, math
+import os
+
 from DataAnalysis import DataApi
 from PredictModel import *
 from MysqlOS import SQLOS
-import datetime
-import math
-import os
 
 class PredictApi(object):
     """
@@ -180,7 +182,7 @@ class PredictApi(object):
         elif alg == 2:
             predict_df = self.pred_arima_day_df.copy()
         else:
-            predict_df = self.pre_holtwinters_day_df.copy()
+            predict_df = self.pred_holtwinters_day_df.copy()
     
         month_flow = predict_df[predict_df['month'] == month]['y']
 
@@ -199,7 +201,7 @@ class PredictApi(object):
         elif alg == 2:
             predict_df = self.pred_arima_day_df.copy()
         else:
-            predict_df = self.pre_holtwinters_day_df.copy()
+            predict_df = self.pred_holtwinters_day_df.copy()
 
         date_flow = predict_df['y']
 
@@ -353,7 +355,7 @@ class PredictApi(object):
 
     def get_sta_hour_flow(self, date, _type='out', station=None):
         """
-        获取各个站点或指定站点6-21点的进站客流量 
+        获取各个站点或指定站点6-21点的进/出站客流量 
 
         Parameters
         ----------
@@ -375,7 +377,7 @@ class PredictApi(object):
             out_pred_df['type'] = 1
             pred_df = pd.concat([in_pred_df, out_pred_df])
         else:
-            pred_df = self.pred_in_hour_df[date] if _type == 'in' else self.pred_in_hour_df[date]
+            pred_df = self.pred_in_hour_df[date] if _type == 'in' else self.pred_out_hour_df[date]
 
         if station is None:
             for sta in sta_list:
@@ -542,7 +544,7 @@ class PredictApi(object):
     def cal_normalized_eval(self, date):
         """
         计算归一化的五个指标
-        返回一个字典
+        返回一个字典或DataFrame
         """
         func_list = [
             # self.get_peek_hour,
@@ -587,8 +589,8 @@ class PredictApi(object):
         #     day_dict[day] = dict(zip(eval_name, res_list))
         #     i += 1
 
-        day_df = pd.DataFrame(index = day_list, 
-            data = np.zeros((len(day_list), len(eval_name))), columns=eval_name)
+        day_df = pd.DataFrame(index=day_list, 
+            data=np.zeros((len(day_list), len(eval_name))), columns=eval_name)
 
         i = 0
         for day in day_list:
@@ -610,7 +612,7 @@ class PredictApi(object):
             day_df.loc[day] = res_list
             i += 1
 
-        day_df.to_csv('./eval.csv', encoding = 'gb18030')
+        day_df.to_csv('./eval.csv', encoding='gb18030')
 
         return day_df
 
@@ -621,8 +623,8 @@ class PredictApi(object):
         """
         sta_flow = self.get_sta_hour_flow(date, _type, station)
         hour_personnel = {}
-        for i in range(0,len(sta_flow)):
-            hour_personnel[i+6] = int(sta_flow[i+6]*2.5+2.02+0.06*15-0.125*9)
+        for i in range(0, len(sta_flow)):
+            hour_personnel[i + 6] = int(sta_flow[i + 6] * 2.5 + 2.02 + 0.06 * 15 - 0.125 * 9)
 
         return hour_personnel
 
@@ -661,10 +663,121 @@ class PredictApi(object):
 
         return score
 
+    def get_pre_bicycles_num(self, date, station):
+        """
+        获取未来的单车投放数目
+        """
+        all_flow = self.get_sta_hour_flow(date, 'out')
+        sta_flow = all_flow[station]
+        bic_num = []
+        for i in range(0, len(sta_flow)):
+            if sta_flow[i + 6] <= 5:
+                bic_num.append(int(sta_flow[i + 6] * 3.5) + random.randint(0, 1) + 5)
+            elif sta_flow[i + 6] <= 10 and sta_flow[i + 6] > 5:
+                bic_num.append(int(sta_flow[i + 6] * 3.2))
+            elif sta_flow[i + 6] <= 18 and sta_flow[i + 6] > 10:
+                bic_num.append(int(sta_flow[i + 6] * 2.8))
+            elif sta_flow[i + 6] <= 25 and sta_flow[i + 6] > 18:
+                bic_num.append(int(sta_flow[i + 6] * 2.3))
+            elif sta_flow[i + 6] > 25:
+                bic_num.append(int(sta_flow[i + 6] * 1.9))
+
+        return bic_num
+
+    def get_pre_bus_interval(self, date, station):
+        """
+        获取未来公交的间隔时间
+        返回一个列表
+        """
+        all_flow = self.get_sta_hour_flow(date, 'out')
+        sta_flow = all_flow[station]
+        bus_interval = []
+        for i in range(0, len(sta_flow)):
+            if sta_flow[i + 6] <= 5:
+                bus_interval.append(15 + random.randint(1, 2))
+            elif sta_flow[i + 6] <= 10 and sta_flow[i + 6] > 5:
+                bus_interval.append(9 + random.randint(1, 2))
+            elif sta_flow[i + 6] <= 18 and sta_flow[i + 6] > 10:
+                bus_interval.append(6 + random.randint(1, 2))
+            elif sta_flow[i + 6] <= 25 and sta_flow[i + 6] > 18:
+                bus_interval.append(4 + random.randint(1, 2))
+            elif sta_flow[i + 6] > 25:
+                bus_interval.append(2 + random.randint(1, 2))
+
+        return bus_interval
+
+    def get_pre_subway_run(self, date, station):
+        """
+        获取预测列车运行图
+        返回一个元组 分别为发车周期 横坐标列表 纵坐标列表
+        """
+        all_flow = self.get_sta_hour_flow(date, 'all')
+        sta_hour_flow = all_flow[station]
+        sta_flow = 0
+        for i in range(0, len(sta_hour_flow)):
+            sta_flow += sta_hour_flow[i + 6]
+
+        tempt = 10 - (sta_flow % 10)
+        if tempt < 5:
+            t = tempt + 5
+        else :
+            t = tempt
+
+        T = 2 * t   
+        x, y = [], []
+        interval = math.pi / t
+        temp = -math.pi / 2
+        for i in range(0, T + 1):
+            x.append(temp)
+            temp += interval
+        for i in range(0, len(x)):
+            y.append(math.sin(x[i]))
+
+        flag = 0
+        for i in range(1, len(x) - 1):
+            if flag == 0 :
+                flag = 1 
+                if y[i] != 1:
+                    if y[i - 1] > y[i] and y[i] < y[i + 1]:
+                        j = min(y[i - 1] - y[i], y[i + 1] - y[i]) - 0.05
+                        if j >= 0:
+                            y[i] += random.uniform(0, j)
+                    elif y[i - 1] > y[i] and y[i] > y[i + 1]:
+                        j = y[i - 1] - y[i] - 0.05
+                        if j >= 0:
+                            y[i] += random.uniform(0, j)         
+                    elif y[i - 1] < y[i] and y[i] < y[i + 1] :
+                        j = y[i + 1] - y[i] - 0.05
+                        if j>= 0 :
+                            y[i] += random.uniform(0, j)
+                    elif y[i - 1] < y[i] and y[i] > y[i + 1] :
+                        y[i] += random.uniform(0, 0.5)  
+            else:
+                flag = 0
+                if y[i] != 1:
+                    if y[i - 1] > y[i] and y[i] < y[i + 1]:
+                        y[i] -= random.uniform(0, 0.5)
+                    elif y[i - 1] > y[i] and y[i] > y[i + 1]:
+                        j = y[i] - y[i + 1] - 0.05
+                        if j >= 0 :
+                            y[i] -= random.uniform(0, j)         
+                    elif y[i - 1] < y[i] and y[i] < y[i + 1] :
+                        j = y[i] - y[i - 1] - 0.05 
+                        if j >=0 :
+                            y[i] -= random.uniform(0, j)
+                    elif y[i - 1] < y[i] and y[i] > y[i + 1] :
+                        j = min(y[i] - y[i - 1], y[i] - y[i + 1]) - 0.05
+                        if j >= 0 :
+                            y[i] -= random.uniform(0, j)   
+                            
+        x = list(map(lambda y : y + math.pi / 2, x))
+
+        return tempt, x, y
+
 if __name__ == '__main__':
     pred_api = PredictApi()
-    # res = pred_api.get_section_flow('2020-07-17')
-    # print(res)
+    res = pred_api.get_pre_bus_interval('2020-07-17', 'Sta101')
+    print(res)
     # res = pred_api.get_day_sta_flow('2020-07-21')
     # print(res)
     # ml = MLPredictor()

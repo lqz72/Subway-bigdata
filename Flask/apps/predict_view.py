@@ -14,13 +14,13 @@ def pred_in_out_hour_flow():
     param_dict = json.loads(param_str)
 
     date = param_dict['c_date']
-    _type = param_dict['inout_s']
-
     date = pred_api.time_map(date)
 
-    flow_dict = pred_api.get_sta_hour_flow(date, _type)
+    hour_list = [str(i) for i in range(6, 22)]
+    in_flow = pred_api.get_hour_flow(date, 'in')
+    # out_flow = pred_api.get_hour_flow(date, 'out')
 
-    return jsonify(flow_dict)
+    return jsonify({'hour': hour_list, 'in_flow': in_flow})
 
 @predict_bp.route('/day_info', methods=['POST', 'GET'])
 def pred_day_info():
