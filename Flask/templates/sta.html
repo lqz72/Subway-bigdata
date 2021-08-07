@@ -66,9 +66,9 @@
                         <div class="locinfo">
                             <p id = 'area'>所属区域：<span>{{sta_info.area}}</span></p>
                             <p id = 'line'>所属线路：<span>{{sta_info.line}}</span></p>
-                            <p id = 'dict'>所属功能区域：<span>{{sta_info.category}}</span> </p>
+                            <p id = 'dict'>所属功能区域：<span id='farea'>{{sta_info.category}}</span> </p>
                             <div class="img">
-                                <img src="../static/images/zhuzhaiqu.jpg" alt="">
+                                <img src="../static/images/zhuzhaiqu.jpg" alt="" id='bgimg'>
                             </div>
                         </div>
                         <div class="datainfo">
@@ -196,7 +196,9 @@
             </div>
             
 
-
+            <!-- <div class="addflex">
+                <div class="test" style="height: 300px; flex:1;" id = 'test'></div>
+            </div> -->
 
  
         </div>
@@ -212,15 +214,18 @@
             </div>
             <div class="modal-body">
                 <div class="tolbike">
-                    共享单车投放数量建议:<span>132</span>
+                    共享单车初始投放数量建议:<span id='bikenum'>132</span>
                 </div>
                 <div class="addflex">
-                    <div class="bikegraph">
+                    <div class="bikegraph" id="bikegraph">
+
+                    </div>
+                    <div class="busgraph" id="busgraph">
 
                     </div>
                 </div>
                 <div class="bus">
-                    公交车发车间隔时间建议:<span>5<em>分钟</em></span>
+                    公交车发车间隔时间建议:<span id = 'busnum'>5<em>分钟</em></span>
                 </div>
             </div>
         </div>
@@ -228,22 +233,16 @@
 
     <!-- 模态框2 -->
     <div id="myModal2" class="modal">
-        <div class="modal-content">
+        <div class="modal-content mymol2">
             <div class="modal-header">
-                <h2>公交接驳</h2>
+                <h2>广告投放</h2>
                 <span id="closeBtn2" class="close">&times;</span>
             </div>
             <div class="modal-body">
-                <div class="tolbike">
-                    共享单车投放数量建议:<span>132</span>
-                </div>
                 <div class="addflex">
-                    <div class="bikegraph">
+                    <div class="adtype" id='adtype'>
 
                     </div>
-                </div>
-                <div class="bus">
-                    公交车发车间隔时间建议:<span>5<em>分钟</em></span>
                 </div>
             </div>
         </div>
@@ -251,26 +250,21 @@
 
     <!-- 模态框3 -->
     <div id="myModal3" class="modal">
-        <div class="modal-content">
+        <div class="modal-content mymol3">
             <div class="modal-header">
-                <h2>公交接驳</h2>
+                <h2>列车运行图调整</h2>
                 <span id="closeBtn3" class="close">&times;</span>
             </div>
             <div class="modal-body">
-                <div class="tolbike">
-                    共享单车投放数量建议:<span>132</span>
-                </div>
                 <div class="addflex">
-                    <div class="bikegraph">
+                    <div class="subwaygraph" id = 'subwaygraph'>
 
                     </div>
-                </div>
-                <div class="bus">
-                    公交车发车间隔时间建议:<span>5<em>分钟</em></span>
                 </div>
             </div>
         </div>
     </div>
+    
     
     <script src="{{ url_for('static',filename ='layui/layui.js') }}"></script>
     <script src="{{ url_for('static',filename ='js/sta.js') }}"></script>

@@ -92,6 +92,46 @@ function change_data()
         }
     });
 
+    //更新图片信息
+    var farea = document.querySelector("#farea");
+    farea = farea.innerHTML;
+    var bgimg = document.querySelector("#bgimg");
+    // console.log(farea);
+    // console.log(bgimg.src);
+    if(farea=='开发区'){
+        bgimg.src = '../static/images/kaifaqu.jpg';
+    }
+    else if(farea=='风景区'){
+        bgimg.src = '../static/images/fengjingqu.jpg';
+    }
+    else if(farea=='住宅区'){
+        bgimg.src = '../static/images/zhuzhaiqu.jpg';
+    }
+    else if(farea=='文教区'){
+        bgimg.src = '../static/images/wenjiaoqu.jpg';
+    }
+    else if(farea=='中心商业区'){
+        bgimg.src = '../static/images/zhongxinshangyequ.jpg';
+    }
+    else if(farea=='综合区'){
+        bgimg.src = '../static/images/zonghequ.jpg';
+    }
+    else if(farea=='工业区'){
+        bgimg.src = '../static/images/gongyequ.jpg';
+    }
+    else if(farea=='仓储区'){
+        bgimg.src = '../static/images/cangchuqu.jpg';
+    }
+    else if(farea=='商业街'){
+        bgimg.src = '../static/images/shangyejie.jpg';
+    }
+    else if(farea=='卫星城'){
+        bgimg.src = '../static/images/weixingcheng.jpg';
+    }
+    //console.log(bgimg.src);
+    
+
+
     week_line = echarts.init(document.getElementById('week_flow'));
     $.ajax({
         type: 'POST',
@@ -120,7 +160,7 @@ function change_data()
         async: true,
         dataType: 'json',
         success: function (result) {
-            console.log(result);
+            // console.log(result);
             var hour_list = Object.keys(result);
             var in_flow = [];
             var out_flow = [];
@@ -172,6 +212,100 @@ function change_data()
 
     aixin_bar = echarts.init(document.getElementById('aixin'));
     aixin_bar.setOption(aixin_bar_opts);
+
+
+    //模态框更新
+    //共享单车投放
+    bike_line = echarts.init(document.querySelector("#bikegraph"));
+    $.ajax({
+        type: 'POST',
+        url: '/sta/curr_day/bicycle_num',
+        data:  JSON.stringify({date: c_date, sta: c_staname}),
+        async: true,
+        dataType: 'json',
+        success: function (data) {
+            option_bikeline.xAxis.data = data[0];
+            option_bikeline.series[0].data = data[1];
+            bike_line.setOption(option_bikeline);
+            bikenum = document.querySelector("#bikenum");
+            bikenum.innerHTML = data[1][0];
+        }
+    })
+
+    //公交
+    bus_line = echarts.init(document.querySelector("#busgraph"));
+    $.ajax({
+        type: 'POST',
+        url: '/sta/curr_day/bus_interval',
+        data:  JSON.stringify({date: c_date, sta: c_staname}),
+        async: true,
+        dataType: 'json',
+        success: function (data) {
+            option_busline.xAxis.data = data[0];
+            option_busline.series[0].data = data[1];
+            bus_line.setOption(option_busline);
+            busnum = document.querySelector("#busnum");
+            busnum.innerHTML = data[1][0] + '<em>分钟</em>';
+        }
+    })
+
+    //广告投放
+    adtype_pie = echarts.init(document.querySelector("#adtype"));
+    $.ajax({
+        type: 'POST',
+        url: '/sta/curr_day/adver_ratio',
+        data:  JSON.stringify({date: c_date, sta: c_staname}),
+        async: true,
+        dataType: 'json',
+        success: function (data) {
+            var tmp = [];
+            for(var i=0;i<data[0].length;i++)
+            {
+                var obj = new Object();
+                obj['name'] = data[0][i];
+                obj['value'] = data[1][i];
+                tmp.push(obj);
+            }
+            // option_adtype.legend.data = data[0];
+            option_adtype.series[0].data = tmp;
+            adtype_pie.setOption(option_adtype);
+        }
+    })
+
+    //列车运行图
+    subway_line = echarts.init(document.querySelector("#subwaygraph"));
+    $.ajax({
+        type: 'POST',
+        url: '/sta/curr_day/run_info/12',
+        data:  JSON.stringify({date: c_date, sta: c_staname}),
+        async: true,
+        dataType: 'json',
+        success: function (data) {
+            console.log(data);
+            for(var level=0;level<12;level++)
+            {
+                var eachseries = {
+                    type: 'line',
+                    data: [],
+                    smooth: true,
+                    showSymbol: false
+                };
+                var tmp =  [];
+                for(var i=0;i<data[level][0].length;i++)
+                {
+                    var item = [];
+                    item.push(data[level][0][i]);
+                    item.push(data[level][1][i]+1);
+                    tmp.push(item);
+                }
+                console.log(tmp);
+                eachseries.data = tmp;
+                option_subwayline.series.push(eachseries);
+            }
+            console.log(option_subwayline);
+            subway_line.setOption(option_subwayline);
+        }
+    })
 }
 
 
@@ -879,8 +1013,11 @@ var aixin_bar_opts = {
 
     /*模态框显示*/
     modalBox.show = function() {
-        console.log(this.modal);
+        // console.log(this.modal);
         this.modal.style.display = "block";
+        
+        bike_line.resize();
+        bus_line.resize();
     }
 
     /*模态框关闭*/
@@ -928,6 +1065,7 @@ var aixin_bar_opts = {
     modalBox.show = function() {
         console.log(this.modal);
         this.modal.style.display = "block";
+        adtype_pie.resize();
     }
 
     /*模态框关闭*/
@@ -976,6 +1114,7 @@ var aixin_bar_opts = {
     modalBox.show = function() {
         console.log(this.modal);
         this.modal.style.display = "block";
+        subway_line.resize();
     }
 
     /*模态框关闭*/
@@ -1006,3 +1145,254 @@ var aixin_bar_opts = {
     }
     modalBox.init();
 })();
+
+option_bikeline = {
+    title: {
+        text: '共享自行车调度建议',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    grid: {
+        left: '2%',
+        right: '8%',
+        bottom: '3%',
+        containLabel: true
+    //     show: true,// 显示边框
+    //   borderColor: '#012f4a',// 边框颜色
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        axisTick: {
+            show: false,
+            alignWithLabel: true
+        },
+        name: '时',
+        data: [],
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    yAxis: {
+        type: 'value',
+        name: '数量',
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    series: [
+        {
+            type: 'line',
+            data: [10, 11, 13, 11, 12, 12, 9],
+            markLine: {
+                symbol: 'none',
+                data: [
+                    {
+                        type: 'average', 
+                        name: '平均值'
+                
+                    }
+                ],
+                label: {
+                    show:true,
+                    formatter: '平均值:{c}',
+                    position:'insideEndBottom'
+                }
+            },
+            smooth: true,
+            // 设置拐点 小圆点
+            symbol: "circle",
+            // 拐点大小
+            symbolSize: 8,
+            // 设置拐点颜色以及边框
+            itemStyle: {
+                // color: "#0184d5",
+                borderColor: "rgba(221, 220, 107, .4)",
+                borderWidth: 12
+            },
+            // 开始不显示拐点， 鼠标经过显示
+            showSymbol: false,
+            // 填充区域
+            // areaStyle: { }
+        }
+    ]
+};
+
+option_busline = {
+    title: {
+        text: '公交车发车建议',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    grid: {
+        left: '2%',
+        right: '8%',
+        bottom: '3%',
+        containLabel: true
+    //     show: true,// 显示边框
+    //   borderColor: '#012f4a',// 边框颜色
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        axisTick: {
+            show: false,
+            alignWithLabel: true
+        },
+        name: '时',
+        data: [],
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    yAxis: {
+        type: 'value',
+        name: '分钟/班',
+        axisLine: {
+            show:true,
+            symbol:['none', 'arrow'],
+            symbolSize:[5,10]
+        }
+    },
+    series: [
+        {
+            type: 'line',
+            data: [10, 11, 13, 11, 12, 12, 9],
+            markLine: {
+                symbol: 'none',
+                data: [
+                    {
+                        type: 'average', 
+                        name: '平均值'
+                
+                    }
+                ],
+                label: {
+                    show:true,
+                    formatter: '平均值:{c}',
+                    position:'insideEndBottom'
+                }
+            },
+            smooth: true,
+            // 设置拐点 小圆点
+            symbol: "circle",
+            // 拐点大小
+            symbolSize: 8,
+            // 设置拐点颜色以及边框
+            itemStyle: {
+                // color: "#0184d5",
+                borderColor: "rgba(221, 220, 107, .4)",
+                borderWidth: 12
+            },
+            // 开始不显示拐点， 鼠标经过显示
+            showSymbol: false,
+            // 填充区域
+            // areaStyle: { }
+        }
+    ]
+};
+
+option_adtype = {
+    title:{
+        text:'广告类型投放建议',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    legend: {
+        top: 'bottom'
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: '{b}({d}%)'
+    },
+    series: [
+        {
+            name: '面积模式',
+            type: 'pie',
+            radius: [30, 150],
+            center: ['50%', '50%'],
+            roseType: 'area',
+            itemStyle: {
+                borderRadius: 8
+            },
+            data: [
+                {value: 40, name: 'rose 1'},
+                {value: 38, name: 'rose 2'},
+                {value: 32, name: 'rose 3'},
+                {value: 30, name: 'rose 4'},
+                {value: 28, name: 'rose 5'},
+                {value: 26, name: 'rose 6'},
+                {value: 22, name: 'rose 7'},
+                {value: 18, name: 'rose 8'}
+            ]
+        }
+    ]
+};
+
+option_subwayline = {
+    title: {
+        text: '列车运行图调整建议',
+        left: 'center',
+        textStyle: {
+            fontWeight: 400
+        }
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    grid: {
+        left: '2%',
+        right: '8%',
+        bottom: '3%',
+        containLabel: true,
+        show: true,// 显示边框
+       borderColor: '#012f4a',// 边框颜色
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        axisTick: {
+            show: false,
+            alignWithLabel: true
+        },
+        name: '时间',
+        data: [],
+        axisLine: {
+            show:true,
+            symbol:'none'
+        }
+    },
+    yAxis: {
+        type: 'value',
+        name: '站点',
+        axisLine: {
+            show:true,
+            symbol:'none'
+        },
+        axisLabel : {
+            formatter: function(){
+                  return "";
+            }
+        }
+    },
+    series: [
+    ]
+};
