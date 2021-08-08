@@ -170,31 +170,42 @@ def sta_curr_day_adver_ratio():
 
     return jsonify((ad_list, res))
 
-@station_bp.route('/curr_day/run_info/<int:subway_num>', methods=['POST', 'GET'])
-def sta_curr_day_run_info(subway_num):
+@station_bp.route('/curr_day/run_info', methods=['POST', 'GET'])
+def sta_curr_day_run_info():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
 
     station = param_dict['sta']
     date = param_dict['date']
+    hour = param_dict.get('hour', 9)
 
     cur_date = datetime.datetime.strptime(date, '%Y-%m-%d')
     end_time = datetime.datetime.strptime('2020-07-16', '%Y-%m-%d')
 
     if cur_date > end_time:
         date = pred_api.time_map(date)
-        res = pred_api.get_pre_subway_run(date, station)
+        res = pred_api.get_pre_subway_run(date, station, hour)
     else:
-        res = api.get_his_subway_run(date, station)
+        res = api.get_his_subway_run(date, station, hour)
 
-    x_axis, y_axis = res[1], res[2]
-    axis_pair = [(x_axis, y_axis)]
-    if subway_num > 1:
-        for i in range(0, subway_num - 1):
-            x_axis = list(map(lambda x : x + res[0], x_axis)) 
-            axis_pair.append((x_axis, y_axis))
-            
-    return jsonify(axis_pair)
+    temp, xaxis, yaxis = res[0], res[1], res[2]
+    axis_pair = [(xaxis, yaxis)]
+
+    while 0 <= xaxis[0] + temp <= 60:
+
+        xaxis = list(map(lambda x: x + temp, xaxis)) 
+
+        x_axis, y_axis = [], []
+        for i in range(len(xaxis)):
+            if 0 <= xaxis[i] <= 60:
+                x_axis.append(xaxis[i])
+                y_axis.append(yaxis[i])
+
+        axis_pair.append((x_axis, y_axis))
+
+    yaxis_label = api.get_line_sta_list(station)
+
+    return jsonify((axis_pair, yaxis_label))
 
 @station_bp.route('/age/pie', methods=['POST', 'GET'])
 def sta_age_pie():

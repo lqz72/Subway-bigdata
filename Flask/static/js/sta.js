@@ -276,13 +276,15 @@ function change_data()
     subway_line = echarts.init(document.querySelector("#subwaygraph"));
     $.ajax({
         type: 'POST',
-        url: '/sta/curr_day/run_info/12',
+        url: '/sta/curr_day/run_info',
         data:  JSON.stringify({date: c_date, sta: c_staname}),
         async: true,
         dataType: 'json',
-        success: function (data) {
+        success: function (result) {
+            data = result[0];
             console.log(data);
-            for(var level=0;level<12;level++)
+            console.log(result[1]);
+            for(var level=0;level<data.length;level++)
             {
                 var eachseries = {
                     type: 'line',

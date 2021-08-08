@@ -9,10 +9,12 @@ from DataAnalysis import DataApi
 from PredictModel import *
 from MysqlOS import SQLOS
 
+
 class PredictApi(object):
     """
     提供预测数据分析接口
     """
+
     def __init__(self):
         self.abs_path = os.path.abspath(os.path.dirname(__file__))
         self.ml_predictor = MLPredictor()
@@ -26,7 +28,7 @@ class PredictApi(object):
         self.pred_down_section_df = SQLOS.get_pred_section('down')
         self.weather_list = ["多云", "晴", "阴", "阵雨", "小雨", "中雨", "大雨", "暴雨"]
         self.line_list = ['1号线', '2号线', '3号线', '4号线', '5号线', '10号线', '11号线', '12号线']
-    
+
     @staticmethod
     def get_station_pred_flow():
         '''
@@ -47,7 +49,7 @@ class PredictApi(object):
                 feature_df = p_api.ml_predictor.get_sta_feature(in_series)
                 df = p_api.ml_predictor.forecast_day_flow(feature_df, sta)
                 df.to_csv(api.abs_path + '/predict/station/%s.csv' % sta, encoding='gb18030')
-            
+
                 print(sta)
             print('success!')
         except Exception as e:
@@ -57,16 +59,16 @@ class PredictApi(object):
     @staticmethod
     def get_sta_hour_feature():
         in_df, out_df = SQLOS.get_in_out_df()
-        in_df = in_df.loc['2020-05-01':].drop('user_id', axis =1)
+        in_df = in_df.loc['2020-05-01':].drop('user_id', axis=1)
         out_df = out_df.loc['2020-05-01':].drop('user_id', axis=1)
-        
-        in_df.reset_index(level = 'in_time', inplace =True)
-        out_df.reset_index(level = 'out_time', inplace =True)
+
+        in_df.reset_index(level='in_time', inplace=True)
+        out_df.reset_index(level='out_time', inplace=True)
         in_df['y'] = 1
         out_df['y'] = 1
         in_df['day'] = in_df.in_time.dt.normalize()
         out_df['day'] = out_df.out_time.dt.normalize()
-        
+
         # in_grouped = in_df.groupby(by=['in_sta_name', 'day'], as_index=False)[['y']].sum()
         # out_grouped = out_df.groupby(by=['out_sta_name', 'day'], as_index=False)[['y']].sum()
         in_df.to_csv('./in.csv', encoding='gb18030', index=0)
@@ -142,8 +144,7 @@ class PredictApi(object):
 
         out_feature_df = self.ml_predictor.get_sta_feature(out_series)
         out_predict_results = self.ml_predictor.forecast_day_flow(out_feature_df, sta_name)
-        
-        
+
         def _get_month_dict(predict_results):
             date_flow = predict_results['y']
 
@@ -158,9 +159,9 @@ class PredictApi(object):
                 month_dict[i] = dict(zip(day, flow))
 
             return month_dict
-        
+
         in_dict = _get_month_dict(in_predict_results)
-        out_dict = _get_month_dict(out_predict_results) 
+        out_dict = _get_month_dict(out_predict_results)
 
         return in_dict, out_dict
 
@@ -176,14 +177,14 @@ class PredictApi(object):
 
         if alg == 1:
             self.change_pred_result(self.pred_day_df, alg=alg, date=date, weather=weather, temp=temp)
-            
+
             predict_df = self.pred_day_df.copy()
 
         elif alg == 2:
             predict_df = self.pred_arima_day_df.copy()
         else:
             predict_df = self.pred_holtwinters_day_df.copy()
-    
+
         month_flow = predict_df[predict_df['month'] == month]['y']
 
         day = [i.strftime("%d").lstrip('0') for i in month_flow.index]
@@ -214,12 +215,12 @@ class PredictApi(object):
         while sunday.weekday() != 6:
             sunday += one_day
         # 返回当前的星期一和星期天的日期
-        monday, sunday = monday.strftime('%Y-%m-%d'), sunday.strftime('%Y-%m-%d') 
+        monday, sunday = monday.strftime('%Y-%m-%d'), sunday.strftime('%Y-%m-%d')
         curr_week_flow = date_flow[monday:sunday]
-       
+
         day = [j.strftime("%d").lstrip('0') for j in curr_week_flow.index]
         flow = curr_week_flow.values
-        
+
         return dict(zip(day, flow))
 
     def get_day_flow_info(self, date, alg):
@@ -238,7 +239,7 @@ class PredictApi(object):
         pre_day = (std_date - one_day).strftime('%Y-%m-%d')
         month = date[5:7].lstrip('0')
 
-        day_flow = int(predict_df.loc[date].y) 
+        day_flow = int(predict_df.loc[date].y)
         pre_day_flow = int(predict_df.loc[pre_day].y)
         month_mean = int(predict_df[predict_df['month'] == month].y.mean())
         year_mean = int(predict_df.y.mean())
@@ -290,7 +291,7 @@ class PredictApi(object):
         grouped.sort_values(ascending=False, inplace=True)
 
         sta_list = grouped.index
-        flow_list = [(i+1) for i in grouped.values]
+        flow_list = [(i + 1) for i in grouped.values]
 
         return dict(zip(sta_list, flow_list))
 
@@ -383,7 +384,7 @@ class PredictApi(object):
             for sta in sta_list:
                 sta_df = pred_df[pred_df['sta'].isin([sta])]
 
-                hour_list = [i for i in range(6,22)]
+                hour_list = [i for i in range(6, 22)]
                 hour_dict = dict.fromkeys(hour_list, 0)
                 for hour in hour_list:
                     hour_dict[hour] = int(sta_df[sta_df.hour.isin([hour])].y.sum())
@@ -393,13 +394,13 @@ class PredictApi(object):
         else:
             sta_df = pred_df[pred_df['sta'].isin([station])]
 
-            hour_list = [i for i in range(6,22)]
+            hour_list = [i for i in range(6, 22)]
             hour_dict = dict.fromkeys(hour_list, 0)
             for hour in hour_list:
                 hour_dict[hour] = int(sta_df[sta_df.hour.isin([hour])].y.sum())
 
             return hour_dict
-        
+
     def change_pred_result(self, predict_df, **param):
         """
         判断影响因子是否修改 并重新预测
@@ -409,7 +410,7 @@ class PredictApi(object):
         weather = param.get('weather')
         temp = param.get('temp')
 
-        #判断预测因子是否发生修改
+        # 判断预测因子是否发生修改
         feature_df = self.ml_predictor.feature_day
         day_df = feature_df[feature_df['day'].isin([date])]
         default_weather = day_df.weather.values[0]
@@ -431,13 +432,13 @@ class PredictApi(object):
         返回持续时间 /时
         """
         try:
-            hour_flow = self.get_hour_flow(date,'all')
+            hour_flow = self.get_hour_flow(date, 'all')
             hour_flow_sort = sorted(hour_flow)
             list_len = len(hour_flow)
-            peek_flow = hour_flow_sort[int(list_len*0.7)-1]
-            peek_hour=  0
-            for i in range(0,list_len-2):
-                if hour_flow[i] >= peek_flow and hour_flow[i+1] >= peek_flow and hour_flow[i+2] >= peek_flow:
+            peek_flow = hour_flow_sort[int(list_len * 0.7) - 1]
+            peek_hour = 0
+            for i in range(0, list_len - 2):
+                if hour_flow[i] >= peek_flow and hour_flow[i + 1] >= peek_flow and hour_flow[i + 2] >= peek_flow:
                     peek_hour += 1
             return peek_hour
         except Exception as e:
@@ -448,13 +449,13 @@ class PredictApi(object):
         获取每日的高峰时间段
         """
         try:
-            hour_flow = self.get_hour_flow(date,'all')
+            hour_flow = self.get_hour_flow(date, 'all')
             hour_flow_sort = sorted(hour_flow)
             list_len = len(hour_flow)
-            peek_flow = hour_flow_sort[int(list_len*0.8)-1]
+            peek_flow = hour_flow_sort[int(list_len * 0.8) - 1]
             peek_time = []
-            for i in range(0,list_len-1):
-                if hour_flow[i] >= peek_flow and hour_flow[i+1] >= peek_flow:
+            for i in range(0, list_len - 1):
+                if hour_flow[i] >= peek_flow and hour_flow[i + 1] >= peek_flow:
                     peek_time.append(i)
             return peek_time
         except Exception as e:
@@ -465,7 +466,7 @@ class PredictApi(object):
         客流的不均衡系数
         """
         day_sta_flow = self.get_day_sta_flow(date)
-        sta_flow= [i for i in day_sta_flow.values()]
+        sta_flow = [i for i in day_sta_flow.values()]
 
         top, low = sum(sta_flow[0:5]), sum(sta_flow[-5:])
 
@@ -527,11 +528,11 @@ class PredictApi(object):
         """
         line_list = self.line_list.copy()
         line_dict = {line: self.get_hour_flow(date, 'all', line) for line in line_list}
-        
+
         full, index = 1600, 0
 
         line_value = [0] * len(line_dict)
-        
+
         for line in line_list:
             for i in line_dict[line]:
                 line_value[index] += i
@@ -554,9 +555,8 @@ class PredictApi(object):
             self.get_line_capacity_ratio
         ]
 
-        eval_name = ['peek_hour', 'uneven_flow', 'flow_congestion', 
-                'peek_flow_congestion', 'line_capacity_ratio']
-
+        eval_name = ['peek_hour', 'uneven_flow', 'flow_congestion',
+                     'peek_flow_congestion', 'line_capacity_ratio']
 
         one_day = datetime.timedelta(days=1)
 
@@ -585,30 +585,28 @@ class PredictApi(object):
 
         #     for j in range(len(func_list)):
         #         res_list.append(temp_list[j][i])
-            
+
         #     day_dict[day] = dict(zip(eval_name, res_list))
         #     i += 1
 
-        day_df = pd.DataFrame(index=day_list, 
-            data=np.zeros((len(day_list), len(eval_name))), columns=eval_name)
+        day_df = pd.DataFrame(index=day_list,
+                              data=np.zeros((len(day_list), len(eval_name))), columns=eval_name)
 
         i = 0
         for day in day_list:
             res_list = [self.get_peek_hour(day) * 0.2]
 
-            
             for func in func_list:
                 eval_list = []
                 for each in day_list:
                     eval_list.append(func(each))
-
 
                 eval_list = np.array(eval_list)
                 _range = np.max(eval_list) - np.min(eval_list)
                 res = (eval_list - np.min(eval_list)) / _range
 
                 res_list.append(res[i])
-            
+
             day_df.loc[day] = res_list
             i += 1
 
@@ -636,12 +634,11 @@ class PredictApi(object):
         section_df = self.pred_up_section_df if _type == 'up' else self.pred_down_section_df
         day_df = section_df.loc[date]
 
-
         hour_list = ['7', '16']
         hour_dict = dict.fromkeys(hour_list, 0)
         for hour in hour_list:
             df = day_df[day_df.hour.isin([hour])]
-            
+
             section_list = df.section.tolist()
             prediction = df.y.tolist()
 
@@ -706,85 +703,102 @@ class PredictApi(object):
 
         return bus_interval
 
-    def get_pre_subway_run(self, date, station):
+    def get_pre_subway_run(self, date, station, hour):
         """
         获取预测列车运行图
         返回一个元组 分别为发车周期 横坐标列表 纵坐标列表
         """
+        sta_dict = SQLOS.get_station_dict()
+        line = sta_dict[station]
+        sta_num = {'1号线': 19, '2号线': 23, '3号线': 39, '4号线': 7, '5号线': 8, '10号线': 19, '11号线': 31, '12号线': 17}
+        line_num = sta_num[line]
         all_flow = self.get_sta_hour_flow(date, 'all')
         sta_hour_flow = all_flow[station]
-        sta_flow = 0
-        for i in range(0, len(sta_hour_flow)):
-            sta_flow += sta_hour_flow[i + 6]
-
-        tempt = 10 - (sta_flow % 10)
-        if tempt < 5:
-            t = tempt + 5
-        else :
-            t = tempt
-
-        T = 2 * t   
-        x, y = [], []
-        interval = math.pi / t
+        sta_flow = sta_hour_flow[hour]
+        if 0 <= sta_flow < 5:
+            T = 11
+        elif 5 <= sta_flow < 10:
+            T = 8
+        elif 10 <= sta_flow < 15:
+            T = 6
+        elif 15 <= sta_flow < 20:
+            T = 5
+        elif sta_flow >= 20:
+            T = 3
+        x = []
+        y = []
         temp = -math.pi / 2
-        for i in range(0, T + 1):
+        interval = 2 * math.pi / line_num
+        for i in range(0, line_num + 1):
             x.append(temp)
             temp += interval
         for i in range(0, len(x)):
             y.append(math.sin(x[i]))
-
         flag = 0
         for i in range(1, len(x) - 1):
-            if flag == 0 :
-                flag = 1 
+            if flag == 0:
+                flag = 1
                 if y[i] != 1:
                     if y[i - 1] > y[i] and y[i] < y[i + 1]:
-                        j = min(y[i - 1] - y[i], y[i + 1] - y[i]) - 0.05
-                        if j >= 0:
+                        j = min(y[i - 1] - y[i], y[i + 1] - y[i]) - 0.1
+                        if j > 0.1:
                             y[i] += random.uniform(0, j)
-                    elif y[i - 1] > y[i] and y[i] > y[i + 1]:
-                        j = y[i - 1] - y[i] - 0.05
-                        if j >= 0:
-                            y[i] += random.uniform(0, j)         
-                    elif y[i - 1] < y[i] and y[i] < y[i + 1] :
-                        j = y[i + 1] - y[i] - 0.05
-                        if j>= 0 :
+                    elif y[i - 1] > y[i] > y[i + 1]:
+                        j = y[i - 1] - y[i] - 0.1
+                        if j > 0.1:
                             y[i] += random.uniform(0, j)
-                    elif y[i - 1] < y[i] and y[i] > y[i + 1] :
-                        y[i] += random.uniform(0, 0.5)  
+                    elif y[i - 1] < y[i] < y[i + 1]:
+                        j = y[i + 1] - y[i] - 0.1
+                        if j > 0.1:
+                            y[i] += random.uniform(0, j)
+                    elif y[i - 1] < y[i] and y[i] > y[i + 1]:
+                        y[i] += random.uniform(0, 0.3)
             else:
                 flag = 0
                 if y[i] != 1:
                     if y[i - 1] > y[i] and y[i] < y[i + 1]:
-                        y[i] -= random.uniform(0, 0.5)
-                    elif y[i - 1] > y[i] and y[i] > y[i + 1]:
-                        j = y[i] - y[i + 1] - 0.05
-                        if j >= 0 :
-                            y[i] -= random.uniform(0, j)         
-                    elif y[i - 1] < y[i] and y[i] < y[i + 1] :
-                        j = y[i] - y[i - 1] - 0.05 
-                        if j >=0 :
+                        y[i] -= random.uniform(0, 0.3)
+                    elif y[i - 1] > y[i] > y[i + 1]:
+                        j = y[i] - y[i + 1] - 0.1
+                        if j > 0.1:
                             y[i] -= random.uniform(0, j)
-                    elif y[i - 1] < y[i] and y[i] > y[i + 1] :
-                        j = min(y[i] - y[i - 1], y[i] - y[i + 1]) - 0.05
-                        if j >= 0 :
-                            y[i] -= random.uniform(0, j)   
-                            
-        x = list(map(lambda y : y + math.pi / 2, x))
+                    elif y[i - 1] < y[i] < y[i + 1]:
+                        j = y[i] - y[i - 1] - 0.1
+                        if j > 0.1:
+                            y[i] -= random.uniform(0, j)
+                    elif y[i - 1] < y[i] and y[i] > y[i + 1]:
+                        j = min(y[i] - y[i - 1], y[i] - y[i + 1]) - 0.1
+                        if j > 0.1:
+                            y[i] -= random.uniform(0, j)
+        xreal = [0]
+        if 0 <= sta_flow < 5:
+            for i in range(1, line_num + 1):
+                xreal.append(i + random.randint(1, 2))
+        elif 5 <= sta_flow < 10:
+            for i in range(1, line_num + 1):
+                xreal.append(i + random.randint(1, 2))
+        elif 10 <= sta_flow < 15:
+            for i in range(1, line_num + 1):
+                xreal.append(i + random.randint(0, 1))
+        elif 15 <= sta_flow < 20:
+            for i in range(1, line_num + 1):
+                xreal.append(i + random.randint(0, 1))
+        elif sta_flow >= 20:
+            for i in range(1, line_num + 1):
+                xreal.append(i + random.randint(0, 1))
+        return T, xreal, y
 
-        return tempt, x, y
 
 if __name__ == '__main__':
     pred_api = PredictApi()
-    res = pred_api.get_pre_bus_interval('2020-07-17', 'Sta101')
-    print(res)
+    print(pred_api.get_pre_train_run('2020-07-21', 'Sta1', 11))
     # res = pred_api.get_day_sta_flow('2020-07-21')
     # print(res)
     # ml = MLPredictor()
     # rs = ml.forecast_by_factor('2020-07-17', choose_wea='阴', choose_temp='22')
     # print(rs)
     # pred_api = PredictApi()
- 
+
     # p_api = PredictApi()
     # print(p_api.get_hour_flow('2020-07-17'))
     # p_api.get_sta_hour_flow('2020-07-17')
@@ -810,14 +824,14 @@ if __name__ == '__main__':
     #     for time in times:
     #         ddf = df[df['time'] == time]
     #         real_sta_list = ddf.sta.tolist()
- 
+
     #         nan_list  = []
     #         for sta in sta_list:
     #             if sta not in real_sta_list:
     #                 nan_list.append(sta)
     #         df_len = len(nan_list)
     #         nan_df = pd.DataFrame({'time': [time] * df_len, 'y': [0] * df_len, 'sta': nan_list})
-            
+
     #         nan_df['time'] = pd.to_datetime(nan_df['time'])
     #         nan_df['hour'] = nan_df.time.dt.hour
     #         nan_df['weekday'] = nan_df.time.dt.weekday + 1
@@ -829,7 +843,6 @@ if __name__ == '__main__':
     #         ddf = ddf.append(nan_df)
     #         ddf = ddf.sort_values(by=['sta'], key=lambda x: x.str.lstrip('Sta').astype('int'))
 
-        
     #         if j == 0:
     #             my_df = ddf
     #         else:
@@ -845,14 +858,14 @@ if __name__ == '__main__':
     # sta_dict = SQLOS.get_station_dict()
     # i = 0
     # for sta in sta_dict:
-        
+
     #     sta_df = pd.read_csv(p_api.abs_path + '/predict/station/%s.csv' % sta, encoding='gb18030')
     #     sta_df['sta'] = sta
     #     if i == 0:
     #         df = sta_df
     #     else:
     #         df = df.append(sta_df)
-            
+
     #     i += 1
     # df.index =range(df.shape[0])
     # print(df)
