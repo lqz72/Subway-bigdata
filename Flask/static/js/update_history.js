@@ -54,6 +54,7 @@ var state = 0;//表示未折叠
 
 
 var n_date;
+var areanum = 1;
 function updatewea(data)
 {
     // console.log(data);
@@ -344,6 +345,22 @@ function change()
             inoutChart.setOption(inoutOption);
         }
     });
+}
+
+//区域点入点出流量分布
+var area = document.querySelector('#area').children;
+for(var i=0;i<area.length;i++)
+{
+    // console.log(area[i]);
+    thisarea = area[i];
+    thisarea.addEventListener('click',function()
+    {
+        // console.log(this.dataset.index);
+        // console.log(area[areanum]);
+        area[areanum-1].style.backgroundColor = '#fff';
+        areanum = this.dataset.index;
+        this.style.backgroundColor = '#37A2DA';
+    })
 }
 
 function get_icon_words(wea){

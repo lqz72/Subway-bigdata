@@ -283,7 +283,6 @@ function change_data()
         success: function (result) {
             data = result[0];
             console.log(data);
-            console.log(result[1]);
             for(var level=0;level<data.length;level++)
             {
                 var eachseries = {

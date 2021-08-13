@@ -495,7 +495,7 @@
     float: left;
     flex:4;
     width: 650px;
-    height: 700px;
+    height: 710px;
     margin-top:10px;
     margin-left: 20px;
     margin-right: 10px;
@@ -506,7 +506,7 @@
     float: left;
     /* flex:1; */
     width: 248px;
-    height: 700px;
+    height: 710px;
     margin-top: 10px;
     margin-right: 30px;
     background-color: #ffffff;
@@ -557,10 +557,47 @@
 .inout {
     flex: 1;
     height: 600px;
-    margin: 10px 30px 0 20px;
+    margin: 10px 30px 0 0px;
     background-color: #fff;
 }
-
+.leftchoose {
+    width: 200px;
+    height: 600px;
+    margin-left: 20px;
+    margin-top: 10px;
+    margin-right: 0;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.choice {
+    height: 400px;
+    width: 120px;
+    margin-left: 55px;
+}
+.choice ul {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    /* background-color: pink; */
+}
+.choice ul li {
+    flex:1;
+    border : 1px solid #E3E3E3;
+    border-bottom: none;
+    line-height: 44px;
+    text-align: center;
+}
+.choice ul li:hover {
+    cursor: pointer;
+}
+.choice ul li:first-child {
+    background-color: #37A2DA;
+}
+.choice ul li:last-child {
+    border-bottom:1px solid #E3E3E3;
+}
 
 /* 线路断面 */
 .cutline {
@@ -634,6 +671,7 @@
 .leaderboard2 table tr:hover {
     background-color: #F2F2F2;
 }
+
 
 
 /* -------------------------------------------------------------------------------- */
