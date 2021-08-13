@@ -1,3 +1,4 @@
+import json
 from flask import request
 from flask import jsonify, json
 from flask import Blueprint
@@ -84,8 +85,16 @@ def od_flow() -> json:
 def inout_flow() -> json:
     """返回区域点入点出客流
     """
-    curr_date = request.get_data().decode('utf-8')
-    sta_list, in_flow, out_flow = api.get_area_in_out_flow(curr_date, '住宅区')
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+
+    curr_date = param_dict['date']
+    area_index = int(param_dict['index'])
+
+    area_list = ['工业区', '商业区', '住宅区', '仓储区', '文教区', '中心商业区', '综合区', '风景区', '卫星城']
+    area = area_list[area_index - 1]
+    
+    sta_list, in_flow, out_flow = api.get_area_in_out_flow(curr_date, area)
 
     return jsonify(sta_list, in_flow, out_flow)
 

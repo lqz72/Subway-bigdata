@@ -331,7 +331,7 @@ function change()
     $.ajax({
         type: "POST",
         url: '/history/area/inout_flow',
-        data: value,
+        data: JSON.stringify({date: value, index: areanum}),
         dataType: 'json',
         success: function (param) {
             setAreaInoutChart(param[0], param[1], param[2]);
@@ -360,6 +360,26 @@ for(var i=0;i<area.length;i++)
         area[areanum-1].style.backgroundColor = '#fff';
         areanum = this.dataset.index;
         this.style.backgroundColor = '#37A2DA';
+
+        inoutChart = echarts.init(document.getElementById('area_inout'));
+
+        $.ajax({
+            type: "POST",
+            url: '/history/area/inout_flow',
+            data: JSON.stringify({date: n_date, index: areanum}),
+            dataType: 'json',
+            success: function (param) {
+                setAreaInoutChart(param[0], param[1], param[2]);
+                inoutOption.title = {
+                    text: '线路流量占比',
+                    left: 'center',
+                    textStyle: {
+                        fontWeight: 400
+                    }
+                };
+                inoutChart.setOption(inoutOption);
+            }
+        });
     })
 }
 
@@ -1087,7 +1107,7 @@ function setAreaInoutChart(staList, inFlow, outFlow){
         let hours = hoursList[i];
         inoutOption.options.push({
             title:{
-                text: hours + "时间段点入点出流量分布",
+                text: hours + "时间段区域入站出站流量分布",
             },
             series:[
                 {
