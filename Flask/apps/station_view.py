@@ -101,7 +101,7 @@ def sta_curr_day_eval():
 
     score_list = np.array(score_list)
     _range = np.max(score_list) - np.min(score_list)
-    res = (score_list - np.min(score_list)) / _range
+    res = 1 - (score_list - np.min(score_list)) / _range
 
     return jsonify({'score': int(res[index] * 100)})
 

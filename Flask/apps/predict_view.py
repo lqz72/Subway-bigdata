@@ -44,9 +44,9 @@ def pred_day_eval():
 
     eval_value = SQLOS.get_eval_factor(date)
     weight = [0.016745, 0.249164, 0.247595, 0.276281, 0.210215]
-    result =  100 * sum(list(map(lambda x, y: x * y, eval_value, weight)))
+    result =  1 - sum(list(map(lambda x, y: x * y, eval_value, weight)))
 
-    return jsonify({'eval': int(result)}) 
+    return jsonify({'eval': int(result * 100)}) 
 
 @predict_bp.route('/section_flow', methods=['POST', 'GET'])
 def pred_section_flow():
