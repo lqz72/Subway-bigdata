@@ -1114,15 +1114,20 @@ class DataApi(object):
             T = 3
         x = []
         y = []
+        line_num = 2 * line_num-1
         temp = -math.pi / 2
-        interval = 2 * math.pi / line_num
+        interval = 2 * math.pi / (line_num - 1)
         for i in range(0, line_num + 1):
             x.append(temp)
             temp += interval
         for i in range(0, len(x)):
-            y.append(math.sin(x[i]))
+            if i != (len(x)-1)/2 :
+                y.append(math.sin(x[i]))
+            else:
+                y.append(1)
         flag = 0
         for i in range(1, len(x) - 1):
+            pre = y[i]
             if flag == 0:
                 flag = 1
                 if y[i] != 1:
@@ -1140,6 +1145,8 @@ class DataApi(object):
                             y[i] += random.uniform(0, j)
                     elif y[i - 1] < y[i] and y[i] > y[i + 1]:
                         y[i] += random.uniform(0, 0.3)
+                    if y[i] >= 1 or y[i] <= -1:
+                        y[i] = pre
             else:
                 flag = 0
                 if y[i] != 1:
@@ -1157,6 +1164,8 @@ class DataApi(object):
                         j = min(y[i] - y[i - 1], y[i] - y[i + 1]) - 0.1
                         if j > 0.1:
                             y[i] -= random.uniform(0, j)
+                    if y[i] >= 1 or y[i] <= -1:
+                        y[i] = pre
         xreal = [0]
         if 0 <= sta_flow < 5:
             for i in range(1, line_num + 1):
@@ -1193,7 +1202,7 @@ class DataApi(object):
 
 if __name__ == '__main__':
     api = DataApi()
-    res = api.get_his_train_run('2020-07-01', 'Sta99', 8)
+    res = api.get_his_subway_run('2020-07-01', 'Sta99', 8)
 
     # temp, xaxis, yaxis = res[0], res[1], res[2]
     # axis_pair = [(xaxis, yaxis)]

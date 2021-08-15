@@ -81,6 +81,19 @@ function change_data()
         success: function (data) {
             markpreOption.series[0].data[0].value = data['eval'];
             markgraph.setOption(markpreOption);
+            
+            let measure_list = [];
+            if(data['eval'] > 50){  //小客流
+                measure_list =  makeRandomArr(lowLevelMeasures, 4);
+            }
+            else{  //大客流
+                measure_list =  makeRandomArr(highLevelMeasures, 4);
+            }
+
+            var measure = $("#measure li");
+            for(let i = 0; i < measure.length; i++){
+                measure[i].innerHTML = measure_list[i];
+            }
         }
     });
 
@@ -291,26 +304,17 @@ function inout_s()
 
             if(data_b['graphtaggle'] == 0){
                 var hourFlowData = getHourFlowData(result, stations);
-                graphOption = setGraphOptions(graphOption, hourFlowData);
-                graphOption.title = {
-                    text: '用户出行轨迹',
-                    left: 'left',
-                    textStyle: {
-                        fontWeight: 400
-                    }
-                };
+                if(parseInt(data_b['inout_s']) == 0){
+                    graphOption = setGraphOptions(graphOption, hourFlowData, "入站");
+                }
+                else{
+                    graphOption = setGraphOptions(graphOption, hourFlowData, "出站");
+                }
                 graphChart.setOption(graphOption);
             }
             else{
                 var sectionFlowData = getSectionGraphData(stations, links, result);
                 sectionGraphOption = setSectionGraphOptions(sectionGraphOption, sectionFlowData);
-                sectionGraphOption.title = {
-                    text: '用户出行轨迹',
-                    left: 'left',
-                    textStyle: {
-                        fontWeight: 400
-                    }
-                };
                 graphChart.setOption(sectionGraphOption);
             }
             
@@ -650,7 +654,7 @@ function timelist() {
 }
 
 //配置图表属性
-function setGraphOptions(option, hourFlowData, type = "出站") {
+function setGraphOptions(option, hourFlowData, type) {
     option.options = [];
     for (let i = 0; i <= 15; i++){ 
         option.options.push({
@@ -782,6 +786,22 @@ var sectionGraphOption = {
             return label;
         }
     },
+    visualMap: {
+        min: 0,
+        max: 300,
+        calculable: true,
+        text: ['High', 'Low'],
+        inRange: {
+            color: ['#23c768', '#FDD56A', '#fe0000']
+
+        },
+        padding: 5,
+        right: "5%",
+        bottom: "20%",
+        textStyle: {
+            color: '#808A87'
+        }
+    },
     // legend: legend,
     series: [
         // 用关系图实现地铁地图
@@ -821,7 +841,7 @@ var sectionGraphOption = {
 //配置图表属性
 function setSectionGraphOptions(option, sectionFlowData) {
     option.options = [];
-    var text_list = ['7:00-10:00时间段', '16:00-17:00时间段'];
+    var text_list = ['7:00-10:00时', '16:00-19:00时'];
     for (let i = 0; i <= 1; i++){ 
         option.options.push({
             title: {
@@ -1141,3 +1161,39 @@ option_hourline = {
         }
     ]
 };
+
+
+var lowLevelMeasures = [
+    "采取出入口人员提醒、广播疏导客流、警示牌及警戒线导流等现场疏散措施。",
+    "视情况对客流进行限量进入。",
+    "开启部分备用通道，疏散客流。",
+    "加派安全员现场疏导客流和维护秩序。",
+    "加强对站台乘客候车动态及站台屏蔽门工作状态的监控"
+];
+
+var highLevelMeasures = [
+    "车站应立即组织力量，在事件初期迅速出动，准确施救，控制事态，减少损失。",
+    "车站做好临时导向标志、告示牌、临时售票亭等客运设施的准备、设置工作。",
+    "紧急情况下各站出入口开、关，各站根据各自的客流特点安排。",
+    "接到车站突发大客流报告后，行车调度应对该站进行重点监控，根据实际情况适当延长列车在该站的停站时间，尽快疏运车站客流。",
+    "调度部应根据实际情况及时组织备用车上线投入运营，缓解车站客流压力。",
+    "客流较多，造成列车在多个车站连续出现延长停站时间的情况时，行车调度根据现场实际情况及时对行车进行调整，减少对乘客的影响。",
+    "遇突发大客流，必要时指挥机构总指挥有权下达临时封站命令。"
+];
+
+//从数组中随机选择num个元素
+function makeRandomArr(arrList, num){
+    if(num > arrList.length){
+       return;
+    }
+    
+    var tempArr = arrList.slice(0);
+    var newArrList = [];    
+    for(var i = 0; i < num; i++){
+        var random = Math.floor(Math.random() * (tempArr.length - 1));
+        var arr = tempArr[random];
+        tempArr.splice(random, 1);
+        newArrList.push(arr);    
+    }
+    return newArrList;
+}

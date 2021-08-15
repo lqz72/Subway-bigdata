@@ -727,15 +727,20 @@ class PredictApi(object):
             T = 3
         x = []
         y = []
+        line_num = 2 * line_num-1
         temp = -math.pi / 2
-        interval = 2 * math.pi / line_num
-        for i in range(0, line_num + 1):
+        interval = 2 * math.pi / (line_num - 1)
+        for i in range(0, line_num):
             x.append(temp)
             temp += interval
         for i in range(0, len(x)):
-            y.append(math.sin(x[i]))
+            if i != (len(x)-1)/2 :
+                y.append(math.sin(x[i]))
+            else:
+                y.append(1)
         flag = 0
         for i in range(1, len(x) - 1):
+            pre = y[i]
             if flag == 0:
                 flag = 1
                 if y[i] != 1:
@@ -753,6 +758,8 @@ class PredictApi(object):
                             y[i] += random.uniform(0, j)
                     elif y[i - 1] < y[i] and y[i] > y[i + 1]:
                         y[i] += random.uniform(0, 0.3)
+                    if y[i] >= 1 or y[i] <= -1:
+                        y[i] = pre
             else:
                 flag = 0
                 if y[i] != 1:
@@ -770,6 +777,8 @@ class PredictApi(object):
                         j = min(y[i] - y[i - 1], y[i] - y[i + 1]) - 0.1
                         if j > 0.1:
                             y[i] -= random.uniform(0, j)
+                    if y[i] >= 1 or y[i] <= -1:
+                        y[i] = pre
         xreal = [0]
         if 0 <= sta_flow < 5:
             for i in range(1, line_num + 1):
@@ -791,7 +800,7 @@ class PredictApi(object):
 
 if __name__ == '__main__':
     pred_api = PredictApi()
-    print(pred_api.get_pre_train_run('2020-07-21', 'Sta1', 11))
+    pred_api.get_pre_subway_run('2020-01-03','Sta1',11)
     # res = pred_api.get_day_sta_flow('2020-07-21')
     # print(res)
     # ml = MLPredictor()

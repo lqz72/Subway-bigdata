@@ -253,17 +253,23 @@ var categories = lineNames.map(lineName => { return { name: lineName } });
 
 var linesOption = {
     title : {
-        text: '用户出行轨迹',
-        left: 'left',
+        text: '用户出行轨迹图',
+        left: 'center',
         textStyle: {
             fontWeight: 400
         }
     },
     backgroundColor: '#fff',
     coordinateSystem: "cartesian2d", //使用二维的直角坐标系（也称笛卡尔坐标系）
+    grid: {
+        left: '5%',
+        right: '8%',
+        bottom: '3%',
+        top: '3%'
+    },
     xAxis: {
         show: false,
-        min: 50,
+        min: 0,
         max: 2300,
         axisPointer: {
             show: true
@@ -272,7 +278,7 @@ var linesOption = {
     yAxis: {
         show: false,
         min: 0,
-        max: 2000,
+        max: 2100,
         axisPointer: {
             show: true
         },
@@ -315,9 +321,9 @@ var linesOption = {
             },
             lineStyle: {
                 normal: {
-                    opacity: 0.6, //线条透明度
+                    opacity: 0.2, //线条透明度
                     curveness: 0, //站点间连线曲度，0表示直线
-                    width: 5, //线条宽度
+                    width: 6, //线条宽度
                 }
             }
         },
@@ -342,8 +348,8 @@ var linesOption = {
             },
             lineStyle: {
                 normal: {
-                    width: 1, //尾迹线条宽度
-                    opacity: 1, //尾迹线条透明度
+                    width: .8, //尾迹线条宽度
+                    opacity: .6, //尾迹线条透明度
                     curveness: .3 //尾迹线条曲直度
                 }
             },
