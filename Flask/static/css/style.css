@@ -188,8 +188,8 @@
     font-family: 'iconfont';
 }
 .maininfo .wea .weawords {
-    margin-top: 50px;
-    font-size: 25px;
+    margin-top: 27px;
+    font-size: 20px;
     text-align: center;
 }
 
@@ -495,7 +495,7 @@
     float: left;
     flex:4;
     width: 650px;
-    height: 710px;
+    height: 670px;
     margin-top:10px;
     margin-left: 20px;
     margin-right: 10px;
@@ -506,7 +506,7 @@
     float: left;
     /* flex:1; */
     width: 248px;
-    height: 710px;
+    height: 670px;
     margin-top: 10px;
     margin-right: 30px;
     background-color: #ffffff;
@@ -526,8 +526,8 @@
 
 .leaderboard table tr th {
     font-weight: normal;
-    height: 29px;
-    line-height: 29px;
+    height: 28px;
+    line-height: 28px;
     border-bottom: 2px solid #E9E9E9;
     border-top: 2px solid #E9E9E9;
 }
@@ -536,8 +536,8 @@
 }
 
 .leaderboard table tr td {
-    height: 24px;
-    line-height: 24px;
+    height: 23px;
+    line-height: 23px;
     font-size: 12px;
     border-bottom: 2px solid #E9E9E9;
 }

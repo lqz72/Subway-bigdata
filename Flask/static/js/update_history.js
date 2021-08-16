@@ -216,6 +216,7 @@ function change()
         url: "/history/line/pie",
         dataType: 'json',
         success: function (result) {
+            console.log(result);
             result.title = {
                 text: '线路流量占比',
                 left: 'center',
@@ -223,6 +224,7 @@ function change()
                     fontWeight: 400
                 }
             };
+            result.color = ['#63b2ee', '#76da91' ,'#f8cb7f' , '#f89588' , '#7cd6cf' , '#9192ab' , '#7898e1' , '#efa666'];
             line_pie.setOption(result);
         }
     });
@@ -286,7 +288,7 @@ function change()
 
             setBarOption(barOption, uplineFlow, downlineFlow, splitNames);
             barOption.title = {
-                text: '线路流量占比',
+                text: '地铁线路断面客流',
                 left: 'center',
                 textStyle: {
                     fontWeight: 400
@@ -315,12 +317,13 @@ function change()
             
             setODOption(ODOption, ODstations, ODLinks);
             ODOption.title = {
-                text: '线路流量占比',
+                text: '地铁站点OD关系图',
                 left: 'center',
                 textStyle: {
                     fontWeight: 400
                 }
             };
+            ODOption.color = ['#63b2ee', '#76da91' ,'#f8cb7f' , '#f89588' , '#7cd6cf' , '#9192ab' , '#7898e1' , '#efa666'];
             ODChart.setOption(ODOption);
         }
     });
