@@ -131,7 +131,10 @@ $.ajax({
     async: true,
     dataType: 'json',
     success: function (result) {
-        result.color =  ['#006cff', '#60cda0', '#ed8884', '#ff9f7f', '#0096ff', '#9fe6b8', '#32c5e9', '#1d9dff'];
+        // result.color =  ['#95a2ff' , '#fa8080' , '#ffc076' , '#fae768' , '#87e885' , '#3cb9fc' , '#73abf5' , '#cb9bff' , '#434348' , '#90ed7d' , '#f7a35c' , '#8085e9'];
+        // result.color =  ['#006cff', '#60cda0', '#ed8884', '#ff9f7f', '#0096ff', '#9fe6b8', '#32c5e9', '#1d9dff'];
+        // result.color =  ['#5b9bd5' , '#ed7d31' , '#70ad47' , '#ffc000' , '#4472c4' , '#91d024' , '#b235e6' , '#02ae75'];
+        result.color = ['#fa8080','#63b2ee', '#76da91' ,'#f8cb7f' , '#f89588' , '#7cd6cf' , '#9192ab' , '#7898e1' , '#efa666'];
         result.title = {
             text: '用户年龄结构分布',
             left: 'center',

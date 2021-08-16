@@ -195,6 +195,7 @@ function change_data()
                     fontWeight: 400
                 }
             };
+            option.color = ['#63b2ee', '#76da91' ,'#f8cb7f' , '#f89588' , '#7cd6cf' , '#9192ab' , '#7898e1' , '#efa666'];
             linePie.setOption(option);
         }
     })
@@ -222,6 +223,21 @@ function change_data()
         data: s_data,
         dataType: 'json',
         success: function (option) {
+            option.color = [  '#FF917C'];
+            option.series[0].lineStyle.color = '#56A3F1';
+            // option.series[0].data[0].areaStyle = {
+            //     color: new echarts.graphic.RadialGradient(0.1, 0.6, 1, [
+            //         {
+            //             color: 'rgba(255, 145, 124, 0.1)',
+            //             offset: 0
+            //         },
+            //         {
+            //             color: 'rgba(255, 145, 124, 0.9)',
+            //             offset: 1
+            //         }
+            //     ])
+            // };
+            console.log(option);
             evalRadar.setOption(option);
         }
     })
