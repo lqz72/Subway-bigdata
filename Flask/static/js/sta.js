@@ -295,7 +295,8 @@ function change_data()
         dataType: 'json',
         success: function (result) {
             data = result[0];
-            console.log(data);
+            // console.log(data);
+            option_subwayline.series = [];
             for(var level=0;level<data.length;level++)
             {
                 var eachseries = {
@@ -312,7 +313,7 @@ function change_data()
                     item.push(data[level][1][i] + 1);
                     tmp.push(item);
                 }
-                console.log(tmp);
+                // console.log(tmp);
                 eachseries.data = tmp;
                 option_subwayline.series.push(eachseries);
             }
@@ -1077,7 +1078,7 @@ var aixin_bar_opts = {
 
     /*模态框显示*/
     modalBox.show = function() {
-        console.log(this.modal);
+        // console.log(this.modal);
         this.modal.style.display = "block";
         adtype_pie.resize();
     }
@@ -1126,7 +1127,7 @@ var aixin_bar_opts = {
 
     /*模态框显示*/
     modalBox.show = function() {
-        console.log(this.modal);
+        // console.log(this.modal);
         this.modal.style.display = "block";
         subway_line.resize();
     }

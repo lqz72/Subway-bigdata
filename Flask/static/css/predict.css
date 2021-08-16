@@ -379,7 +379,7 @@
     width: 280px; */
     flex:1;
     height: 280px;
-    margin-right: 20px;
+    margin-right: 10px;
 }
 .markpre  .words {
     position: absolute;
@@ -398,25 +398,26 @@
     width: 290px; */
     flex:1;
     height: 280px;
-    padding-right: 40px;
-    padding-top: 15px;
+    padding-right: 25px;
+    padding-top: 5px;
     padding-left: 10px;
 }
 .markpre .description ul li {
     position: relative;
-    height: 50px;
+    height: 67px;
+    line-height: 20px;
 }
 .markpre .description ul li:nth-child(2) {
-    line-height: 50px;
+    line-height: 20px;
 }
 .markpre .description ul li:nth-child(3) {
-    line-height: 50px;
+    line-height: 20px;
 }
 .markpre .description ul li:nth-child(4) {
-    line-height: 50px;
+    line-height: 20px;
 }
 .markpre .description ul li:nth-child(5) {
-    line-height: 50px;
+    line-height: 20px;
 }
 
 .markpre .description ul li::before {
@@ -426,23 +427,23 @@
     font-size: 30px;
     color: #06c478;
     font-family: 'iconfont';
-    line-height: 57px;
+    line-height: 20px;
 }
 .markpre .description ul li:nth-child(1)::before {
-    line-height: 50px;
+    /* line-height: 50px; */
 }
 .markpre .description ul li:nth-child(2)::before {
     
 }
 .markpre .description ul li:nth-child(3)::before {
-    color: #93251c;
+    color: #ff7e02;
     
 }
 .markpre .description ul li:nth-child(4)::before {
-    color: #ff7e02;
+    color: #93251c;
 }
 .markpre .description ul li:nth-child(5)::before {
-    line-height: 50px;
+    /* line-height: 50px; */
 }
 
 .markpre .graph2 {
