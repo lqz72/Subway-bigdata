@@ -48,6 +48,24 @@ def pred_day_eval():
 
     return jsonify({'eval': int(result * 100)}) 
 
+@predict_bp.route('/day_eval_factor', methods=['POST', 'GET'])
+def pred_day_eval_factor():
+    param_str = request.get_data().decode('utf-8')
+    param_dict = json.loads(param_str)
+    date = param_dict['c_date']
+
+    date = pred_api.time_map(date)
+
+    factor_value = SQLOS.get_eval_factor(date)
+    mean_factor_value = [0.46, 0.51, 0.56, 0.61, 0.70]
+    factor_name = ["高峰时间占比", "客流不均衡系数", "客流拥堵指数", "高峰拥堵指数", "线网满载率"]
+
+    return jsonify({
+        "value": factor_value,
+        "mean_value": mean_factor_value,
+        "name": factor_name
+        })
+
 @predict_bp.route('/section_flow', methods=['POST', 'GET'])
 def pred_section_flow():
     param_str = request.get_data().decode('utf-8')
