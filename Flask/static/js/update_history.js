@@ -233,7 +233,7 @@ function change()
     graphChart = echarts.init(document.getElementById('line_graph'));
 
     graphChart.on('click', function (param) {
-        var reg = /Sta[1-9][0-9][0-9]/;
+        var reg = /Sta[1-9][0-9]?/;
         if(reg.test(param.data.name)){
             location.href = '/station/' + param.data.name;
         }

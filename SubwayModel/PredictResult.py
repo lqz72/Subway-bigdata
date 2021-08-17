@@ -710,7 +710,7 @@ class PredictApi(object):
         """
         sta_dict = SQLOS.get_station_dict()
         line = sta_dict[station]
-        sta_num = {'1号线': 19, '2号线': 23, '3号线': 39, '4号线': 7, '5号线': 8, '10号线': 19, '11号线': 31, '12号线': 17}
+        sta_num = {'1号线': 22, '2号线': 24, '3号线': 46, '4号线': 8, '5号线': 10, '10号线': 22, '11号线': 31, '12号线': 18}
         line_num = sta_num[line]
         all_flow = self.get_sta_hour_flow(date, 'all')
         sta_hour_flow = all_flow[station]
