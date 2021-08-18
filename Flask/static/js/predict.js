@@ -58,6 +58,7 @@ data_b['choose_temp'] = 28;
 data_b['c_date'] = "2020-07-17";
 data_b['inout_s'] = 0;
 data_b['graphtaggle'] = 0; //切换进出/断面,0表示进出
+data_b['is_change'] = 0;
 
 var alg; //选择的算法
 var choose_wea; //选择的天气
@@ -65,13 +66,19 @@ var choose_temp; //选择的温度
 var flag = 0;//表示未选择温度,用于解决之前的bug
 
 //向后端传取数据代码写这儿,对象时s_data 为一个字符串（对象转化而来）
-function change_data()
+function change_data(is_change=0)
 {
+    //预测因子是否改变
+    if(is_change == 1) 
+        data_b['is_change'] = 1;
+    else
+        data_b['is_change'] = 0;
+
     //改变推荐算法
     introalg = document.querySelector('#introalg');
-    if(data_b['c_date']<"2020-07-24") introalg.innerHTML = 'Xgboost';
+    if(data_b['c_date']<"2020-07-24") introalg.innerHTML = 'XGBoost';
     else if(data_b['c_date']<"2020-08-17") introalg.innerHTML = 'SARIMA';
-    else introalg.innerHTML = '指数平滑';
+    else introalg.innerHTML = 'XGBoost';
 
 
     //转换成字符串的对象
@@ -357,7 +364,7 @@ apply.addEventListener('click',function(){
     data_b['choose_wea'] = choose_wea;
     data_b['choose_temp'] = choose_temp;
     
-    change_data();
+    change_data(is_change=1);
     flag = 1;
 })
 //获取select值

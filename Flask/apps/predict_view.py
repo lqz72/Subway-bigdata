@@ -26,11 +26,9 @@ def pred_in_out_hour_flow():
 def pred_day_info():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
-
     date = param_dict['c_date']
-    alg = int(param_dict.get('alg', 1))
 
-    day_info = pred_api.get_day_flow_info(date, alg)
+    day_info = pred_api.get_day_flow_info(date, **param_dict)
 
     return jsonify(day_info)
 
@@ -114,11 +112,9 @@ def pred_month_line():
 def pred_week_line():
     param_str = request.get_data().decode('utf-8')
     param_dict = json.loads(param_str)
-    
     curr_date = param_dict['c_date']
-    alg = int(param_dict.get('alg', 0))
 
-    week_dict = pred_api.get_curr_week_flow(curr_date, alg)
+    week_dict = pred_api.get_curr_week_flow(curr_date, **param_dict)
     line = ChartApi.pred_week_line(week_dict)
 
     return line.dump_options_with_quotes()

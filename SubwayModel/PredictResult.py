@@ -174,9 +174,11 @@ class PredictApi(object):
         date = param.get('c_date', '2020-07-17')
         weather = self.weather_list[int(param.get('choose_wea', 2)) - 1]
         temp = int(param.get('choose_temp', 28))
+        is_change = int(param.get('is_change', 0))
 
         if alg == 1:
-            self.change_pred_result(self.pred_day_df, alg=alg, date=date, weather=weather, temp=temp)
+            if is_change:
+                self.change_pred_result(self.pred_day_df, alg=alg, date=date, weather=weather, temp=temp)
 
             predict_df = self.pred_day_df.copy()
 
@@ -192,13 +194,23 @@ class PredictApi(object):
 
         return dict(zip(day, flow))
 
-    def get_curr_week_flow(self, date, alg):
+    def get_curr_week_flow(self, date, **param):
         """
         获取当前周的客流变化 
         返回一个字典 格式: {day:flow,}
         """
+        alg = int(param.get('alg', 1))
+        date = param.get('c_date', '2020-07-17')
+        weather = self.weather_list[int(param.get('choose_wea', 2)) - 1]
+        temp = int(param.get('choose_temp', 28))
+        is_change = int(param.get('is_change', 0))
+
         if alg == 1:
+            if is_change:
+                self.change_pred_result(self.pred_day_df, alg=alg, date=date, weather=weather, temp=temp)
+
             predict_df = self.pred_day_df.copy()
+
         elif alg == 2:
             predict_df = self.pred_arima_day_df.copy()
         else:
@@ -223,16 +235,26 @@ class PredictApi(object):
 
         return dict(zip(day, flow))
 
-    def get_day_flow_info(self, date, alg):
+    def get_day_flow_info(self, date, **param):
         """
         获取日客流信息
         """
+        alg = int(param.get('alg', 1))
+        date = param.get('c_date', '2020-07-17')
+        weather = self.weather_list[int(param.get('choose_wea', 2)) - 1]
+        temp = int(param.get('choose_temp', 28))
+        is_change = int(param.get('is_change', 0))
+
         if alg == 1:
+            if is_change:
+                self.change_pred_result(self.pred_day_df, alg=alg, date=date, weather=weather, temp=temp)
+
             predict_df = self.pred_day_df.copy()
+            
         elif alg == 2:
             predict_df = self.pred_arima_day_df.copy()
         else:
-            predict_df = self.pre_holtwinters_day_df.copy()
+            predict_df = self.pred_holtwinters_day_df.copy()
 
         std_date = pd.to_datetime(date)
         one_day = datetime.timedelta(days=1)
@@ -416,6 +438,8 @@ class PredictApi(object):
         default_weather = day_df.weather.values[0]
         default_temp = day_df.mean_temp.values[0]
 
+        print(weather, default_weather)
+        print(temp, int(default_temp))
         if (weather != default_weather or temp != int(default_temp)):
             """
             此时需要根据数据重新拟合 适用xgboost
