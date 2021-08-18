@@ -15,11 +15,11 @@
     src: url(../fonts/DS-DIGIT.TTF);
 }
 
-  @font-face {
+@font-face {
     font-family: 'iconfont';  /* Project id 2411818 */
-    src: url('http://at.alicdn.com/t/font_2411818_c3tt5lb8o3b.woff2?t=1627102739236') format('woff2'),
-         url('http://at.alicdn.com/t/font_2411818_c3tt5lb8o3b.woff?t=1627102739236') format('woff'),
-         url('http://at.alicdn.com/t/font_2411818_c3tt5lb8o3b.ttf?t=1627102739236') format('truetype');
+    src: url('http://at.alicdn.com/t/font_2411818_09m0uidv6s2v.woff2?t=1629165455646') format('woff2'),
+         url('http://at.alicdn.com/t/font_2411818_09m0uidv6s2v.woff?t=1629165455646') format('woff'),
+         url('http://at.alicdn.com/t/font_2411818_09m0uidv6s2v.ttf?t=1629165455646') format('truetype');
   }
 
 /* @font-face {

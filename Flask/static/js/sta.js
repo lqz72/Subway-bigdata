@@ -216,9 +216,11 @@ function change_data()
         async: true,
         dataType: 'json',
         success: function (result) {
-            // schedule_line.setOption(result);
+            //schedule_line.setOption(result);
+            console.log(result);
             option_scheline.xAxis.data = result.xAxis.data;
             option_scheline.series[0].data = result.series[0].data;
+            // option_scheline.series[1].data = result.series[1].data;
             schedule_line.setOption(option_scheline);
         }
     })
@@ -287,15 +289,21 @@ function change_data()
 
     //列车运行图
     subway_line = echarts.init(document.querySelector("#subwaygraph"));
+    changehour(6);
+}
+
+function changehour(val)
+{
     $.ajax({
         type: 'POST',
         url: '/sta/curr_day/run_info',
-        data:  JSON.stringify({date: c_date, sta: c_staname}),
+        data:  JSON.stringify({date: c_date, sta: c_staname,hour:val}),
         async: true,
         dataType: 'json',
         success: function (result) {
             data = result[0];
-            // console.log(data);
+            stas = result[1];
+            console.log(result);
             option_subwayline.series = [];
             for(var level=0;level<data.length;level++)
             {
@@ -317,12 +325,24 @@ function change_data()
                 eachseries.data = tmp;
                 option_subwayline.series.push(eachseries);
             }
-            console.log(option_subwayline);
+            //console.log(option_subwayline);
+            var tag = 2.0/(stas.length-1);
+            option_subwayline.yAxis.interval = tag;
+            // console.log(option_subwayline.yAxis.splitNumber)
+            
+            option_subwayline.yAxis.axisLabel  = {
+                formatter: function (value,index) {
+                    var texts;
+                    var myindex = Math.round(value/tag);
+                    // var myindex = parseInt(value/tag);
+                    // console.log(index)
+                    return stas[myindex];
+                }
+            }
             subway_line.setOption(option_subwayline);
         }
     })
 }
-
 
 layui.use('laydate', function(){
     var laydate = layui.laydate;
@@ -379,7 +399,7 @@ option_scheline = {
         name: '时',
         data: [],
         axisLine: {
-            show:true,
+            show:false,
             symbol:['none', 'arrow'],
             symbolSize:[5,10]
         }
@@ -1130,6 +1150,11 @@ var aixin_bar_opts = {
         // console.log(this.modal);
         this.modal.style.display = "block";
         subway_line.resize();
+        layui.use('form', function(){
+            var form = layui.form;
+            
+            //各种基于事件的操作，下面会有进一步介绍
+          });
     }
 
     /*模态框关闭*/
@@ -1370,42 +1395,90 @@ option_subwayline = {
             fontWeight: 400
         }
     },
+    // color:'#7ED3F4',
     tooltip: {
-        trigger: 'axis'
+        trigger: 'none'
     },
     grid: {
         left: '2%',
-        right: '8%',
+        right: '12%',
         bottom: '3%',
         containLabel: true,
         show: true,// 显示边框
        borderColor: '#012f4a',// 边框颜色
     },
     xAxis: {
-        type: 'category',
-        boundaryGap: false,
+        type: 'value',
+        boundaryGap: true,
         axisTick: {
             show: false,
-            alignWithLabel: true
+            alignWithLabel: false
         },
-        name: '时间',
-        data: [],
-        axisLine: {
-            show:true,
-            symbol:'none'
-        }
-    },
-    yAxis: {
-        type: 'value',
-        name: '站点',
+        name: '时间(分钟)',
+        data: [10,20,30,40,50],
         axisLine: {
             show:true,
             symbol:'none'
         },
         axisLabel : {
-            formatter: function(){
-                  return "";
+            show:true
+        },
+        splitNumber : 6,
+        axisPointer: {
+            label: {
+                formatter: ''
             }
+        },
+    },
+    yAxis: {
+        type: 'value',
+        name: '站点',
+        axisLine: {
+            show:false,
+            symbol:'none'
+        },
+        axisTick: {
+            show: true,
+            alignWithLabel: true
+        },
+        axisLabel : {
+            // formatter: function(){
+            //       return "1";
+            // }
+            
+            
+            formatter: function (value) {
+                var texts;
+                if(value<=0.2){
+                texts = 'Sta1';
+                }
+                else if (value <=0.4) {
+                texts = 'Sta2';
+                }
+                else if (value<= 0.6) {
+                texts = 'Sta3';
+                }
+                else if(value<= 0.8){
+                texts = 'Sta4';
+                }
+                else if(value<= 1.0){
+                    texts = 'Sta5';
+                }
+                else if(value<= 1.2){
+                    texts = 'Sta6';
+                }
+                else{
+                texts = 'Sta7';
+                }
+                return texts;
+                
+                                    }
+        },
+        max : 2,
+        min : 0,
+        interval:0.2,
+        splitLine:{
+            show:false
         }
     },
     series: [
@@ -1446,3 +1519,38 @@ function makeRandomArr(arrList, num){
     }
     return newArrList;
 }
+
+
+layui.use('form', function(){
+  var form = layui.form;
+  
+  //各种基于事件的操作，下面会有进一步介绍
+  form.on('select', function(data){
+     //console.log(data.value); //得到被选中的值
+     changehour(parseInt(data.value));
+    // console.log(n_date);
+    //切换线路代码写这儿
+    // $.ajax({
+    //     type: 'POST',
+    //     url: '/history/split_flow/' + data.value,
+    //     async: true,
+    //     data: n_date,
+    //     datatype: 'json',
+    //     success: function (result) {
+    //         splitFlow = result;
+
+    //         uplineFlow = [];
+    //         downlineFlow = [];
+    //         splitNames = Object.keys(splitFlow);
+    //         for (let index = 0; index < splitNames.length; index++){
+    //             var split = splitFlow[splitNames[index]];
+    //             uplineFlow.push(split.up);
+    //             downlineFlow.push(split.down);
+    //         }
+
+    //         setBarOption(barOption, uplineFlow, downlineFlow, splitNames, data.value);
+    //         splitChart.setOption(barOption);
+    //     }
+    // });
+}); 
+});

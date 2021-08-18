@@ -67,6 +67,13 @@ var flag = 0;//表示未选择温度,用于解决之前的bug
 //向后端传取数据代码写这儿,对象时s_data 为一个字符串（对象转化而来）
 function change_data()
 {
+    //改变推荐算法
+    introalg = document.querySelector('#introalg');
+    if(data_b['c_date']<"2020-07-24") introalg.innerHTML = 'Xgboost';
+    else if(data_b['c_date']<"2020-08-17") introalg.innerHTML = 'SARIMA';
+    else introalg.innerHTML = '指数平滑';
+
+
     //转换成字符串的对象
     s_data = JSON.stringify(data_b);
     //评分图
@@ -1213,3 +1220,53 @@ function makeRandomArr(arrList, num){
     }
     return newArrList;
 }
+
+
+//-----------------------模态框部分代码----------------------
+(function() {
+    /*建立模态框对象*/
+    var modalBox = {};
+
+    /*获取模态框*/
+    modalBox.modal = document.getElementById("myModal");
+
+    /*获得trigger按钮*/
+    modalBox.triggerBtn = document.getElementById("triggerBtn");
+
+    /*获得关闭按钮*/
+    modalBox.closeBtn = document.getElementById("closeBtn");
+
+    /*模态框显示*/
+    modalBox.show = function() {
+        // console.log(this.modal);
+        this.modal.style.display = "block";
+    }
+
+    /*模态框关闭*/
+    modalBox.close = function() {
+        this.modal.style.display = "none";
+    }
+
+    /*当用户点击模态框内容之外的区域，模态框也会关闭*/
+    modalBox.outsideClick = function() {
+        var modal = this.modal;
+        window.onclick = function(event) {
+            if(event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+
+    /*模态框初始化*/
+    modalBox.init = function() {
+        var that = this;
+        this.triggerBtn.onclick = function() {
+            that.show();
+        }
+        this.closeBtn.onclick = function() {
+            that.close();
+        }
+        this.outsideClick();
+    }
+    modalBox.init();
+})();

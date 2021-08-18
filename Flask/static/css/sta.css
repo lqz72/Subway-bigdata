@@ -735,10 +735,25 @@ button {
 }
 .subwaygraph {
     flex:1;
+    position: relative;
     margin-left: 30px;
     margin-right: 30px;
     margin-top: 40px;
     margin-bottom: 40px;
     /* background-color: pink; */
     height: 450px;
+}
+.layui-form-item {
+    margin-bottom: 0px;
+}
+.cmb {
+    position: absolute;
+    width: 77px;
+    left: 65%;
+    top: 10%;
+}
+.layui-input-block {
+    position:absolute;
+    z-index: 9999999;
+    margin-left: 0;
 }

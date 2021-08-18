@@ -168,7 +168,7 @@
                         <div class="layui-progress-bar" lay-percent="75%" ></div>
                     </div>
                     <div class="bigimg">
-                        <img src="../static/images/otherbig_03.png" alt="">
+                        <img src="../static/images/train2.jfif" alt="">
                     </div>
                 </div>
             </div>
@@ -257,13 +257,40 @@
             </div>
             <div class="modal-body">
                 <div class="addflex">
-                    <div class="subwaygraph" id = 'subwaygraph'>
-
+                    <div class="subwaygraph layui-form" id = 'subwaygraph'>
+                        
+                    </div>
+                </div>
+                <div class="layui-form" style="height: 200px; width: 200px;">
+                    <div class="layui-form-item cmb">
+                        <!-- <label class="layui-form-label">选择线路</label> -->
+                        <div class="layui-input-block">
+                        <select name="interest" lay-filter="aihao">
+                            <option value="6">6时</option>
+                            <option value="7">7时</option>
+                            <option value="8">8时</option>
+                            <option value="9">9时</option>
+                            <option value="10">10时</option>
+                            <option value="11">11时</option>
+                            <option value="12">12时</option>
+                            <option value="13">13时</option>
+                            <option value="14">14时</option>
+                            <option value="15">15时</option>
+                            <option value="16">16时</option>
+                            <option value="17">17时</option>
+                            <option value="18">18时</option>
+                            <option value="19">19时</option>
+                            <option value="20">20时</option>
+                            <option value="21">21时</option>
+                            <option value="22">22时</option>
+                        </select>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     
     
     <script src="{{ url_for('static',filename ='layui/layui.js') }}"></script>
